@@ -55,8 +55,6 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            sudo systemctl start docker || true
-            sudo systemctl status docker
             sudo docker compose down || true
             sudo docker image prune -af || true
             sudo docker pull genqserve/citilyst-frontend:latest
