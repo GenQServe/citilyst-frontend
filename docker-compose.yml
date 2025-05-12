@@ -1,6 +1,6 @@
 services:
   citilyst-frontend:
-    container_name: citilyst-frontend-prod
+    container_name: citilyst-fe-prod
     image: genqserve/citilyst-frontend:latest
     ports:
       - "3000:3000"
