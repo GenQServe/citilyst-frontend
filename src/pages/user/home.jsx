@@ -7,6 +7,7 @@ import Hero from "@/components/home-user/hero";
 import CallToAction from "@/components/home-user/call-to-action";
 import FeaturesHighlight from "@/components/home-user/features-highlight";
 import FeedbackCarousel from "@/components/feedback/feedback-carousel";
+import FAQ from "@/components/home-user/faq";
 
 const Home = () => {
   const heroRef = useRef(null);
@@ -28,6 +29,7 @@ const Home = () => {
       <HowWorks />
       <FeaturesHighlight />
       <FeedbackCarousel />
+      <FAQ />
       <CallToAction />
     </div>
   );
