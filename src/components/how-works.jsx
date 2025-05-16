@@ -113,7 +113,7 @@ const HowWorks = () => {
     >
       <div className="container mx-auto px-5 md:px-8 lg:px-10 xl:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
-          <div className="px-4 md:px-6 lg:px-8 text-justify lg:text-left text-center">
+          <div className="px-4 md:px-6 lg:px-8 text-center lg:text-left">
             <h2
               ref={titleRef}
               className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
@@ -121,7 +121,7 @@ const HowWorks = () => {
               Cara Kerja CityList
             </h2>
 
-            <h3 className="text-xl md:text-2xl font-medium mb-8 text-justify">
+            <h3 className="text-xl md:text-2xl font-medium mb-8 text-center lg:text-left">
               Hanya dengan{" "}
               <span className="text-[#4E9F60]">5 langkah mudah</span>:
             </h3>
