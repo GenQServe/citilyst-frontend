@@ -35,27 +35,33 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
     needs: [build_and_push]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: copy file via ssh key
+      - name: Create .env file
+        run: |
+          cat > .env << EOF
+          VITE_API_URL=${{ secrets.VITE_API_URL }}
+          VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}
+          EOF
+      - name: Copy files to server
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          source: "docker-compose.yml"
-          target: .
-      - name: run docker-compose
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "docker-compose.yml,.env"
+          target: "./"
+      - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             docker compose down || true
             docker image prune -af || true
-            docker pull genqserve/citilyst-frontend:latest
+            docker compose pull
             docker compose up -d
+            docker compose ps

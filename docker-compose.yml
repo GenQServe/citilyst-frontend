@@ -4,6 +4,6 @@ services:
     image: genqserve/citilyst-frontend:latest
     ports:
       - "3000:3000"
-    environment:
-      - VITE_API_URL=${VITE_API_URL:-https://api.citilyst.rekrutgenai.com/v1}
+    env_file:
+      - .env
     restart: unless-stopped
