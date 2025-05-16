@@ -33,25 +33,22 @@ jobs:
           push: true
           tags: genqserve/citilyst-frontend:latest
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_API_URL=${{ secrets.VITE_API_URL }}
+            VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}
   deploy:
     runs-on: ubuntu-latest
     needs: [build_and_push]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Create .env file
-        run: |
-          cat > .env << EOF
-          VITE_API_URL=${{ secrets.VITE_API_URL }}
-          VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}
-          EOF
-      - name: Copy files to server
+      - name: Copy docker-compose.yml to server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          source: "docker-compose.yml,.env"
+          source: "docker-compose.yml"
           target: "./"
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.0
