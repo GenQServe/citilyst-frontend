@@ -4,8 +4,8 @@ import useGSAP from "@/hooks/use-gsap";
 import WhyChoose from "@/components/why-choose";
 import HowWorks from "@/components/how-works";
 import Hero from "@/components/hero";
-import CallToAction from "@/components/CallToAction";
-import FeaturesHighlight from "@/components/FeaturesHighlight ";
+import CallToAction from "@/components/call-to-action";
+import FeaturesHighlight from "@/components/features-highlight";
 import FeedbackCarousel from "@/components/feedback/feedback-carousel";
 
 const Home = () => {
