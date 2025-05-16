@@ -12,6 +12,12 @@ import {
 } from "@/components/ui/navigation-menu";
 
 import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+} from "@/components/ui/dropdown-menu";
+
+import {
   Menu,
   LayoutGrid,
 } from "lucide-react";
@@ -148,25 +154,28 @@ const FloatingNavbar = () => {
         <div className="hidden md:flex items-center gap-4">
           <Button 
             size="sm" 
-            className="rounded-full bg-[#9DB17C] text-black hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
+            className="rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
           >
             Masuk
           </Button>
         </div>
 
         <div className="md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full text-black hover:bg-[#9DB17C] focus:bg-[#9DB17C]">
                 <Menu />
               </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="bg-[#9CDE9F] border-none w-[85vw] max-w-[300px] overflow-y-auto pt-10 px-5">
-              <div className="flex flex-col gap-6 mt-16">
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="end" 
+              className="bg-[#9CDE9F] border-none w-[100vw] mt-2 p-4 shadow-lg rounded-xl"
+            >
+              <div className="flex flex-col gap-4">
                 <Link
                   to="/home"
                   className={cn(
-                    "text-xl transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                    "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
                     isActiveLink("/home") && "bg-[#9DB17C] rounded-md px-3 py-2"
                   )}
                 >
@@ -175,7 +184,7 @@ const FloatingNavbar = () => {
                 <Link
                   to="/user"
                   className={cn(
-                    "text-xl transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                    "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
                     isActiveLink("/user") && "bg-[#9DB17C] rounded-md px-3 py-2"
                   )}
                 >
@@ -184,20 +193,20 @@ const FloatingNavbar = () => {
                 <Link
                   to="/walikota"
                   className={cn(
-                    "text-xl transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                    "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
                     isActiveLink("/walikota") && "bg-[#9DB17C] rounded-md px-3 py-2"
                   )}
                 >
                   Cek Status
                 </Link>
-                <div className="flex items-center gap-4 mt-6">
-                  <Button size="sm" className="w-full rounded-full bg-[#9DB17C] text-black hover:bg-[#8CA06B]">
+                <div className="pt-2 mt-2 border-t border-[#8CA06B]/30">
+                  <Button size="sm" className="w-full rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B]">
                     Masuk
                   </Button>
                 </div>
               </div>
-            </SheetContent>
-          </Sheet>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
       </div>
