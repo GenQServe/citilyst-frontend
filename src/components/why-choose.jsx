@@ -75,26 +75,26 @@ const WhyChoose = () => {
           Kenapa Pilih CityList?
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-6 lg:gap-4 xl:gap-8 px-2 sm:px-4 md:px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-10 xl:gap-8">
           {featureData.map((feature, index) => (
             <Card
               key={index}
               ref={(el) => (cardsRef.current[index] = el)}
-              className="bg-white border-none rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2 aspect-square overflow-hidden"
+              className="bg-white border-none rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2 overflow-hidden aspect-square"
             >
-              <CardContent className="flex flex-col items-center justify-center text-center p-5 sm:p-6 lg:p-4 xl:p-6 h-full">
-                <div className="flex items-center justify-center mb-4 lg:mb-2 xl:mb-4">
+              <CardContent className="flex flex-col items-center justify-center text-center p-4 sm:p-5 md:p-6 lg:p-4 xl:p-6 h-full">
+                <div className="flex items-center justify-center mb-3 md:mb-4 lg:mb-3">
                   <img
                     src={feature.icon}
                     alt={feature.title}
-                    className="w-16 h-16 sm:w-18 sm:h-18 lg:w-16 lg:h-16 xl:w-20 xl:h-20"
+                    className="w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 lg:w-14 lg:h-14 xl:w-16 xl:h-16"
                   />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <h3 className="text-lg sm:text-xl lg:text-lg xl:text-2xl font-bold mb-2 lg:mb-1 xl:mb-3">
+                  <h3 className="text-lg sm:text-xl md:text-xl lg:text-base xl:text-lg font-bold mb-2 md:mb-3 lg:mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm lg:text-xs xl:text-base">
+                  <p className="text-muted-foreground text-sm md:text-base lg:text-xs xl:text-sm">
                     {feature.description}
                   </p>
                 </div>
