@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { publicRoutes, userRoutes, adminRoutes } from "./routes";
+import { publicRoutes, userRoutes, walikotaRoutes } from "./routes";
 
 function App() {
   return (
@@ -8,13 +8,37 @@ function App() {
         <Route key={route.path} path={route.path} element={route.element} />
       ))}
 
-      {userRoutes.map((route) => (
-        <Route key={route.path} path={route.path} element={route.element} />
-      ))}
+      {userRoutes.map((route) =>
+        route.children ? (
+          <Route key={route.path} path={route.path} element={route.element}>
+            {route.children.map((childRoute) => (
+              <Route
+                key={childRoute.path}
+                path={childRoute.path}
+                element={childRoute.element}
+              />
+            ))}
+          </Route>
+        ) : (
+          <Route key={route.path} path={route.path} element={route.element} />
+        )
+      )}
 
-      {adminRoutes.map((route) => (
-        <Route key={route.path} path={route.path} element={route.element} />
-      ))}
+      {walikotaRoutes.map((route) =>
+        route.children ? (
+          <Route key={route.path} path={route.path} element={route.element}>
+            {route.children.map((childRoute) => (
+              <Route
+                key={childRoute.path}
+                path={childRoute.path}
+                element={childRoute.element}
+              />
+            ))}
+          </Route>
+        ) : (
+          <Route key={route.path} path={route.path} element={route.element} />
+        )
+      )}
     </Routes>
   );
 }

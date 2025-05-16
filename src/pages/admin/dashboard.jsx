@@ -1,64 +1,72 @@
 import { Button } from "@/components/ui/button";
-import { useRef, useLayoutEffect } from "react";
-import { gsap } from "gsap";
-import useGSAP from "@/hooks/use-gsap";
 
-const Dashboard = () => {
-  const dashboardRef = useRef(null);
-  const cardsRef = useRef([]);
-
-  useGSAP(() => {
-    const tl = gsap.timeline();
-
-    tl.fromTo(
-      dashboardRef.current.querySelector("h1"),
-      { opacity: 0, y: -20 },
-      { opacity: 1, y: 0, duration: 0.5 }
-    )
-      .fromTo(
-        dashboardRef.current.querySelector("p"),
-        { opacity: 0, y: -10 },
-        { opacity: 1, y: 0, duration: 0.5 },
-        "-=0.3"
-      )
-      .fromTo(
-        cardsRef.current,
-        { opacity: 0, y: 30, stagger: 0.1 },
-        { opacity: 1, y: 0, stagger: 0.1 },
-        "-=0.2"
-      );
-  }, []);
-
-  const addToCardsRef = (el) => {
-    if (el && !cardsRef.current.includes(el)) {
-      cardsRef.current.push(el);
-    }
-  };
-
+const WalikotaDashboard = () => {
   return (
-    <div className="container mx-auto p-4" ref={dashboardRef}>
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-      <p className="mb-4">Manage your Citilyst application here.</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="p-4 border rounded-md" ref={addToCardsRef}>
-          <h2 className="font-bold">Users</h2>
-          <p>Manage system users</p>
-          <Button className="mt-2" variant="outline">
-            Manage
+    <div>
+      <h1 className="text-3xl font-bold mb-6">Dashboard Walikota</h1>
+      <p className="text-muted-foreground mb-8">
+        Selamat datang di panel administrasi Walikota. Pantau dan kelola kota
+        Anda dengan mudah.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="p-6 bg-card rounded-xl shadow-sm">
+          <h2 className="text-xl font-bold">Proyek Kota</h2>
+          <p className="mt-2 text-muted-foreground">
+            Kelola proyek infrastruktur dan pembangunan kota
+          </p>
+          <Button className="mt-4" variant="outline">
+            Kelola Proyek
           </Button>
         </div>
-        <div className="p-4 border rounded-md" ref={addToCardsRef}>
-          <h2 className="font-bold">Settings</h2>
-          <p>System configuration</p>
-          <Button className="mt-2" variant="outline">
-            Configure
+
+        <div className="p-6 bg-card rounded-xl shadow-sm">
+          <h2 className="text-xl font-bold">Anggaran</h2>
+          <p className="mt-2 text-muted-foreground">
+            Pantau dan kelola anggaran kota
+          </p>
+          <Button className="mt-4" variant="outline">
+            Lihat Anggaran
           </Button>
         </div>
-        <div className="p-4 border rounded-md" ref={addToCardsRef}>
-          <h2 className="font-bold">Reports</h2>
-          <p>View analytics</p>
-          <Button className="mt-2" variant="outline">
-            View
+
+        <div className="p-6 bg-card rounded-xl shadow-sm">
+          <h2 className="text-xl font-bold">Layanan Publik</h2>
+          <p className="mt-2 text-muted-foreground">
+            Manajemen layanan untuk warga kota
+          </p>
+          <Button className="mt-4" variant="outline">
+            Atur Layanan
+          </Button>
+        </div>
+
+        <div className="p-6 bg-card rounded-xl shadow-sm">
+          <h2 className="text-xl font-bold">Acara Kota</h2>
+          <p className="mt-2 text-muted-foreground">
+            Jadwal dan kelola acara-acara kota
+          </p>
+          <Button className="mt-4" variant="outline">
+            Kelola Acara
+          </Button>
+        </div>
+
+        <div className="p-6 bg-card rounded-xl shadow-sm">
+          <h2 className="text-xl font-bold">Pengumuman</h2>
+          <p className="mt-2 text-muted-foreground">
+            Buat dan kelola pengumuman resmi
+          </p>
+          <Button className="mt-4" variant="outline">
+            Buat Pengumuman
+          </Button>
+        </div>
+
+        <div className="p-6 bg-card rounded-xl shadow-sm">
+          <h2 className="text-xl font-bold">Statistik Kota</h2>
+          <p className="mt-2 text-muted-foreground">
+            Lihat laporan dan statistik kota
+          </p>
+          <Button className="mt-4" variant="outline">
+            Lihat Statistik
           </Button>
         </div>
       </div>
@@ -66,4 +74,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default WalikotaDashboard;
