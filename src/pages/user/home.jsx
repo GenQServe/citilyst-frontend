@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { gsap } from "gsap";
 import useGSAP from "@/hooks/use-gsap";
 import WhyChoose from "@/components/why-choose";
+import HowWorks from "@/components/how-works";
 
 const Home = () => {
   const heroRef = useRef(null);
@@ -27,6 +28,7 @@ const Home = () => {
       </section>
 
       <WhyChoose />
+      <HowWorks />
     </div>
   );
 };
