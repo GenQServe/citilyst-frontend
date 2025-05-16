@@ -13,8 +13,10 @@ import { Menu, X, LayoutGrid } from "lucide-react";
 const FloatingNavbar = () => {
   const navbarRef = useRef(null);
   const navbarContentRef = useRef(null);
+  const dropdownRef = useRef(null);
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isFloating, setIsFloating] = useState(false);
 
   useEffect(() => {
     const navbar = navbarRef.current;
@@ -24,6 +26,7 @@ const FloatingNavbar = () => {
       position: "fixed",
       top: 0,
       left: 0,
+      right: 0,
       width: "100%",
       padding: "16px 0",
       borderRadius: "0px",
@@ -32,6 +35,7 @@ const FloatingNavbar = () => {
       backgroundColor: "#9CDE9F",
       border: "none",
       zIndex: 100,
+      margin: "0 auto",
     });
 
     const tl = gsap.timeline({ paused: true });
@@ -40,7 +44,7 @@ const FloatingNavbar = () => {
       top: 16,
       left: "50%",
       xPercent: -50,
-      width: "90%",
+      width: "80%",
       padding: "10px 0",
       borderRadius: "16px",
       boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
@@ -67,8 +71,10 @@ const FloatingNavbar = () => {
       if (scrollY > 50) {
         const progress = Math.min(1, (scrollY - 50) / 100);
         tl.progress(progress);
+        setIsFloating(true);
       } else {
         tl.progress(0);
+        setIsFloating(false);
       }
     };
 
@@ -105,8 +111,8 @@ const FloatingNavbar = () => {
           CityList
         </Link>
 
-        <div className="hidden md:flex items-center gap-4">
-          <div className="flex items-center gap-2 mr-4">
+        <div className="hidden lg:flex items-center justify-center flex-1">
+          <div className="flex items-center gap-2">
             <Link
               to="/home"
               className={cn(
@@ -136,7 +142,9 @@ const FloatingNavbar = () => {
               Cek Status
             </Link>
           </div>
+        </div>
 
+        <div className="hidden lg:flex items-center gap-2">
           <Link to="/login">
             <Button
               size="sm"
@@ -145,9 +153,18 @@ const FloatingNavbar = () => {
               Masuk
             </Button>
           </Link>
+          <Link to="/register">
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
+            >
+              Daftar
+            </Button>
+          </Link>
         </div>
 
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button
@@ -177,8 +194,10 @@ const FloatingNavbar = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
+              ref={dropdownRef}
               align="end"
-              className="bg-[#9CDE9F] border-none w-[100vw] mt-2 p-4 shadow-lg rounded-xl"
+              className="w-[100vw] bg-[#9CDE9F] border-none mt-2 px-6 py-4 shadow-lg rounded-xl"
+              sideOffset={8}
               onCloseAutoFocus={(e) => e.preventDefault()}
             >
               <div className="flex flex-col gap-4 animate-in slide-in-from-top-5 duration-300">
@@ -214,15 +233,27 @@ const FloatingNavbar = () => {
                   Cek Status
                 </Link>
                 <div className="pt-2 mt-2 border-t border-[#8CA06B]/30">
-                  <Link to="/login">
-                    <Button
-                      size="sm"
-                      className="rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none w-full"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      Masuk
-                    </Button>
-                  </Link>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link to="/login">
+                      <Button
+                        size="sm"
+                        className="w-full rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Masuk
+                      </Button>
+                    </Link>
+                    <Link to="/register">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Daftar
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </DropdownMenuContent>
