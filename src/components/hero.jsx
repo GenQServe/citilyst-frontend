@@ -3,7 +3,7 @@ import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
 import useGSAP from "@/hooks/use-gsap";
 import { Button } from "@/components/ui/button";
-import heroPhoto from "@/constants/heroPhoto.png"; // Fixed import statement
+import heroPhoto from "@/constants/heroPhoto.png"; 
 
 const Hero = () => {
   const heroRef = useRef(null);
