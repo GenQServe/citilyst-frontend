@@ -22,8 +22,6 @@ import {
   LayoutGrid,
 } from "lucide-react";
 
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-
 const FloatingNavbar = () => {
   const navbarRef = useRef(null);
   const navbarContentRef = useRef(null);

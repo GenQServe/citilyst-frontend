@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import useGSAP from "@/hooks/use-gsap";
 import WhyChoose from "@/components/why-choose";
 import HowWorks from "@/components/how-works";
+import Hero from "@/components/hero";
 
 const Home = () => {
   const heroRef = useRef(null);
@@ -19,16 +20,10 @@ const Home = () => {
 
   return (
     <div className="space-y-20">
-      <section ref={heroRef} className="container mx-auto px-4 py-16">
-        <h1 className="text-5xl font-bold mb-6">Selamat Datang di Citilyst</h1>
-        <p className="text-xl text-muted-foreground max-w-2xl">
-          Platform pelaporan dan pengaduan masyarakat modern yang menghubungkan
-          warga dengan pemerintah kota.
-        </p>
-      </section>
-
+      <Hero />
       <WhyChoose />
       <HowWorks />
+      
     </div>
   );
 };
