@@ -4,6 +4,7 @@ import useGSAP from "@/hooks/use-gsap";
 import WhyChoose from "@/components/why-choose";
 import HowWorks from "@/components/how-works";
 import Hero from "@/components/hero";
+import CallToAction from "@/components/CallToAction";
 
 const Home = () => {
   const heroRef = useRef(null);
@@ -23,6 +24,7 @@ const Home = () => {
       <Hero />
       <WhyChoose />
       <HowWorks />
+      <CallToAction />
       
     </div>
   );
