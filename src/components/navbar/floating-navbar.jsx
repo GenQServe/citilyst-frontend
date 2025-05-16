@@ -18,7 +18,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoonIcon, SunIcon, Menu } from "lucide-react";
+import {
+  MoonIcon,
+  SunIcon,
+  Menu,
+  LayoutGrid,
+  Home,
+  User,
+  Building,
+} from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const FloatingNavbar = () => {
@@ -101,20 +109,7 @@ const FloatingNavbar = () => {
         className="container mx-auto px-4 flex items-center justify-between"
       >
         <Link to="/" className="text-xl font-bold flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-6 h-6"
-          >
-            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-            <path d="M2 17l10 5 10-5" />
-            <path d="M2 12l10 5 10-5" />
-          </svg>
+          <LayoutGrid className="w-6 h-6" />
           Citilyst
         </Link>
 
@@ -129,6 +124,7 @@ const FloatingNavbar = () => {
                       isActiveLink("/home") && "text-primary font-medium"
                     )}
                   >
+                    <Home className="w-4 h-4 mr-2" />
                     Home
                   </NavigationMenuLink>
                 </Link>
@@ -139,6 +135,7 @@ const FloatingNavbar = () => {
                     isActiveLink("/user") && "text-primary font-medium"
                   }
                 >
+                  <User className="w-4 h-4 mr-2" />
                   User
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -180,6 +177,7 @@ const FloatingNavbar = () => {
                       isActiveLink("/walikota") && "text-primary font-medium"
                     )}
                   >
+                    <Building className="w-4 h-4 mr-2" />
                     Walikota
                   </NavigationMenuLink>
                 </Link>
@@ -224,28 +222,31 @@ const FloatingNavbar = () => {
                 <Link
                   to="/home"
                   className={cn(
-                    "text-xl transition-colors hover:text-primary",
+                    "text-xl transition-colors hover:text-primary flex items-center gap-2",
                     isActiveLink("/home") && "text-primary font-medium"
                   )}
                 >
+                  <Home className="w-5 h-5" />
                   Home
                 </Link>
                 <Link
                   to="/user"
                   className={cn(
-                    "text-xl transition-colors hover:text-primary",
+                    "text-xl transition-colors hover:text-primary flex items-center gap-2",
                     isActiveLink("/user") && "text-primary font-medium"
                   )}
                 >
+                  <User className="w-5 h-5" />
                   User Area
                 </Link>
                 <Link
                   to="/walikota"
                   className={cn(
-                    "text-xl transition-colors hover:text-primary",
+                    "text-xl transition-colors hover:text-primary flex items-center gap-2",
                     isActiveLink("/walikota") && "text-primary font-medium"
                   )}
                 >
+                  <Building className="w-5 h-5" />
                   Walikota
                 </Link>
                 <div className="flex items-center gap-4 mt-6">
