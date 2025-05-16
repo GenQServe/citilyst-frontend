@@ -1,11 +1,21 @@
-import { Button } from "@/components/ui/button";
+import { Routes, Route } from "react-router-dom";
+import { publicRoutes, userRoutes, adminRoutes } from "./routes";
 
 function App() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
-      <h1 className="text-3xl font-bold">Welcome to Citilyst app</h1>
-      <Button>Click me</Button>
-    </div>
+    <Routes>
+      {publicRoutes.map((route) => (
+        <Route key={route.path} path={route.path} element={route.element} />
+      ))}
+
+      {userRoutes.map((route) => (
+        <Route key={route.path} path={route.path} element={route.element} />
+      ))}
+
+      {adminRoutes.map((route) => (
+        <Route key={route.path} path={route.path} element={route.element} />
+      ))}
+    </Routes>
   );
 }
 
