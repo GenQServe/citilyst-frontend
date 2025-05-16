@@ -62,15 +62,15 @@ const FAQ = () => {
 
     timeline
       .fromTo(
-        accordionRef.current,
+        imageRef.current,
         { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }
+        { opacity: 1, y: 0, duration: 0.6, ease: "back.out(1.2)" }
       )
       .fromTo(
-        imageRef.current,
-        { opacity: 0, x: -20 },
-        { opacity: 1, x: 0, duration: 0.6, ease: "back.out(1.2)" },
-        "-=0.4"
+        accordionRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" },
+        "-=0.3"
       );
   }, []);
 
@@ -112,16 +112,19 @@ const FAQ = () => {
       className="py-16 md:py-20 lg:py-24 bg-[#F4FFEE] overflow-hidden"
     >
       <div className="container mx-auto px-5 md:px-8 lg:px-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
-          <div ref={imageRef} className="order-last lg:order-first">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 md:gap-16 items-center">
+          <div
+            ref={imageRef}
+            className="order-first lg:order-first mb-8 lg:mb-0"
+          >
             <img
               src={images.faqImage}
               alt="Frequently Asked Questions"
               className="w-full max-w-md mx-auto"
             />
           </div>
-          <div>
-            <div ref={accordionRef} className="space-y-4">
+          <div ref={accordionRef} className="w-full">
+            <div className="space-y-4">
               <div className="bg-white rounded-2xl shadow-lg p-6">
                 <div className="w-full">
                   {faqItems.slice(0, 3).map((item) => (
@@ -135,9 +138,9 @@ const FAQ = () => {
                       >
                         <h3 className="text-lg font-medium">{item.question}</h3>
                         {activeItem === item.id ? (
-                          <Minus className="text-green-600 w-6 h-6" />
+                          <Minus className="text-green-600 w-6 h-6 flex-shrink-0 ml-2" />
                         ) : (
-                          <Plus className="text-green-600 w-6 h-6" />
+                          <Plus className="text-green-600 w-6 h-6 flex-shrink-0 ml-2" />
                         )}
                       </div>
                       <div
@@ -171,9 +174,9 @@ const FAQ = () => {
                             {item.question}
                           </h3>
                           {activeItem === item.id ? (
-                            <Minus className="text-green-600 w-6 h-6" />
+                            <Minus className="text-green-600 w-6 h-6 flex-shrink-0 ml-2" />
                           ) : (
-                            <Plus className="text-green-600 w-6 h-6" />
+                            <Plus className="text-green-600 w-6 h-6 flex-shrink-0 ml-2" />
                           )}
                         </div>
                         <div
