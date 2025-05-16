@@ -137,12 +137,14 @@ const FloatingNavbar = () => {
             </Link>
           </div>
 
-          <Button
-            size="sm"
-            className="rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
-          >
-            Masuk
-          </Button>
+          <Link to="/login">
+            <Button
+              size="sm"
+              className="rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
+            >
+              Masuk
+            </Button>
+          </Link>
         </div>
 
         <div className="md:hidden">
@@ -212,12 +214,15 @@ const FloatingNavbar = () => {
                   Cek Status
                 </Link>
                 <div className="pt-2 mt-2 border-t border-[#8CA06B]/30">
-                  <Button
-                    size="sm"
-                    className="w-full rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B]"
-                  >
-                    Masuk
-                  </Button>
+                  <Link to="/login">
+                    <Button
+                      size="sm"
+                      className="rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none w-full"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Masuk
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </DropdownMenuContent>

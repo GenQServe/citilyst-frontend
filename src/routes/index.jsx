@@ -3,11 +3,26 @@ import Home from "@/pages/user/home";
 import UserLayout from "@/layouts/user-layout";
 import WalikotaLayout from "@/layouts/walikota-layout";
 import WalikotaDashboard from "@/pages/admin/dashboard";
+import LoginPage from "@/pages/auth/login";
+import RegisterPage from "@/pages/auth/register";
+import VerifyOtpPage from "@/pages/auth/verify-otp";
 
 export const publicRoutes = [
   {
     path: "/",
     element: <Navigate to="/home" replace />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
+    path: "/verify-otp",
+    element: <VerifyOtpPage />,
   },
   {
     path: "*",

@@ -50,6 +50,7 @@ const FAQ = () => {
   const moreRef = useRef(null);
   const [showAll, setShowAll] = useState(false);
   const [activeItem, setActiveItem] = useState(null);
+  const [accordionHeights, setAccordionHeights] = useState({});
 
   useGSAP(() => {
     const timeline = gsap.timeline({
@@ -81,7 +82,7 @@ const FAQ = () => {
           moreRef.current,
           { height: 0, opacity: 0 },
           {
-            height: moreRef.current.scrollHeight,
+            height: "auto",
             opacity: 1,
             duration: 0.5,
             ease: "power2.out",
@@ -99,11 +100,7 @@ const FAQ = () => {
   }, [showAll]);
 
   const toggleAccordion = (itemId) => {
-    if (activeItem === itemId) {
-      setActiveItem(null);
-    } else {
-      setActiveItem(itemId);
-    }
+    setActiveItem(activeItem === itemId ? null : itemId);
   };
 
   return (
@@ -124,17 +121,54 @@ const FAQ = () => {
             />
           </div>
           <div ref={accordionRef} className="w-full">
-            <div className="space-y-4">
-              <div className="bg-white rounded-2xl shadow-lg p-6">
-                <div className="w-full">
-                  {faqItems.slice(0, 3).map((item) => (
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="w-full">
+                {faqItems.slice(0, 3).map((item) => (
+                  <div
+                    key={item.id}
+                    className="border-b border-gray-100 last:border-b-0"
+                  >
+                    <button
+                      className="w-full py-6 px-6 flex justify-between items-center cursor-pointer text-left bg-transparent border-none"
+                      onClick={() => toggleAccordion(item.id)}
+                      aria-expanded={activeItem === item.id}
+                    >
+                      <h3 className="text-lg font-medium">{item.question}</h3>
+                      {activeItem === item.id ? (
+                        <Minus className="text-green-600 w-6 h-6 flex-shrink-0 ml-2" />
+                      ) : (
+                        <Plus className="text-green-600 w-6 h-6 flex-shrink-0 ml-2" />
+                      )}
+                    </button>
+                    <div
+                      className={`transition-all duration-300 ease-in-out overflow-hidden bg-white px-6 ${
+                        activeItem === item.id ? "max-h-96" : "max-h-0"
+                      }`}
+                    >
+                      <div className="py-4 text-gray-700">
+                        <p>{item.answer}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div
+                  ref={moreRef}
+                  className="overflow-hidden"
+                  style={{
+                    height: showAll ? "auto" : "0px",
+                    opacity: showAll ? 1 : 0,
+                    transition: "opacity 0.3s ease",
+                  }}
+                >
+                  {faqItems.slice(3).map((item) => (
                     <div
                       key={item.id}
                       className="border-b border-gray-100 last:border-b-0"
                     >
-                      <div
-                        className="py-6 flex justify-between items-center cursor-pointer"
+                      <button
+                        className="w-full py-6 px-6 flex justify-between items-center cursor-pointer text-left bg-transparent border-none"
                         onClick={() => toggleAccordion(item.id)}
+                        aria-expanded={activeItem === item.id}
                       >
                         <h3 className="text-lg font-medium">{item.question}</h3>
                         {activeItem === item.id ? (
@@ -142,55 +176,20 @@ const FAQ = () => {
                         ) : (
                           <Plus className="text-green-600 w-6 h-6 flex-shrink-0 ml-2" />
                         )}
-                      </div>
+                      </button>
                       <div
-                        className={`overflow-hidden transition-all duration-300 text-gray-700 ${
-                          activeItem === item.id ? "max-h-96 pb-6" : "max-h-0"
+                        className={`transition-all duration-300 ease-in-out overflow-hidden bg-white px-6 ${
+                          activeItem === item.id ? "max-h-96" : "max-h-0"
                         }`}
                       >
-                        <p>{item.answer}</p>
-                      </div>
-                    </div>
-                  ))}
-                  <div
-                    ref={moreRef}
-                    style={{
-                      overflow: "hidden",
-                      height: showAll ? moreRef.current?.scrollHeight : 0,
-                      opacity: showAll ? 1 : 0,
-                      transition: "height 0.5s, opacity 0.5s",
-                    }}
-                  >
-                    {faqItems.slice(3).map((item) => (
-                      <div
-                        key={item.id}
-                        className="border-b border-gray-100 last:border-b-0"
-                      >
-                        <div
-                          className="py-6 flex justify-between items-center cursor-pointer"
-                          onClick={() => toggleAccordion(item.id)}
-                        >
-                          <h3 className="text-lg font-medium">
-                            {item.question}
-                          </h3>
-                          {activeItem === item.id ? (
-                            <Minus className="text-green-600 w-6 h-6 flex-shrink-0 ml-2" />
-                          ) : (
-                            <Plus className="text-green-600 w-6 h-6 flex-shrink-0 ml-2" />
-                          )}
-                        </div>
-                        <div
-                          className={`overflow-hidden transition-all duration-300 text-gray-700 ${
-                            activeItem === item.id ? "max-h-96 pb-6" : "max-h-0"
-                          }`}
-                        >
+                        <div className="py-4 text-gray-700">
                           <p>{item.answer}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="pt-4">
+                <div className="py-4 px-6">
                   <button
                     className="text-green-600 hover:text-green-700 font-medium flex items-center bg-transparent border-none cursor-pointer"
                     onClick={() => setShowAll((prev) => !prev)}
