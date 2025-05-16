@@ -149,7 +149,7 @@ const HowWorks = () => {
                       </span>
                     </div>
                     <h4
-                      className={`text-lg font-bold flex-1 text-justify ${
+                      className={`text-md md:text-lg font-bold flex-1 text-left ${
                         activeSteps[step.number]
                           ? "text-[#4E9F60]"
                           : "text-[#4E9F60] "
@@ -164,7 +164,7 @@ const HowWorks = () => {
                       ref={(el) => (descriptionRefs.current[step.number] = el)}
                       className="pl-16 pr-4 py-3 rounded-b-lg mt-1 overflow-hidden"
                     >
-                      <p className="text-base text-black font-semibold text-justify">
+                      <p className="text-sm md:text-lg text-black font-medium text-left">
                         {step.description}
                       </p>
                     </div>
