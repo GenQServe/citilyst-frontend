@@ -5,28 +5,17 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
+
 } from "@/components/ui/navigation-menu";
+
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  MoonIcon,
-  SunIcon,
   Menu,
   LayoutGrid,
-  Home,
-  User,
-  Building,
 } from "lucide-react";
+
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const FloatingNavbar = () => {
@@ -47,8 +36,8 @@ const FloatingNavbar = () => {
       borderRadius: "0px",
       boxShadow: "none",
       backdropFilter: "none",
-      backgroundColor: "rgba(255, 255, 255, 1)",
-      border: "1px solid rgba(229, 231, 235, 1)",
+      backgroundColor: "#9CDE9F", // Changed to light green color
+      border: "none",
       zIndex: 100,
     });
 
@@ -63,8 +52,8 @@ const FloatingNavbar = () => {
       borderRadius: "16px",
       boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
       backdropFilter: "blur(12px)",
-      backgroundColor: "rgba(255, 255, 255, 0.9)",
-      border: "1px solid rgba(255, 255, 255, 0.2)",
+      backgroundColor: "#9CDE9F", // Kept consistent color
+      border: "none",
       duration: 0.4,
       ease: "power3.out",
     });
@@ -103,14 +92,14 @@ const FloatingNavbar = () => {
   };
 
   return (
-    <nav ref={navbarRef} className="w-full fixed top-0 left-0 z-50">
+    <nav ref={navbarRef} className="w-full fixed top-0 left-0 z-50 bg-[#9CDE9F]">
       <div
         ref={navbarContentRef}
         className="container mx-auto px-4 flex items-center justify-between"
       >
-        <Link to="/" className="text-xl font-bold flex items-center gap-2">
+        <Link to="/" className="text-xl font-bold flex items-center gap-2 text-black">
           <LayoutGrid className="w-6 h-6" />
-          Citilyst
+          CityList
         </Link>
 
         <div className="hidden md:block">
@@ -120,65 +109,35 @@ const FloatingNavbar = () => {
                 <Link to="/home">
                   <NavigationMenuLink
                     className={cn(
-                      navigationMenuTriggerStyle(),
-                      isActiveLink("/home") && "text-primary font-medium"
+                      "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
+                      isActiveLink("/home") && "bg-[#9DB17C] text-black font-medium"
                     )}
                   >
-                    <Home className="w-4 h-4 mr-2" />
-                    Home
+                    Beranda
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuTrigger
-                  className={
-                    isActiveLink("/user") && "text-primary font-medium"
-                  }
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  User
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[300px] gap-3 p-4">
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          to="/user/home"
-                          className="block select-none rounded-md p-3 hover:bg-accent"
-                        >
-                          <div className="text-sm font-medium">Dashboard</div>
-                          <div className="mt-1 text-xs text-muted-foreground">
-                            User dashboard overview
-                          </div>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          to="/user/profile"
-                          className="block select-none rounded-md p-3 hover:bg-accent"
-                        >
-                          <div className="text-sm font-medium">Profile</div>
-                          <div className="mt-1 text-xs text-muted-foreground">
-                            Manage your profile
-                          </div>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
+                <Link to="/user">
+                  <NavigationMenuLink
+                    className={cn(
+                      "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
+                      isActiveLink("/user") && "bg-[#9DB17C] text-black font-medium"
+                    )}
+                  >
+                    Buat Laporan
+                  </NavigationMenuLink>
+                </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link to="/walikota">
                   <NavigationMenuLink
                     className={cn(
-                      navigationMenuTriggerStyle(),
-                      isActiveLink("/walikota") && "text-primary font-medium"
+                      "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
+                      isActiveLink("/walikota") && "bg-[#9DB17C] text-black font-medium"
                     )}
                   >
-                    <Building className="w-4 h-4 mr-2" />
-                    Walikota
+                    Cek Status
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
@@ -187,77 +146,60 @@ const FloatingNavbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full h-9 w-9"
-              >
-                <SunIcon className="h-4 w-4 rotate-0 scale-100 transition-all" />
-                <MoonIcon className="absolute h-4 w-4 rotate-90 scale-0 transition-all" />
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>Light</DropdownMenuItem>
-              <DropdownMenuItem>Dark</DropdownMenuItem>
-              <DropdownMenuItem>System</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button size="sm" className="rounded-full">
-            Login
+          <Button 
+            size="sm" 
+            className="rounded-full bg-[#9DB17C] text-black hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
+          >
+            Masuk
           </Button>
         </div>
 
         <div className="md:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
+              <Button variant="ghost" size="icon" className="rounded-full text-black hover:bg-[#9DB17C] focus:bg-[#9DB17C]">
                 <Menu />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
-              <div className="flex flex-col gap-6 mt-10">
+            <SheetContent side="right" className="bg-[#9CDE9F] border-none w-[85vw] max-w-[300px] overflow-y-auto pt-10 px-5">
+              <div className="flex flex-col gap-6 mt-16">
                 <Link
                   to="/home"
                   className={cn(
-                    "text-xl transition-colors hover:text-primary flex items-center gap-2",
-                    isActiveLink("/home") && "text-primary font-medium"
+                    "text-xl transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                    isActiveLink("/home") && "bg-[#9DB17C] rounded-md px-3 py-2"
                   )}
                 >
-                  <Home className="w-5 h-5" />
-                  Home
+                  Beranda
                 </Link>
                 <Link
                   to="/user"
                   className={cn(
-                    "text-xl transition-colors hover:text-primary flex items-center gap-2",
-                    isActiveLink("/user") && "text-primary font-medium"
+                    "text-xl transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                    isActiveLink("/user") && "bg-[#9DB17C] rounded-md px-3 py-2"
                   )}
                 >
-                  <User className="w-5 h-5" />
-                  User Area
+                  Buat Laporan
                 </Link>
                 <Link
                   to="/walikota"
                   className={cn(
-                    "text-xl transition-colors hover:text-primary flex items-center gap-2",
-                    isActiveLink("/walikota") && "text-primary font-medium"
+                    "text-xl transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                    isActiveLink("/walikota") && "bg-[#9DB17C] rounded-md px-3 py-2"
                   )}
                 >
-                  <Building className="w-5 h-5" />
-                  Walikota
+                  Cek Status
                 </Link>
                 <div className="flex items-center gap-4 mt-6">
-                  <Button size="sm" className="w-full rounded-full">
-                    Login
+                  <Button size="sm" className="w-full rounded-full bg-[#9DB17C] text-black hover:bg-[#8CA06B]">
+                    Masuk
                   </Button>
                 </div>
               </div>
             </SheetContent>
           </Sheet>
         </div>
+        
       </div>
     </nav>
   );
