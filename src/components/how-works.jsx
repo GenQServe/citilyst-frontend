@@ -112,56 +112,66 @@ const HowWorks = () => {
       className="py-16 md:py-20 lg:py-24 bg-[#F4FFEE] overflow-hidden"
     >
       <div className="container mx-auto px-5 md:px-8 lg:px-10 xl:px-12">
-        <h2
-          ref={titleRef}
-          className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-12"
-        >
-          Cara Kerja CityList
-        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
+          <div className="px-4 md:px-6 lg:px-8 text-justify lg:text-left text-center">
+            <h2
+              ref={titleRef}
+              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+            >
+              Cara Kerja CityList
+            </h2>
 
-        <h3 className="text-xl md:text-2xl font-medium text-center mb-12">
-          Hanya dengan 5 langkah mudah:
-        </h3>
+            <h3 className="text-xl md:text-2xl font-medium mb-8 text-justify">
+              Hanya dengan{" "}
+              <span className="text-[#4E9F60]">5 langkah mudah</span>:
+            </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
-          <div
-            ref={stepsRef}
-            className="space-y-6 mx-auto md:mx-0 px-4 md:px-8 lg:px-12"
-          >
-            {steps.map((step) => (
-              <div key={step.number} className="step-item">
-                <div
-                  className={`flex items-center gap-4 cursor-pointer p-3 rounded-lg transition-all ${
-                    activeSteps[step.number] ? "bg-[#F4FFEE]" : "bg-[#F4FFEE]"
-                  }`}
-                  onClick={() => toggleStep(step.number)}
-                >
-                  <div className="flex-shrink-0">
-                    <span
-                      className={`flex items-center justify-center w-8 h-8 rounded-full border border-black font-semibold ${
+            <div ref={stepsRef} className="space-y-3">
+              {steps.map((step) => (
+                <div key={step.number} className="step-item">
+                  <div
+                    className="flex items-center gap-4 cursor-pointer p-3 rounded-lg transition-all"
+                    onClick={() => toggleStep(step.number)}
+                  >
+                    <div className="flex-shrink-0">
+                      <span
+                        className={`flex items-center justify-center w-8 h-8 rounded-full border-2 font-semibold ${
+                          activeSteps[step.number]
+                            ? "bg-[#4E9F60] text-[#F4FFEE]"
+                            : "bg-[#F4FFEE] text-[#4E9F60]"
+                        } ${
+                          activeSteps[step.number]
+                            ? "border-[#4E9F60]"
+                            : "border-[#4E9F60]"
+                        }`}
+                      >
+                        {step.number}
+                      </span>
+                    </div>
+                    <h4
+                      className={`text-lg font-bold flex-1 text-justify ${
                         activeSteps[step.number]
-                          ? "bg-black text-white"
-                          : "bg-[#F4FFEE] text-black"
+                          ? "text-[#4E9F60]"
+                          : "text-[#4E9F60] "
                       }`}
                     >
-                      {step.number}
-                    </span>
+                      {step.title}
+                    </h4>
                   </div>
-                  <h4 className="text-xl font-bold flex-1">{step.title}</h4>
-                </div>
 
-                {activeSteps[step.number] && (
-                  <div
-                    ref={(el) => (descriptionRefs.current[step.number] = el)}
-                    className="pl-16 pr-4 py-4 rounded-b-lg mt-1 overflow-hidden"
-                  >
-                    <p className="text-base text-gray-700">
-                      {step.description}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))}
+                  {activeSteps[step.number] && (
+                    <div
+                      ref={(el) => (descriptionRefs.current[step.number] = el)}
+                      className="pl-16 pr-4 py-3 rounded-b-lg mt-1 overflow-hidden"
+                    >
+                      <p className="text-base text-black font-semibold text-justify">
+                        {step.description}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div
