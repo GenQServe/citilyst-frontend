@@ -7,6 +7,9 @@ import LoginPage from "@/pages/auth/login";
 import RegisterPage from "@/pages/auth/register";
 import VerifyOtpPage from "@/pages/auth/verify-otp";
 import UserProfilePage from "@/pages/user/me";
+import CreateLaporan from "@/pages/user/create-laporan"; 
+import CheckStatusPage from "@/pages/user/check-status";
+import NotificationsPage from "@/pages/user/notifications";
 
 export const publicRoutes = [
   {
@@ -51,6 +54,18 @@ export const userRoutes = [
       {
         path: "me",
         element: <UserProfilePage />,
+      },
+      {
+        path: "user/create-report",
+        element: <CreateLaporan />, 
+      },
+      {
+        path: "user/check-status", 
+        element: <CheckStatusPage />, 
+      },
+      {
+        path: "user/notifications", 
+        element: <NotificationsPage />, 
       },
     ],
   },
