@@ -99,17 +99,21 @@ const FeaturesHighlight = () => {
                 <div
                   key={feature.id}
                   ref={(el) => (featuresRef.current[index] = el)}
-                  className="flex items-center bg-white rounded-xl px-3 sm:px-4 lg:px-3 py-2.5 sm:py-3 lg:py-2 shadow-sm hover:shadow-md transition-shadow duration-300"
+                  className="flex items-center bg-white rounded-xl px-3 sm:px-4 lg:px-4 py-2.5 sm:py-3 lg:py-3 shadow-sm hover:shadow-md transition-shadow duration-300"
                 >
-                  <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 lg:w-4 lg:h-4 mr-2 sm:mr-3 lg:mr-1.5 bg-[#9CDE9F] rounded-full flex items-center justify-center text-white">
-                    <Check size={12} strokeWidth={3} className="sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-2.5 lg:w-2.5" />
+                  <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 lg:w-6 lg:h-6 mr-2 sm:mr-3 lg:mr-3 bg-[#9CDE9F] rounded-full flex items-center justify-center text-white">
+                    <Check
+                      size={12}
+                      strokeWidth={3}
+                      className="sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-3.5 lg:w-3.5"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="lg:flex lg:items-center break-words lg:break-normal">
-                      <span className="font-medium text-[#4E9F60] text-xs sm:text-sm md:text-base lg:text-[0.625rem] lg:leading-none">
+                      <span className="font-medium text-[#4E9F60] text-xs sm:text-sm md:text-base lg:text-sm lg:leading-normal">
                         {feature.label}
                       </span>{" "}
-                      <span className="text-gray-700 text-xs sm:text-xs md:text-sm lg:text-[0.625rem] lg:leading-none">
+                      <span className="text-gray-700 text-xs sm:text-xs md:text-sm lg:text-sm lg:leading-normal">
                         {feature.description}
                       </span>
                     </div>
