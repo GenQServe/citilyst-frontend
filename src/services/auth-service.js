@@ -24,6 +24,19 @@ export const resendOtp = async () => {
   return response.data;
 };
 
+export const loginUser = async (credentials) => {
+  const response = await api.post("/auth/login", credentials);
+  return response.data;
+};
+
+export const googleLogin = async () => {
+  const redirectUri = `${import.meta.env.VITE_FRONTEND_URL}/`;
+  const response = await api.get(
+    `/auth/google?redirect_uri=${redirectUri}&path=/`
+  );
+  return response.data;
+};
+
 export const getUserProfile = async () => {
   const response = await api.get("/auth/me");
   return response.data;

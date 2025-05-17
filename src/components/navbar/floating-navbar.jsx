@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -7,16 +7,53 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, LayoutGrid } from "lucide-react";
+import { Menu, X, LayoutGrid, User, LogOut } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 const FloatingNavbar = () => {
   const navbarRef = useRef(null);
   const navbarContentRef = useRef(null);
   const dropdownRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isFloating, setIsFloating] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = Cookies.get("token");
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          setUser(decoded);
+        } catch (error) {
+          console.error("Invalid token", error);
+          Cookies.remove("token");
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+
+    checkAuth();
+
+    const intervalId = setInterval(checkAuth, 60000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const handleLogout = () => {
+    Cookies.remove("token");
+    setUser(null);
+    navigate("/");
+  };
 
   useEffect(() => {
     const navbar = navbarRef.current;
@@ -145,23 +182,67 @@ const FloatingNavbar = () => {
         </div>
 
         <div className="hidden lg:flex items-center gap-2">
-          <Link to="/login">
-            <Button
-              size="sm"
-              className="rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
-            >
-              Masuk
-            </Button>
-          </Link>
-          <Link to="/register">
-            <Button
-              size="sm"
-              variant="outline"
-              className="rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
-            >
-              Daftar
-            </Button>
-          </Link>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="rounded-full p-0 h-10 w-10">
+                  <Avatar>
+                    <AvatarImage src={user.image_url} />
+                    <AvatarFallback className="bg-[#9DB17C] text-white">
+                      {user.name?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.image_url} />
+                    <AvatarFallback className="bg-[#9DB17C] text-white">
+                      {user.name?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium text-sm">{user.name}</p>
+                    <p className="text-xs text-muted-foreground truncate w-[180px]">
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <Link to="/me">
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profil</span>
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Keluar</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button
+                  size="sm"
+                  className="rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
+                >
+                  Masuk
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
+                >
+                  Daftar
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="lg:hidden">
@@ -233,27 +314,70 @@ const FloatingNavbar = () => {
                   Cek Status
                 </Link>
                 <div className="pt-2 mt-2 border-t border-[#8CA06B]/30">
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link to="/login">
-                      <Button
-                        size="sm"
-                        className="w-full rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        Masuk
-                      </Button>
-                    </Link>
-                    <Link to="/register">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        Daftar
-                      </Button>
-                    </Link>
-                  </div>
+                  {user ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 py-2">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={user.image_url} />
+                          <AvatarFallback className="bg-[#9DB17C] text-white">
+                            {user.name?.charAt(0) || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{user.name}</p>
+                          <p className="text-xs text-gray-600 truncate w-[200px]">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Link to="/me">
+                          <Button
+                            size="sm"
+                            className="w-full rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
+                            onClick={() => setMenuOpen(false)}
+                          >
+                            <User className="mr-2 h-4 w-4" />
+                            Profil
+                          </Button>
+                        </Link>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
+                          onClick={() => {
+                            handleLogout();
+                            setMenuOpen(false);
+                          }}
+                        >
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Keluar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link to="/login">
+                        <Button
+                          size="sm"
+                          className="w-full rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          Masuk
+                        </Button>
+                      </Link>
+                      <Link to="/register">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          Daftar
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             </DropdownMenuContent>

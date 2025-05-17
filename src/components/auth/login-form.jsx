@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Eye, EyeOff, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,6 +23,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { icons } from "@/constants/icons";
+import { useLogin, useGoogleLogin } from "@/hooks/use-auth";
+import Cookies from "js-cookie";
 import { toast } from "sonner";
 
 const formSchema = z.object({
@@ -32,6 +34,10 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const { mutate: login, isPending: isLoggingIn } = useLogin();
+  const { mutate: loginWithGoogle, isPending: isGoogleLoggingIn } =
+    useGoogleLogin();
+  const navigate = useNavigate();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -41,10 +47,20 @@ export function LoginForm() {
     },
   });
 
+  useEffect(() => {
+    const email = Cookies.get("email");
+    if (email) {
+      toast.info("Lanjutkan pendaftaran Anda terlebih dahulu");
+      navigate("/verify-otp");
+    }
+  }, [navigate]);
+
   const onSubmit = (data) => {
-    toast.success("Login berhasil", {
-      description: `Selamat datang kembali, ${data.email}`,
-    });
+    login(data);
+  };
+
+  const handleGoogleLogin = () => {
+    loginWithGoogle();
   };
 
   return (
@@ -128,8 +144,16 @@ export function LoginForm() {
                 <Button
                   type="submit"
                   className="w-full bg-[#9DB17C] hover:bg-[#8CA06B] text-white"
+                  disabled={isLoggingIn}
                 >
-                  Masuk
+                  {isLoggingIn ? (
+                    <div className="flex items-center gap-2">
+                      <Loader className="h-4 w-4 animate-spin" />
+                      <span>Masuk...</span>
+                    </div>
+                  ) : (
+                    "Masuk"
+                  )}
                 </Button>
               </form>
             </Form>
@@ -149,10 +173,24 @@ export function LoginForm() {
               variant="outline"
               type="button"
               className="w-full flex items-center justify-center gap-2 border-gray-300"
-              onClick={() => toast.info("Google login coming soon")}
+              onClick={handleGoogleLogin}
+              disabled={isGoogleLoggingIn}
             >
-              <img src={icons.googleIcon} alt="Google" className="w-5 h-5" />
-              Masuk dengan Google
+              {isGoogleLoggingIn ? (
+                <div className="flex items-center gap-2">
+                  <Loader className="h-4 w-4 animate-spin" />
+                  <span>Memproses...</span>
+                </div>
+              ) : (
+                <>
+                  <img
+                    src={icons.googleIcon}
+                    alt="Google"
+                    className="w-5 h-5"
+                  />
+                  Masuk dengan Google
+                </>
+              )}
             </Button>
           </CardContent>
           <CardFooter className="px-0 pb-0 pt-4">

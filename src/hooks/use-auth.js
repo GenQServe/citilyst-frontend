@@ -7,6 +7,8 @@ import {
   verifyOtp,
   resendOtp,
   getUserProfile,
+  loginUser,
+  googleLogin,
 } from "@/services/auth-service";
 import { setUser } from "@/features/slices/authSlice";
 import Cookies from "js-cookie";
@@ -22,6 +24,37 @@ export function useRegister() {
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Registration failed");
+    },
+  });
+}
+
+export function useLogin() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  return useMutation({
+    mutationFn: loginUser,
+    onSuccess: (data) => {
+      toast.success(data.message);
+      dispatch(setUser(data.data));
+      navigate("/");
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Login failed");
+    },
+  });
+}
+
+export function useGoogleLogin() {
+  return useMutation({
+    mutationFn: googleLogin,
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Google login failed");
     },
   });
 }
