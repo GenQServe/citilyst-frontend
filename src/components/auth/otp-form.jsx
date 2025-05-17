@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,6 +20,8 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useVerifyOtp, useResendOtp } from "@/hooks/use-auth";
+import Cookies from "js-cookie";
 import { toast } from "sonner";
 
 const formSchema = z.object({
@@ -38,12 +40,24 @@ export function OtpForm() {
     useRef(),
   ];
 
+  const navigate = useNavigate();
+  const { mutate: verifyOtp, isPending: isVerifying } = useVerifyOtp();
+  const { mutate: resendOtp, isPending: isResending } = useResendOtp();
+  const email = Cookies.get("email");
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       otp: "",
     },
   });
+
+  useEffect(() => {
+    if (!email) {
+      toast.error("Email tidak ditemukan, silakan daftar terlebih dahulu");
+      navigate("/register");
+    }
+  }, [email, navigate]);
 
   useEffect(() => {
     let timer;
@@ -58,14 +72,12 @@ export function OtpForm() {
   }, [resendDisabled, countdown]);
 
   const onSubmit = (data) => {
-    toast.success("Verifikasi berhasil", {
-      description: "Akun Anda telah diverifikasi",
-    });
+    verifyOtp({ otp: data.otp });
   };
 
   const handleResendOtp = () => {
     if (!resendDisabled) {
-      toast.info("OTP baru telah dikirim");
+      resendOtp();
       setResendDisabled(true);
       setCountdown(30);
     }
@@ -117,8 +129,13 @@ export function OtpForm() {
     <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-8 md:py-12">
       <div className="w-full max-w-md">
         <Link
-          to="/"
-          className="inline-flex items-center gap-2 mb-8 text-gray-600 hover:text-gray-900"
+          to="/register"
+          className={`inline-flex items-center gap-2 mb-8 ${
+            !email
+              ? "pointer-events-none opacity-50"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+          onClick={(e) => !email && e.preventDefault()}
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="font-medium">Kembali</span>
@@ -128,7 +145,7 @@ export function OtpForm() {
           <CardHeader className="px-0 pt-0">
             <CardTitle className="text-2xl font-bold">Verifikasi OTP</CardTitle>
             <p className="text-gray-500 text-sm mt-2">
-              Masukkan kode 6 digit yang telah dikirimkan ke email Anda
+              Masukkan kode 6 digit yang telah dikirimkan ke email {email || ""}
             </p>
           </CardHeader>
           <CardContent className="px-0 space-y-4">
@@ -167,8 +184,16 @@ export function OtpForm() {
                 <Button
                   type="submit"
                   className="w-full bg-[#9DB17C] hover:bg-[#8CA06B] text-white"
+                  disabled={isVerifying || !email}
                 >
-                  Verifikasi
+                  {isVerifying ? (
+                    <div className="flex items-center gap-2">
+                      <Loader className="h-4 w-4 animate-spin" />
+                      <span>Verifikasi...</span>
+                    </div>
+                  ) : (
+                    "Verifikasi"
+                  )}
                 </Button>
               </form>
             </Form>
@@ -180,12 +205,21 @@ export function OtpForm() {
                 variant="ghost"
                 size="sm"
                 className={`text-[#9DB17C] hover:text-[#8CA06B] ${
-                  resendDisabled ? "opacity-50 cursor-not-allowed" : ""
+                  resendDisabled || isResending || !email
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
                 }`}
-                disabled={resendDisabled}
+                disabled={resendDisabled || isResending || !email}
                 onClick={handleResendOtp}
               >
-                Kirim Ulang {resendDisabled && `(${countdown}s)`}
+                {isResending ? (
+                  <div className="flex items-center gap-2">
+                    <Loader className="h-3 w-3 animate-spin" />
+                    <span>Mengirim...</span>
+                  </div>
+                ) : (
+                  `Kirim Ulang ${resendDisabled ? `(${countdown}s)` : ""}`
+                )}
               </Button>
             </div>
           </CardFooter>

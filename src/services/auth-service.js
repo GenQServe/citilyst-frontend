@@ -1,0 +1,30 @@
+import api from "@/lib/api";
+import Cookies from "js-cookie";
+
+export const registerUser = async (userData) => {
+  const response = await api.post("/auth/register", userData);
+  Cookies.set("email", userData.email, { expires: 1 });
+  return response.data;
+};
+
+export const verifyOtp = async (otpData) => {
+  const email = Cookies.get("email");
+  const payload = {
+    email,
+    otp: otpData.otp,
+  };
+  const response = await api.post("/auth/verify-otp", payload);
+  return response.data;
+};
+
+export const resendOtp = async () => {
+  const email = Cookies.get("email");
+  const payload = { email };
+  const response = await api.post("/auth/resend-otp", payload);
+  return response.data;
+};
+
+export const getUserProfile = async () => {
+  const response = await api.get("/auth/me");
+  return response.data;
+};

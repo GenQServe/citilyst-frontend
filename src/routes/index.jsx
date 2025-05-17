@@ -6,6 +6,7 @@ import WalikotaDashboard from "@/pages/admin/dashboard";
 import LoginPage from "@/pages/auth/login";
 import RegisterPage from "@/pages/auth/register";
 import VerifyOtpPage from "@/pages/auth/verify-otp";
+import UserProfilePage from "@/pages/user/me";
 
 export const publicRoutes = [
   {
@@ -46,6 +47,10 @@ export const userRoutes = [
       {
         path: "user/home",
         element: <Home />,
+      },
+      {
+        path: "me",
+        element: <UserProfilePage />,
       },
     ],
   },

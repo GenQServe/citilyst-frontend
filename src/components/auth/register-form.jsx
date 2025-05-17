@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Eye, EyeOff, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,6 +21,8 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useRegister } from "@/hooks/use-auth";
+import Cookies from "js-cookie";
 import { toast } from "sonner";
 
 const formSchema = z.object({
@@ -36,6 +38,16 @@ const formSchema = z.object({
 
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const { mutate: register, isPending } = useRegister();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const email = Cookies.get("email");
+    if (email) {
+      toast.info("Anda sudah terdaftar, silakan verifikasi OTP");
+      navigate("/verify-otp");
+    }
+  }, [navigate]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -48,9 +60,7 @@ export function RegisterForm() {
   });
 
   const onSubmit = (data) => {
-    toast.success("Registrasi berhasil", {
-      description: `Selamat datang, ${data.name}`,
-    });
+    register(data);
   };
 
   return (
@@ -158,8 +168,16 @@ export function RegisterForm() {
                   <Button
                     type="submit"
                     className="w-full bg-[#9DB17C] hover:bg-[#8CA06B] text-white"
+                    disabled={isPending}
                   >
-                    Daftar
+                    {isPending ? (
+                      <div className="flex items-center gap-2">
+                        <Loader className="h-4 w-4 animate-spin" />
+                        <span>Mendaftar...</span>
+                      </div>
+                    ) : (
+                      "Daftar"
+                    )}
                   </Button>
                 </div>
               </form>

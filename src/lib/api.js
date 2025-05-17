@@ -1,5 +1,4 @@
 import axios from "axios";
-import Cookies from "js-cookie";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -12,10 +11,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = Cookies.get("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
     return config;
   },
   (error) => {
@@ -29,10 +24,7 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response) {
-      if (error.response.status === 401) {
-        Cookies.remove("token");
-        window.location.href = "/login";
-      }
+      console.error("Response error:", error.response.data);
     } else if (error.request) {
       console.error("Request error:", error.request);
     } else {
