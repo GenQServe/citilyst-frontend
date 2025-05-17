@@ -126,7 +126,7 @@ export function OtpForm() {
   };
 
   return (
-    <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-8 md:py-12">
+    <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-8 lg:py-12">
       <div className="w-full max-w-md">
         <Link
           to="/register"

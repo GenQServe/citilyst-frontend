@@ -7,9 +7,10 @@ import LoginPage from "@/pages/auth/login";
 import RegisterPage from "@/pages/auth/register";
 import VerifyOtpPage from "@/pages/auth/verify-otp";
 import UserProfilePage from "@/pages/user/me";
-import CreateLaporan from "@/pages/user/create-laporan"; 
+import CreateLaporan from "@/pages/user/create-laporan";
 import CheckStatusPage from "@/pages/user/check-status";
 import NotificationsPage from "@/pages/user/notifications";
+import { ProtectedRoute, PublicRoute } from "@/components/protected-route";
 
 export const publicRoutes = [
   {
@@ -18,19 +19,27 @@ export const publicRoutes = [
   },
   {
     path: "/login",
-    element: <LoginPage />,
+    element: (
+      <PublicRoute restrictedToUnauthenticated={true}>
+        <LoginPage />
+      </PublicRoute>
+    ),
   },
   {
     path: "/register",
-    element: <RegisterPage />,
+    element: (
+      <PublicRoute restrictedToUnauthenticated={true}>
+        <RegisterPage />
+      </PublicRoute>
+    ),
   },
   {
     path: "/verify-otp",
-    element: <VerifyOtpPage />,
-  },
-  {
-    path: "*",
-    element: <Navigate to="/home" replace />,
+    element: (
+      <PublicRoute>
+        <VerifyOtpPage />
+      </PublicRoute>
+    ),
   },
 ];
 
@@ -39,6 +48,10 @@ export const userRoutes = [
     path: "/",
     element: <UserLayout />,
     children: [
+      {
+        path: "",
+        element: <Navigate to="/home" replace />,
+      },
       {
         path: "home",
         element: <Home />,
@@ -53,19 +66,35 @@ export const userRoutes = [
       },
       {
         path: "me",
-        element: <UserProfilePage />,
+        element: (
+          <ProtectedRoute allowedRoles={["user"]}>
+            <UserProfilePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "user/create-report",
-        element: <CreateLaporan />, 
+        element: (
+          <ProtectedRoute allowedRoles={["user"]}>
+            <CreateLaporan />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: "user/check-status", 
-        element: <CheckStatusPage />, 
+        path: "user/check-status",
+        element: (
+          <ProtectedRoute allowedRoles={["user"]}>
+            <CheckStatusPage />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: "user/notifications", 
-        element: <NotificationsPage />, 
+        path: "user/notifications",
+        element: (
+          <ProtectedRoute allowedRoles={["user"]}>
+            <NotificationsPage />
+          </ProtectedRoute>
+        ),
       },
     ],
   },
@@ -74,7 +103,11 @@ export const userRoutes = [
 export const walikotaRoutes = [
   {
     path: "/walikota",
-    element: <WalikotaLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <WalikotaLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: "",
@@ -85,5 +118,9 @@ export const walikotaRoutes = [
         element: <WalikotaDashboard />,
       },
     ],
+  },
+  {
+    path: "*",
+    element: <Navigate to="/home" replace />,
   },
 ];
