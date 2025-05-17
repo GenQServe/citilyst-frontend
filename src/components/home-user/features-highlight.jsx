@@ -82,35 +82,37 @@ const FeaturesHighlight = () => {
             <img
               src={images.reportPhoto}
               alt="lebih mudah lapor"
-              className="object-contain w-full max-h-[250px] md:max-h-[350px] lg:max-h-[400px]"
+              className="object-contain w-full max-h-[250px] md:max-h-[350px] lg:max-h-[360px]"
             />
           </div>
 
           <div className="text-left">
             <h2
               ref={titleRef}
-              className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6"
+              className="text-2xl md:text-3xl lg:text-3xl font-bold mb-4 md:mb-6"
             >
               Lapor Lebih Mudah dengan CityList
             </h2>
 
-            <div className="space-y-4 md:space-y-5">
+            <div className="space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-5">
               {features.map((feature, index) => (
                 <div
                   key={feature.id}
                   ref={(el) => (featuresRef.current[index] = el)}
-                  className="flex items-start bg-white rounded-xl px-4 py-3 shadow-sm"
+                  className="flex items-center bg-white rounded-xl px-3 sm:px-4 lg:px-3 py-2.5 sm:py-3 lg:py-2 shadow-sm hover:shadow-md transition-shadow duration-300"
                 >
-                  <div className="flex-shrink-0 w-6 h-6 mr-3 bg-[#9CDE9F] rounded-full flex items-center justify-center text-white">
-                    <Check size={14} strokeWidth={3} />
+                  <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 lg:w-4 lg:h-4 mr-2 sm:mr-3 lg:mr-1.5 bg-[#9CDE9F] rounded-full flex items-center justify-center text-white">
+                    <Check size={12} strokeWidth={3} className="sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-2.5 lg:w-2.5" />
                   </div>
-                  <div>
-                    <span className="font-medium text-[#4E9F60] text-sm md:text-base">
-                      {feature.label}
-                    </span>{" "}
-                    <span className="text-gray-700 text-xs md:text-sm">
-                      {feature.description}
-                    </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="lg:flex lg:items-center break-words lg:break-normal">
+                      <span className="font-medium text-[#4E9F60] text-xs sm:text-sm md:text-base lg:text-[0.625rem] lg:leading-none">
+                        {feature.label}
+                      </span>{" "}
+                      <span className="text-gray-700 text-xs sm:text-xs md:text-sm lg:text-[0.625rem] lg:leading-none">
+                        {feature.description}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}

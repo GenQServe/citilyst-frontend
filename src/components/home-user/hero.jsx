@@ -42,9 +42,9 @@ const Hero = () => {
   return (
     <section ref={heroRef} className="py-12 md:py-20 bg-[#F4FFEE] overflow-hidden ">
     <div className="container mx-auto px-4 sm:px-5 md:px-8 lg:px-4 xl:px-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          <div ref={textRef} className="space-y-6">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          <div ref={textRef} className="space-y-6 items-start">
+            <h1 className="text-3xl md:text-4xl lg:text-[2.6rem] xl:text-5xl font-bold leading-tight">
               Laporkan Keluhan <br />
               Wujudkan Perubahan
             </h1>
@@ -82,7 +82,7 @@ const Hero = () => {
             <img
               src={heroPhoto} // Using the imported image
               alt="Citizen reporting using CitiLyst"
-              className="w-full h-auto object-cover rounded-lg"
+              className="w-full h-auto lg:h-[300px] xl:h-[400px] object-cover rounded-lg"
             />
           </div>
         </div>

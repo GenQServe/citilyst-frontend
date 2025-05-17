@@ -178,6 +178,15 @@ const FloatingNavbar = () => {
             >
               Cek Status
             </Link>
+            <Link
+              to="/verify-otp"
+              className={cn(
+                "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
+                isActiveLink("/verify-otp") && "bg-[#9DB17C] text-black font-medium"
+              )}
+            >
+              Notifikasi
+            </Link>
           </div>
         </div>
 
