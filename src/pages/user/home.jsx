@@ -1,5 +1,8 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
+import { useLocation, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
 import useGSAP from "@/hooks/use-gsap";
 import WhyChoose from "@/components/home-user/why-choose";
 import HowWorks from "@/components/home-user/how-works";
@@ -11,6 +14,23 @@ import FAQ from "@/components/home-user/faq";
 
 const Home = () => {
   const heroRef = useRef(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const token = searchParams.get("token");
+
+    if (token) {
+      Cookies.set("token", token, {
+        path: "/",
+        expires: 30,
+        sameSite: "Lax",
+      });
+      toast.success("Login berhasil!");
+      navigate("/home", { replace: true });
+    }
+  }, [location, navigate]);
 
   useGSAP(() => {
     const tl = gsap.timeline();
