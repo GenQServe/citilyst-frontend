@@ -161,7 +161,7 @@ export default function UserProfilePage() {
   }
 
   return (
-    <div className="flex justify-center w-full bg-gray-50 min-h-[calc(100vh-64px)]">
+    <div className="flex justify-center w-full min-h-[calc(100vh-64px)]">
       <div className="container max-w-5xl py-12 px-4 md:px-6 flex flex-col">
         <div className="mb-8 relative">
           <h1 className="text-3xl font-bold mb-2 text-gray-800">

@@ -10,9 +10,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, LayoutGrid, User, LogOut, Bell } from "lucide-react";
+import { Menu, X, User, LogOut, Bell } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuthState } from "@/hooks/use-auth-state";
+import { images } from "@/constants/images";
 
 const FloatingNavbar = () => {
   const navbarRef = useRef(null);
@@ -114,13 +115,13 @@ const FloatingNavbar = () => {
         ref={navbarContentRef}
         className="container mx-auto px-4 flex items-center justify-between"
       >
-        <a
-          href="#"
-          onClick={handleLogoClick}
-          className="text-xl font-bold flex items-center gap-2 text-black"
-        >
-          <LayoutGrid className="w-6 h-6" />
-          CityList
+        <a href="#" onClick={handleLogoClick} className="flex items-center">
+          <img
+            src={images.cityListLogo}
+            alt="CityList Logo"
+            className="h-12 w-auto"
+            style={{ minWidth: 120, maxWidth: 180 }}
+          />
         </a>
 
         <div className="hidden lg:flex items-center justify-center flex-1">

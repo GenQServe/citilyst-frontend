@@ -24,14 +24,12 @@ api.interceptors.request.use(
 
         if (decoded.exp < currentTime) {
           Cookies.remove("token");
-          window.location.href = "/login";
           return Promise.reject("Token expired");
         }
 
         config.headers["Authorization"] = `Bearer ${token}`;
       } catch (error) {
         Cookies.remove("token");
-        window.location.href = "/login";
         return Promise.reject("Invalid token");
       }
     }
@@ -50,7 +48,6 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       Cookies.remove("token");
-      window.location.href = "/login";
     } else if (error.response) {
       console.error("Response error:", error.response.data);
     } else if (error.request) {

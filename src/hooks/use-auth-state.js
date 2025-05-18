@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export function useAuthState() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const checkAuth = () => {
     const token = Cookies.get("token");
@@ -14,7 +15,6 @@ export function useAuthState() {
         const decoded = jwtDecode(token);
         setUser(decoded);
       } catch (error) {
-        console.error("Invalid token", error);
         Cookies.remove("token");
         setUser(null);
       }
@@ -34,6 +34,10 @@ export function useAuthState() {
     const intervalId = setInterval(checkAuth, 60000);
     return () => clearInterval(intervalId);
   }, []);
+
+  useEffect(() => {
+    checkAuth();
+  }, [location]);
 
   return {
     user,
