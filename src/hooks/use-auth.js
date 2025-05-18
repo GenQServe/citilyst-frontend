@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -8,6 +8,8 @@ import {
   getUserProfile,
   loginUser,
   googleLogin,
+  updateUserProfile,
+  updateUserProfilePicture,
 } from "@/services/auth-service";
 import Cookies from "js-cookie";
 
@@ -96,6 +98,38 @@ export function useUserProfile() {
     select: (data) => data.data,
     onError: () => {
       toast.error("Failed to fetch user profile");
+    },
+  });
+}
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateUserProfile,
+    onSuccess: () => {
+      toast.success("Profile updated successfully");
+      queryClient.invalidateQueries(["userProfile"]);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to update profile");
+    },
+  });
+}
+
+export function useUpdateProfilePicture() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateUserProfilePicture,
+    onSuccess: () => {
+      toast.success("Profile picture updated successfully");
+      queryClient.invalidateQueries(["userProfile"]);
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "Failed to update profile picture"
+      );
     },
   });
 }

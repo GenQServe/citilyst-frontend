@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { useUserProfile } from "@/hooks/use-auth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useUserProfile,
+  useUpdateProfile,
+  useUpdateProfilePicture,
+} from "@/hooks/use-auth";
 import {
   Calendar,
   MapPin,
@@ -26,22 +29,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import {
-  updateUserProfile,
-  updateUserProfilePicture,
-} from "@/services/auth-service";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ProfileCard = ({ icon: Icon, label, value, loading = false, onEdit }) => (
   <div className="flex items-start space-x-3 p-4 rounded-lg bg-slate-50 relative hover:bg-slate-100 transition-colors group">
@@ -70,8 +64,12 @@ const ProfileCard = ({ icon: Icon, label, value, loading = false, onEdit }) => (
 );
 
 export default function UserProfilePage() {
-  const { data: user, isLoading, refetch } = useUserProfile();
-  const queryClient = useQueryClient();
+  const { data: user, isLoading } = useUserProfile();
+  const { mutate: updateProfile, isPending: isProfilePending } =
+    useUpdateProfile();
+  const { mutate: updateProfilePicture, isPending: isPicturePending } =
+    useUpdateProfilePicture();
+
   const [isEditing, setIsEditing] = useState(false);
   const [editedField, setEditedField] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -88,37 +86,6 @@ export default function UserProfilePage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isPasswordTab, setIsPasswordTab] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-
-  // Mutasi untuk update profile data (tanpa gambar)
-  const { mutate: updateProfile, isPending: isProfilePending } = useMutation({
-    mutationFn: (data) => updateUserProfile(user?.id, data),
-    onSuccess: () => {
-      toast.success("Profil berhasil diperbarui");
-      setIsEditing(false);
-      setEditedField(null);
-      queryClient.invalidateQueries(["userProfile"]);
-      refetch();
-    },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || "Gagal memperbarui profil");
-    },
-  });
-
-  // Mutasi untuk update foto profil
-  const { mutate: updateProfilePicture, isPending: isPicturePending } = useMutation({
-    mutationFn: (file) => updateUserProfilePicture(user?.id, file),
-    onSuccess: () => {
-      toast.success("Foto profil berhasil diperbarui");
-      setIsEditing(false);
-      setEditedField(null);
-      setPreviewImage(null);
-      queryClient.invalidateQueries(["userProfile"]);
-      refetch();
-    },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || "Gagal memperbarui foto profil");
-    },
-  });
 
   const isPending = isProfilePending || isPicturePending;
 
@@ -163,11 +130,13 @@ export default function UserProfilePage() {
 
   const handleSubmit = () => {
     if (isPasswordTab) {
-      toast.error("Ganti password harus lewat menu khusus (belum didukung)");
+      toast.error("Ganti password belum didukung");
       return;
     }
+
     if (editedField === "image_url" && editForm.image_url) {
       updateProfilePicture(editForm.image_url);
+      setIsEditing(false);
     } else if (
       editedField &&
       ["name", "email", "nik", "phone_number", "address"].includes(editedField)
@@ -175,6 +144,7 @@ export default function UserProfilePage() {
       const payload = {};
       payload[editedField] = editForm[editedField];
       updateProfile(payload);
+      setIsEditing(false);
     } else {
       toast.error("Tidak ada perubahan data");
     }

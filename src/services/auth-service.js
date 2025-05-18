@@ -1,6 +1,6 @@
 import api from "@/lib/api";
 import Cookies from "js-cookie";
-
+import { jwtDecode } from "jwt-decode";
 
 export const registerUser = async (userData) => {
   const response = await api.post("/auth/register", userData);
@@ -43,15 +43,35 @@ export const getUserProfile = async () => {
   return response.data;
 };
 
+export const updateUserProfile = async (data) => {
+  const token = Cookies.get("token");
+  if (!token) {
+    throw new Error("No token found");
+  }
 
-export const updateUserProfile = async (userId, data) => {
+  const decoded = jwtDecode(token);
+  const userId = decoded.sub;
+
   const response = await api.put(`/user/${userId}`, data);
   return response.data;
 };
 
-export const updateUserProfilePicture = async (userId, file) => {
+export const updateUserProfilePicture = async (file) => {
+  const token = Cookies.get("token");
+  if (!token) {
+    throw new Error("No token found");
+  }
+
+  const decoded = jwtDecode(token);
+  const userId = decoded.sub;
+
   const formData = new FormData();
   formData.append("file", file);
-  const response = await api.put(`/user/${userId}/profile-picture`, formData);
+
+  const response = await api.put(`/user/${userId}/profile-picture`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response.data;
 };
