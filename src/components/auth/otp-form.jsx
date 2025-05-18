@@ -23,6 +23,7 @@ import { z } from "zod";
 import { useVerifyOtp, useResendOtp } from "@/hooks/use-auth";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
 
 const formSchema = z.object({
   otp: z.string().length(6, "OTP harus 6 digit"),
@@ -31,6 +32,7 @@ const formSchema = z.object({
 export function OtpForm() {
   const [resendDisabled, setResendDisabled] = useState(true);
   const [countdown, setCountdown] = useState(30);
+  const [emailValue, setEmailValue] = useState("");
   const inputRefs = [
     useRef(),
     useRef(),
@@ -41,9 +43,9 @@ export function OtpForm() {
   ];
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { mutate: verifyOtp, isPending: isVerifying } = useVerifyOtp();
   const { mutate: resendOtp, isPending: isResending } = useResendOtp();
-  const email = Cookies.get("email");
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -53,11 +55,22 @@ export function OtpForm() {
   });
 
   useEffect(() => {
-    if (!email) {
+    const cookieEmail = Cookies.get("email");
+    const stateEmail = location.state?.email;
+
+    // Set email in state for component rendering
+    if (cookieEmail) {
+      setEmailValue(cookieEmail);
+    } else if (stateEmail) {
+      setEmailValue(stateEmail);
+      // Save to cookie if not already there
+      Cookies.set("email", stateEmail, { expires: 1 });
+    } else {
+      // Only navigate away if we have no email from either source
       toast.error("Email tidak ditemukan, silakan daftar terlebih dahulu");
       navigate("/register");
     }
-  }, [email, navigate]);
+  }, [location.state, navigate]);
 
   useEffect(() => {
     let timer;
@@ -74,11 +87,6 @@ export function OtpForm() {
   const onSubmit = (data) => {
     verifyOtp({
       otp: data.otp,
-      onSuccess: (response) => {
-        Cookies.set("token", response.data.token);
-        Cookies.remove("email");
-        navigate("/home", { replace: true });
-      },
     });
   };
 
@@ -137,12 +145,7 @@ export function OtpForm() {
       <div className="w-full max-w-md">
         <Link
           to="/register"
-          className={`inline-flex items-center gap-2 mb-8 ${
-            !email
-              ? "pointer-events-none opacity-50"
-              : "text-gray-600 hover:text-gray-900"
-          }`}
-          onClick={(e) => !email && e.preventDefault()}
+          className="inline-flex items-center gap-2 mb-8 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="font-medium">Kembali</span>
@@ -152,7 +155,7 @@ export function OtpForm() {
           <CardHeader className="px-0 pt-0">
             <CardTitle className="text-2xl font-bold">Verifikasi OTP</CardTitle>
             <p className="text-gray-500 text-sm mt-2">
-              Masukkan kode 6 digit yang telah dikirimkan ke email {email || ""}
+              Masukkan kode 6 digit yang telah dikirimkan ke email {emailValue}
             </p>
           </CardHeader>
           <CardContent className="px-0 space-y-4">
@@ -191,7 +194,7 @@ export function OtpForm() {
                 <Button
                   type="submit"
                   className="w-full bg-[#9DB17C] hover:bg-[#8CA06B] text-white"
-                  disabled={isVerifying || !email}
+                  disabled={isVerifying || !emailValue}
                 >
                   {isVerifying ? (
                     <div className="flex items-center gap-2">
@@ -212,11 +215,11 @@ export function OtpForm() {
                 variant="ghost"
                 size="sm"
                 className={`text-[#9DB17C] hover:text-[#8CA06B] ${
-                  resendDisabled || isResending || !email
+                  resendDisabled || isResending || !emailValue
                     ? "opacity-50 cursor-not-allowed"
                     : ""
                 }`}
-                disabled={resendDisabled || isResending || !email}
+                disabled={resendDisabled || isResending || !emailValue}
                 onClick={handleResendOtp}
               >
                 {isResending ? (
