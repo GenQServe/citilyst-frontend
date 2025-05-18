@@ -70,7 +70,7 @@ export const userRoutes = [
         element: <Home />,
       },
       {
-        path: "me",
+        path: "profile",
         element: (
           <ProtectedRoute allowedRoles={["user"]}>
             <UserProfilePage />

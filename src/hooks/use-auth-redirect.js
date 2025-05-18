@@ -30,7 +30,7 @@ export function useAuthRedirect() {
             setInitialRedirect("/home");
           } else if (
             (location.pathname.startsWith("/home") ||
-              location.pathname === "/me") &&
+              location.pathname === "/profile") &&
             decoded.role === "admin"
           ) {
             setInitialRedirect("/walikota");

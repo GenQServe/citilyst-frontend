@@ -69,7 +69,7 @@ export function useVerifyOtp() {
       toast.success(data.message);
       dispatch(setUser(data.data));
       Cookies.remove("email");
-      navigate("/me");
+      navigate("/profile");
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "OTP verification failed");

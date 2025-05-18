@@ -163,7 +163,8 @@ const FloatingNavbar = () => {
               to="/user/create-report"
               className={cn(
                 "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
-                isActiveLink("/user/create-report") && "bg-[#9DB17C] text-black font-medium"
+                isActiveLink("/user/create-report") &&
+                  "bg-[#9DB17C] text-black font-medium"
               )}
             >
               Buat Laporan
@@ -172,7 +173,8 @@ const FloatingNavbar = () => {
               to="/user/check-status"
               className={cn(
                 "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
-                isActiveLink("/user/check-status") && "bg-[#9DB17C] text-black font-medium"
+                isActiveLink("/user/check-status") &&
+                  "bg-[#9DB17C] text-black font-medium"
               )}
             >
               Cek Status
@@ -181,7 +183,8 @@ const FloatingNavbar = () => {
               to="/user/notifications"
               className={cn(
                 "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
-                isActiveLink("/user/notifications") && "bg-[#9DB17C] text-black font-medium"
+                isActiveLink("/user/notifications") &&
+                  "bg-[#9DB17C] text-black font-medium"
               )}
             >
               Notifikasi
@@ -218,7 +221,7 @@ const FloatingNavbar = () => {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <Link to="/me">
+                <Link to="/profile">
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
                     <span>Profil</span>
@@ -304,7 +307,8 @@ const FloatingNavbar = () => {
                   to="/user/create-report"
                   className={cn(
                     "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
-                    isActiveLink("/user/create-report") && "bg-[#9DB17C] rounded-md px-3 py-2"
+                    isActiveLink("/user/create-report") &&
+                      "bg-[#9DB17C] rounded-md px-3 py-2"
                   )}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -314,7 +318,8 @@ const FloatingNavbar = () => {
                   to="/user/check-status"
                   className={cn(
                     "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
-                    isActiveLink("/user/check-status") && "bg-[#9DB17C] rounded-md px-3 py-2"
+                    isActiveLink("/user/check-status") &&
+                      "bg-[#9DB17C] rounded-md px-3 py-2"
                   )}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -324,7 +329,8 @@ const FloatingNavbar = () => {
                   to="/user/notifications"
                   className={cn(
                     "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
-                    isActiveLink("/user/notifications") && "bg-[#9DB17C] rounded-md px-3 py-2"
+                    isActiveLink("/user/notifications") &&
+                      "bg-[#9DB17C] rounded-md px-3 py-2"
                   )}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -348,7 +354,7 @@ const FloatingNavbar = () => {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
-                        <Link to="/me">
+                        <Link to="/profile">
                           <Button
                             size="sm"
                             className="w-full rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
