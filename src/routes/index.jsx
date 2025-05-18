@@ -12,6 +12,7 @@ import CheckStatusPage from "@/pages/user/check-status";
 import NotificationsPage from "@/pages/user/notifications";
 import NotFoundPage from "@/pages/404";
 import { ProtectedRoute, PublicRoute } from "@/components/protected-route";
+import { OAuthCallback } from "@/components/auth/oauth-callback";
 
 export const publicRoutes = [
   {
@@ -41,6 +42,10 @@ export const publicRoutes = [
         <VerifyOtpPage />
       </PublicRoute>
     ),
+  },
+  {
+    path: "/oauth/callback",
+    element: <OAuthCallback />,
   },
   {
     path: "*",

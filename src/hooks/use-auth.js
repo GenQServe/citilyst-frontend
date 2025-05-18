@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
+import { useEffect } from "react";
 import {
   registerUser,
   verifyOtp,
@@ -45,6 +46,20 @@ export function useLogin() {
 }
 
 export function useGoogleLogin() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const token = searchParams.get("token");
+
+    if (token) {
+      Cookies.set("token", token);
+      navigate("/home", { replace: true });
+      toast.success("Login berhasil!");
+    }
+  }, [navigate, location.search]);
+
   return useMutation({
     mutationFn: googleLogin,
     onSuccess: (data) => {

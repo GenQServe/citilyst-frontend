@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Eye, EyeOff, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,7 @@ export function LoginForm() {
   const { mutate: loginWithGoogle, isPending: isGoogleLoggingIn } =
     useGoogleLogin();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -53,7 +54,16 @@ export function LoginForm() {
       toast.info("Lanjutkan pendaftaran Anda terlebih dahulu");
       navigate("/verify-otp");
     }
-  }, [navigate]);
+
+    const searchParams = new URLSearchParams(location.search);
+    const token = searchParams.get("token");
+
+    if (token) {
+      Cookies.set("token", token);
+      navigate("/home", { replace: true });
+      toast.success("Login berhasil!");
+    }
+  }, [navigate, location.search]);
 
   const onSubmit = (data) => {
     login(data);

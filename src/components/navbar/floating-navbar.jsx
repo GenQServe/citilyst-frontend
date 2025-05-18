@@ -182,7 +182,7 @@ const FloatingNavbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-56 mt-2 shadow-2xl border border-gray-100"
+                className="w-56 mt-3 shadow-2xl border border-gray-100"
                 sideOffset={8}
               >
                 <div className="flex items-center justify-start gap-2 p-2">
