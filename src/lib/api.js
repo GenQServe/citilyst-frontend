@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -13,6 +14,12 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+    const token = Cookies.get("token");
+
+    if (token) {
+      config.headers["Cookie"] = `token=${token}`;
+    }
+
     return config;
   },
   (error) => {
