@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, LayoutGrid, User, LogOut } from "lucide-react";
+import { Menu, X, LayoutGrid, User, LogOut, Bell } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuthState } from "@/hooks/use-auth-state";
 
@@ -171,9 +171,12 @@ const FloatingNavbar = () => {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="rounded-full p-0 h-10 w-10">
-                  <Avatar>
-                    <AvatarImage src={user.image_url} />
+                <Button
+                  variant="ghost"
+                  className="rounded-full h-10 w-10 p-0 overflow-hidden border-2 border-[#9DB17C]/50 hover:border-[#9DB17C] transition-all"
+                >
+                  <Avatar className="h-full w-full">
+                    <AvatarImage src={user.image_url} alt={user.name} />
                     <AvatarFallback className="bg-[#9DB17C] text-white">
                       {user.name?.charAt(0) || "U"}
                     </AvatarFallback>
@@ -182,37 +185,51 @@ const FloatingNavbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-56 mt-3 shadow-2xl border border-gray-100"
+                className="w-64 mt-2 shadow-lg border border-gray-100 rounded-xl overflow-hidden p-0"
                 sideOffset={8}
               >
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.image_url} />
-                    <AvatarFallback className="bg-[#9DB17C] text-white">
-                      {user.name?.charAt(0) || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium text-sm">{user.name}</p>
-                    <p className="text-xs text-muted-foreground truncate w-[180px]">
-                      {user.email}
-                    </p>
+                <div className="bg-[#9DB17C]/10 p-4">
+                  <div className="flex items-center justify-start gap-3">
+                    <Avatar className="h-12 w-12 border-2 border-[#9DB17C]">
+                      <AvatarImage src={user.image_url} alt={user.name} />
+                      <AvatarFallback className="bg-[#9DB17C] text-white">
+                        {user.name?.charAt(0) || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-semibold text-sm">{user.name}</p>
+                      <p className="text-xs text-muted-foreground truncate w-[180px]">
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <DropdownMenuSeparator />
-                <Link to="/profile">
-                  <DropdownMenuItem className="cursor-pointer hover:bg-gray-50">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profil</span>
+
+                <div className="p-2">
+                  <Link to="/profile">
+                    <DropdownMenuItem className="cursor-pointer hover:bg-[#9DB17C]/10 rounded-md h-10 flex items-center px-3">
+                      <User className="mr-2 h-4 w-4 text-[#9DB17C]" />
+                      <span>Profil</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link to="/user/notifications">
+                    <DropdownMenuItem className="cursor-pointer hover:bg-[#9DB17C]/10 rounded-md h-10 flex items-center px-3">
+                      <Bell className="mr-2 h-4 w-4 text-[#9DB17C]" />
+                      <span>Notifikasi</span>
+                    </DropdownMenuItem>
+                  </Link>
+                </div>
+
+                <DropdownMenuSeparator className="bg-gray-200" />
+                <div className="p-2">
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer hover:bg-red-50 rounded-md h-10 flex items-center px-3 text-red-500 hover:text-red-600"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Keluar</span>
                   </DropdownMenuItem>
-                </Link>
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="cursor-pointer hover:bg-gray-50"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Keluar</span>
-                </DropdownMenuItem>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -270,7 +287,7 @@ const FloatingNavbar = () => {
             <DropdownMenuContent
               ref={dropdownRef}
               align="end"
-              className="w-[100vw] bg-[#9CDE9F] border-none mt-2 px-6 py-4 shadow-lg rounded-xl"
+              className="w-[100vw] bg-[#9CDE9F] border-none mt-2 px-6 py-4 shadow-lg rounded-b-xl"
               sideOffset={8}
               onCloseAutoFocus={(e) => e.preventDefault()}
             >
@@ -318,11 +335,11 @@ const FloatingNavbar = () => {
                 >
                   Notifikasi
                 </Link>
-                <div className="pt-2 mt-2 border-t border-[#8CA06B]/30">
+                <div className="pt-4 mt-2 border-t border-[#8CA06B]/30">
                   {user ? (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div className="flex items-center gap-3 py-2">
-                        <Avatar className="h-10 w-10">
+                        <Avatar className="h-12 w-12 border-2 border-[#9DB17C]/50">
                           <AvatarImage src={user.image_url} />
                           <AvatarFallback className="bg-[#9DB17C] text-white">
                             {user.name?.charAt(0) || "U"}
@@ -335,11 +352,11 @@ const FloatingNavbar = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 gap-2">
                         <Link to="/profile">
                           <Button
                             size="sm"
-                            className="w-full rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
+                            className="w-full rounded-lg bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none h-10"
                             onClick={() => setMenuOpen(false)}
                           >
                             <User className="mr-2 h-4 w-4" />
@@ -349,7 +366,7 @@ const FloatingNavbar = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="w-full rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
+                          className="w-full rounded-lg border-red-400 text-red-500 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 h-10"
                           onClick={() => {
                             handleLogout();
                             setMenuOpen(false);
@@ -365,7 +382,7 @@ const FloatingNavbar = () => {
                       <Link to="/login">
                         <Button
                           size="sm"
-                          className="w-full rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
+                          className="w-full rounded-lg bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none h-10"
                           onClick={() => setMenuOpen(false)}
                         >
                           Masuk
@@ -375,7 +392,7 @@ const FloatingNavbar = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="w-full rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
+                          className="w-full rounded-lg border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10 h-10"
                           onClick={() => setMenuOpen(false)}
                         >
                           Daftar
