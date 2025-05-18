@@ -54,10 +54,6 @@ export const userRoutes = [
     element: <UserLayout />,
     children: [
       {
-        path: "",
-        element: <Navigate to="/home" replace />,
-      },
-      {
         path: "home",
         element: <Home />,
       },
@@ -100,10 +96,6 @@ export const userRoutes = [
             <NotificationsPage />
           </ProtectedRoute>
         ),
-      },
-      {
-        path: "*",
-        element: <Navigate to="/home" replace />,
       },
     ],
   },

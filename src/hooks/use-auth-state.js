@@ -26,7 +26,7 @@ export function useAuthState() {
   const handleLogout = () => {
     Cookies.remove("token");
     setUser(null);
-    navigate("/home");
+    navigate("/home", { replace: true });
   };
 
   useEffect(() => {

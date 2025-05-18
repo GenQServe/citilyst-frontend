@@ -36,7 +36,7 @@ export function useLogin() {
     onSuccess: (data) => {
       toast.success(data.message);
       Cookies.set("token", data.data.token);
-      navigate("/");
+      navigate("/home", { replace: true });
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Login failed");
