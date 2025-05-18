@@ -1,6 +1,7 @@
 import api from "@/lib/api";
 import Cookies from "js-cookie";
 
+
 export const registerUser = async (userData) => {
   const response = await api.post("/auth/register", userData);
   Cookies.set("email", userData.email, { expires: 1 });
@@ -39,5 +40,14 @@ export const googleLogin = async () => {
 
 export const getUserProfile = async () => {
   const response = await api.get("/auth/me");
+  return response.data;
+};
+
+export const updateUserProfile = async (userId, userData) => {
+  const response = await api.put(`/user/${userId}`, userData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
   return response.data;
 };
