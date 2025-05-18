@@ -72,7 +72,14 @@ export function OtpForm() {
   }, [resendDisabled, countdown]);
 
   const onSubmit = (data) => {
-    verifyOtp({ otp: data.otp });
+    verifyOtp({
+      otp: data.otp,
+      onSuccess: (response) => {
+        Cookies.set("token", response.data.token);
+        Cookies.remove("email");
+        navigate("/home", { replace: true });
+      },
+    });
   };
 
   const handleResendOtp = () => {

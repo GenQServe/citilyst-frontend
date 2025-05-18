@@ -65,11 +65,15 @@ export function useVerifyOtp() {
 
   return useMutation({
     mutationFn: verifyOtp,
-    onSuccess: (data) => {
+    onSuccess: (data, _, context) => {
       toast.success(data.message);
-      dispatch(setUser(data.data));
+      Cookies.set("token", data.data.token);
       Cookies.remove("email");
-      navigate("/profile");
+      if (context?.onSuccess) {
+        context.onSuccess(data);
+      } else {
+        navigate("/home", { replace: true });
+      }
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "OTP verification failed");
