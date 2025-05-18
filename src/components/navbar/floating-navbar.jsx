@@ -13,7 +13,7 @@ import {
 import { Menu, X, LayoutGrid, User, LogOut } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
+import { useUserProfile } from "@/hooks/use-auth";
 
 const FloatingNavbar = () => {
   const navbarRef = useRef(null);
@@ -23,35 +23,11 @@ const FloatingNavbar = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isFloating, setIsFloating] = useState(false);
-  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = Cookies.get("token");
-      if (token) {
-        try {
-          const decoded = jwtDecode(token);
-          setUser(decoded);
-        } catch (error) {
-          console.error("Invalid token", error);
-          Cookies.remove("token");
-          setUser(null);
-        }
-      } else {
-        setUser(null);
-      }
-    };
-
-    checkAuth();
-
-    const intervalId = setInterval(checkAuth, 60000);
-
-    return () => clearInterval(intervalId);
-  }, []);
+  const { data: user, isLoading, isError } = useUserProfile();
 
   const handleLogout = () => {
     Cookies.remove("token");
-    setUser(null);
     navigate("/");
   };
 
@@ -193,7 +169,7 @@ const FloatingNavbar = () => {
         </div>
 
         <div className="hidden lg:flex items-center gap-2">
-          {user ? (
+          {!isLoading && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="rounded-full p-0 h-10 w-10">
@@ -337,7 +313,7 @@ const FloatingNavbar = () => {
                   Notifikasi
                 </Link>
                 <div className="pt-2 mt-2 border-t border-[#8CA06B]/30">
-                  {user ? (
+                  {!isLoading && user ? (
                     <div className="space-y-3">
                       <div className="flex items-center gap-3 py-2">
                         <Avatar className="h-10 w-10">
