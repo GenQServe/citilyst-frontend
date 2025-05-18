@@ -46,20 +46,6 @@ export function useLogin() {
 }
 
 export function useGoogleLogin() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const token = searchParams.get("token");
-
-    if (token) {
-      Cookies.set("token", token);
-      navigate("/home", { replace: true });
-      toast.success("Login berhasil!");
-    }
-  }, [navigate, location.search]);
-
   return useMutation({
     mutationFn: googleLogin,
     onSuccess: (data) => {
