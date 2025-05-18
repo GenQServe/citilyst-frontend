@@ -25,7 +25,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { updateUserProfile } from "@/services/auth-service";
+import {
+  updateUserProfile,
+  updateUserProfilePicture,
+} from "@/services/auth-service";
 import {
   Dialog,
   DialogContent,
@@ -86,7 +89,8 @@ export default function UserProfilePage() {
   const [isPasswordTab, setIsPasswordTab] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
-  const { mutate: updateUser, isPending } = useMutation({
+  // Mutasi untuk update profile data (tanpa gambar)
+  const { mutate: updateProfile, isPending: isProfilePending } = useMutation({
     mutationFn: (data) => updateUserProfile(user?.id, data),
     onSuccess: () => {
       toast.success("Profil berhasil diperbarui");
@@ -99,6 +103,24 @@ export default function UserProfilePage() {
       toast.error(error.response?.data?.message || "Gagal memperbarui profil");
     },
   });
+
+  // Mutasi untuk update foto profil
+  const { mutate: updateProfilePicture, isPending: isPicturePending } = useMutation({
+    mutationFn: (file) => updateUserProfilePicture(user?.id, file),
+    onSuccess: () => {
+      toast.success("Foto profil berhasil diperbarui");
+      setIsEditing(false);
+      setEditedField(null);
+      setPreviewImage(null);
+      queryClient.invalidateQueries(["userProfile"]);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Gagal memperbarui foto profil");
+    },
+  });
+
+  const isPending = isProfilePending || isPicturePending;
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -117,6 +139,7 @@ export default function UserProfilePage() {
     }));
     setIsEditing(true);
     setIsPasswordTab(field === "password");
+    if (field === "image_url") setPreviewImage(null);
   };
 
   const handleInputChange = (e) => {
@@ -139,31 +162,22 @@ export default function UserProfilePage() {
   };
 
   const handleSubmit = () => {
-    const formData = new FormData();
-    
     if (isPasswordTab) {
-      if (editForm.new_password !== editForm.confirm_password) {
-        toast.error("Password baru dan konfirmasi password tidak sama");
-        return;
-      }
-      if (!editForm.password) {
-        toast.error("Masukkan password saat ini");
-        return;
-      }
-      formData.append("password", editForm.password);
-      formData.append("new_password", editForm.new_password);
-    } else {
-      if (editedField === "image_url" && editForm.image_url) {
-        formData.append("image_url", editForm.image_url);
-      } else if (editedField && editForm[editedField]) {
-        formData.append(editedField, editForm[editedField]);
-      } else {
-        toast.error("Tidak ada perubahan data");
-        return;
-      }
+      toast.error("Ganti password harus lewat menu khusus (belum didukung)");
+      return;
     }
-
-    updateUser(formData);
+    if (editedField === "image_url" && editForm.image_url) {
+      updateProfilePicture(editForm.image_url);
+    } else if (
+      editedField &&
+      ["name", "email", "nik", "phone_number", "address"].includes(editedField)
+    ) {
+      const payload = {};
+      payload[editedField] = editForm[editedField];
+      updateProfile(payload);
+    } else {
+      toast.error("Tidak ada perubahan data");
+    }
   };
 
   const handleCloseDialog = () => {

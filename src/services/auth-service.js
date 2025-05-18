@@ -43,11 +43,15 @@ export const getUserProfile = async () => {
   return response.data;
 };
 
-export const updateUserProfile = async (userId, userData) => {
-  const response = await api.put(`/user/${userId}`, userData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  });
+
+export const updateUserProfile = async (userId, data) => {
+  const response = await api.put(`/user/${userId}`, data);
+  return response.data;
+};
+
+export const updateUserProfilePicture = async (userId, file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await api.put(`/user/${userId}/profile-picture`, formData);
   return response.data;
 };
