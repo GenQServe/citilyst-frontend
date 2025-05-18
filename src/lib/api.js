@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -17,7 +18,22 @@ api.interceptors.request.use(
     const token = Cookies.get("token");
 
     if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+      try {
+        const decoded = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+
+        if (decoded.exp < currentTime) {
+          Cookies.remove("token");
+          window.location.href = "/login";
+          return Promise.reject("Token expired");
+        }
+
+        config.headers["Authorization"] = `Bearer ${token}`;
+      } catch (error) {
+        Cookies.remove("token");
+        window.location.href = "/login";
+        return Promise.reject("Invalid token");
+      }
     }
 
     return config;
@@ -32,7 +48,10 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response) {
+    if (error.response && error.response.status === 401) {
+      Cookies.remove("token");
+      window.location.href = "/login";
+    } else if (error.response) {
       console.error("Response error:", error.response.data);
     } else if (error.request) {
       console.error("Request error:", error.request);
