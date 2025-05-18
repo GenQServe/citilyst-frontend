@@ -12,8 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Menu, X, LayoutGrid, User, LogOut } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
+import { useAuthState } from "@/hooks/use-auth-state";
 
 const FloatingNavbar = () => {
   const navbarRef = useRef(null);
@@ -23,37 +22,7 @@ const FloatingNavbar = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isFloating, setIsFloating] = useState(false);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = Cookies.get("token");
-      if (token) {
-        try {
-          const decoded = jwtDecode(token);
-          setUser(decoded);
-        } catch (error) {
-          console.error("Invalid token", error);
-          Cookies.remove("token");
-          setUser(null);
-        }
-      } else {
-        setUser(null);
-      }
-    };
-
-    checkAuth();
-
-    const intervalId = setInterval(checkAuth, 60000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  const handleLogout = () => {
-    Cookies.remove("token");
-    setUser(null);
-    navigate("/");
-  };
+  const { user, handleLogout } = useAuthState();
 
   useEffect(() => {
     const navbar = navbarRef.current;
@@ -131,6 +100,11 @@ const FloatingNavbar = () => {
     setMenuOpen((prev) => !prev);
   };
 
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    navigate("/home");
+  };
+
   return (
     <nav
       ref={navbarRef}
@@ -140,13 +114,14 @@ const FloatingNavbar = () => {
         ref={navbarContentRef}
         className="container mx-auto px-4 flex items-center justify-between"
       >
-        <Link
-          to="/"
+        <a
+          href="#"
+          onClick={handleLogoClick}
           className="text-xl font-bold flex items-center gap-2 text-black"
         >
           <LayoutGrid className="w-6 h-6" />
           CityList
-        </Link>
+        </a>
 
         <div className="hidden lg:flex items-center justify-center flex-1">
           <div className="flex items-center gap-2">
@@ -205,7 +180,11 @@ const FloatingNavbar = () => {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent
+                align="end"
+                className="w-56 mt-3 shadow-2xl border border-gray-100"
+                sideOffset={8}
+              >
                 <div className="flex items-center justify-start gap-2 p-2">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user.image_url} />
@@ -222,12 +201,15 @@ const FloatingNavbar = () => {
                 </div>
                 <DropdownMenuSeparator />
                 <Link to="/profile">
-                  <DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer hover:bg-gray-50">
                     <User className="mr-2 h-4 w-4" />
                     <span>Profil</span>
                   </DropdownMenuItem>
                 </Link>
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="cursor-pointer hover:bg-gray-50"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Keluar</span>
                 </DropdownMenuItem>

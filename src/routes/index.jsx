@@ -101,6 +101,10 @@ export const userRoutes = [
           </ProtectedRoute>
         ),
       },
+      {
+        path: "*",
+        element: <Navigate to="/home" replace />,
+      },
     ],
   },
 ];
