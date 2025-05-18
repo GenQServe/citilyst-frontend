@@ -32,7 +32,7 @@ const formSchema = z.object({
   password: z.string().min(1, "Password wajib diisi"),
 });
 
-export function LoginForm() {
+export function LoginForm({ setLoading }) {
   const [showPassword, setShowPassword] = useState(false);
   const { mutate: login, isPending: isLoggingIn } = useLogin();
   const { mutate: loginWithGoogle, isPending: isGoogleLoggingIn } =
@@ -54,6 +54,10 @@ export function LoginForm() {
       navigate("/verify-otp");
     }
   }, [navigate]);
+
+  useEffect(() => {
+    setLoading(isLoggingIn);
+  }, [isLoggingIn, setLoading]);
 
   const onSubmit = (data) => {
     login(data);
@@ -144,16 +148,8 @@ export function LoginForm() {
                 <Button
                   type="submit"
                   className="w-full bg-[#9DB17C] hover:bg-[#8CA06B] text-white"
-                  disabled={isLoggingIn}
                 >
-                  {isLoggingIn ? (
-                    <div className="flex items-center gap-2">
-                      <Loader className="h-4 w-4 animate-spin" />
-                      <span>Masuk...</span>
-                    </div>
-                  ) : (
-                    "Masuk"
-                  )}
+                  Masuk
                 </Button>
               </form>
             </Form>
