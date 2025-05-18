@@ -10,6 +10,7 @@ import UserProfilePage from "@/pages/user/me";
 import CreateLaporan from "@/pages/user/create-laporan";
 import CheckStatusPage from "@/pages/user/check-status";
 import NotificationsPage from "@/pages/user/notifications";
+import NotFoundPage from "@/pages/404";
 import { ProtectedRoute, PublicRoute } from "@/components/protected-route";
 
 export const publicRoutes = [
@@ -40,6 +41,10 @@ export const publicRoutes = [
         <VerifyOtpPage />
       </PublicRoute>
     ),
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ];
 
@@ -118,9 +123,5 @@ export const walikotaRoutes = [
         element: <WalikotaDashboard />,
       },
     ],
-  },
-  {
-    path: "*",
-    element: <Navigate to="/home" replace />,
   },
 ];
