@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { Outlet } from "react-router-dom";
 import FloatingNavbar from "@/components/navbar/floating-navbar";
+import Footer from "@/components/footer";
 import useGSAP from "@/hooks/use-gsap";
 import { gsap } from "gsap";
 
@@ -25,11 +26,7 @@ const UserLayout = () => {
         <Outlet />
       </main>
 
-      <footer className="py-6 bg-secondary/20 border-t border-border">
-        <div className="container mx-auto text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Citilyst. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
