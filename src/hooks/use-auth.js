@@ -30,13 +30,12 @@ export function useRegister() {
 
 export function useLogin() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   return useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
       toast.success(data.message);
-      dispatch(setUser(data.data));
+      Cookies.set("token", data.data.token);
       navigate("/");
     },
     onError: (error) => {
