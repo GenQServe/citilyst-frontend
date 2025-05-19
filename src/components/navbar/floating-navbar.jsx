@@ -119,7 +119,7 @@ const FloatingNavbar = () => {
           <img
             src={images.cityListLogo}
             alt="CityList Logo"
-            className="h-12 w-auto"
+            className="h-11 w-auto"
             style={{ minWidth: 120, maxWidth: 180 }}
           />
         </a>

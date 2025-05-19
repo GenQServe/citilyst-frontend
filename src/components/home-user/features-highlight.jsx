@@ -112,7 +112,8 @@ const FeaturesHighlight = () => {
                     <div className="lg:flex lg:items-center break-words lg:break-normal">
                       <span className="font-medium text-[#4E9F60] text-xs sm:text-sm md:text-base lg:text-sm lg:leading-normal">
                         {feature.label}
-                      </span>{" "}
+                      </span>
+                      <span className="inline-block w-1"></span>
                       <span className="text-gray-700 text-xs sm:text-xs md:text-sm lg:text-sm lg:leading-normal">
                         {feature.description}
                       </span>

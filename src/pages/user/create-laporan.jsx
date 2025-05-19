@@ -1,24 +1,26 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
-import { 
-  Camera, 
-  MapPin, 
+import {
+  Camera,
+  MapPin,
   CheckCircle,
   AlertCircle,
   ChevronRight,
-  UploadCloud
+  UploadCloud,
+  Home,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { 
+import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle 
+  CardTitle,
 } from "@/components/ui/card";
 import {
   Select,
@@ -29,6 +31,13 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import useGSAP from "@/hooks/use-gsap";
 
 export default function CreateLaporan() {
@@ -40,15 +49,14 @@ export default function CreateLaporan() {
   const [location, setLocation] = useState("");
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const pageRef = useRef(null);
   const titleRef = useRef(null);
   const formRef = useRef(null);
 
-  // Animation with GSAP
   useGSAP(() => {
     const tl = gsap.timeline();
-    
+
     tl.fromTo(
       titleRef.current,
       { opacity: 0, y: -20 },
@@ -60,97 +68,103 @@ export default function CreateLaporan() {
     );
   }, []);
 
-  // Handle image uploads
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    
+
     if (files.length > 0) {
-      // Convert images to preview URLs
-      const newImages = files.map(file => ({
+      const newImages = files.map((file) => ({
         file,
-        preview: URL.createObjectURL(file)
+        preview: URL.createObjectURL(file),
       }));
-      
-      setImages(prev => [...prev, ...newImages]);
+
+      setImages((prev) => [...prev, ...newImages]);
     }
   };
 
-  // Remove an image
   const removeImage = (index) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Handle form submission (temporary mock)
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (step < 3) {
-      // Move to next step
       setStep(step + 1);
-      // Scroll to top when changing steps
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    
-    // On final step, submit the form
+
     setIsSubmitting(true);
-    
-    // Mock API call with timeout
+
     setTimeout(() => {
       setIsSubmitting(false);
-      // Show success feedback and redirect
       alert("Laporan berhasil dibuat!");
-      navigate("/user/laporan-saya"); // This route would need to be created separately
+      navigate("/user/laporan-saya");
     }, 2000);
   };
 
-  // Go back to previous step
   const goToPreviousStep = () => {
     if (step > 1) {
       setStep(step - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 py-8 px-4">
-      <div ref={pageRef} className="w-full max-w-3xl">
+    <div className="container mx-auto px-4 py-6 md:py-10">
+      <div ref={pageRef} className="w-full max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <h1 ref={titleRef} className="text-3xl font-bold">Buat Laporan</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 ref={titleRef} className="text-2xl md:text-3xl font-bold">
+            Buat Laporan
+          </h1>
+          <p className="text-gray-600 mt-2 text-sm md:text-base">
             Lengkapi detail laporan untuk menyampaikan keluhan Anda
           </p>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-10">
           <div className="flex items-center justify-between">
             {[1, 2, 3].map((s) => (
-              <div 
+              <div
                 key={s}
-                className={`flex flex-col items-center flex-1 ${s < 3 ? "relative" : ""}`}
+                className={`flex flex-col items-center flex-1 ${
+                  s < 3 ? "relative" : ""
+                }`}
               >
-                <div 
-                  className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
-                    s === step 
+                <div
+                  className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
+                    s === step
                       ? "bg-[#9DB17C] text-white"
-                      : s < step 
-                        ? "bg-[#4E9F60] text-white"
-                        : "bg-white border border-[#9DB17C] text-[#9DB17C]"
+                      : s < step
+                      ? "bg-[#4E9F60] text-white"
+                      : "bg-white border border-[#9DB17C] text-[#9DB17C]"
                   }`}
                 >
-                  {s < step ? <CheckCircle className="h-5 w-5" /> : s}
+                  {s < step ? (
+                    <CheckCircle className="h-4 w-4 md:h-5 md:w-5" />
+                  ) : (
+                    s
+                  )}
                 </div>
-                
-                <span className={`text-xs text-center ${
-                  s === step ? "font-medium text-[#9DB17C]" : "text-gray-600"
-                }`}>
-                  {s === 1 ? "Detail Laporan" : s === 2 ? "Tambah Media" : "Konfirmasi"}
+
+                <span
+                  className={`text-xs md:text-sm text-center ${
+                    s === step ? "font-medium text-[#9DB17C]" : "text-gray-600"
+                  }`}
+                >
+                  {s === 1
+                    ? "Detail Laporan"
+                    : s === 2
+                    ? "Tambah Media"
+                    : "Konfirmasi"}
                 </span>
-                
+
                 {s < 3 && (
-                  <div className="absolute top-5 left-1/2 w-full h-[2px] bg-gray-200">
-                    <div 
-                      className={`h-full bg-[#9DB17C] ${s < step ? "w-full" : "w-0"}`}
+                  <div className="absolute top-4 md:top-5 left-1/2 w-full h-[2px] bg-gray-200 -z-10">
+                    <div
+                      className={`h-full bg-[#9DB17C] transition-all duration-500 ${
+                        s < step ? "w-full" : "w-0"
+                      }`}
                     ></div>
                   </div>
                 )}
@@ -159,71 +173,89 @@ export default function CreateLaporan() {
           </div>
         </div>
 
-        <Card className="shadow-sm">
-          <form ref={formRef} onSubmit={handleSubmit}>
+        <Card className="shadow-md border-[#E2E8F0]">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-1">
             {step === 1 && (
               <>
-                <CardHeader>
-                  <CardTitle>Detail Laporan</CardTitle>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl text-[#2D3748]">
+                    Detail Laporan
+                  </CardTitle>
                   <CardDescription>
                     Masukkan informasi detail tentang laporan Anda
                   </CardDescription>
                 </CardHeader>
-                
-                <CardContent className="space-y-4">
+
+                <CardContent className="space-y-5">
                   <div className="space-y-2">
-                    <Label htmlFor="category">Kategori Laporan</Label>
-                    <Select 
-                      value={category} 
-                      onValueChange={setCategory} 
+                    <Label htmlFor="category" className="text-[#4A5568]">
+                      Kategori Laporan
+                    </Label>
+                    <Select
+                      value={category}
+                      onValueChange={setCategory}
                       required
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full border-[#E2E8F0] focus:ring-[#9DB17C]">
                         <SelectValue placeholder="Pilih kategori laporan" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="infrastruktur">Infrastruktur Jalan</SelectItem>
+                        <SelectItem value="infrastruktur">
+                          Infrastruktur Jalan
+                        </SelectItem>
                         <SelectItem value="limbah">Limbah & Sampah</SelectItem>
-                        <SelectItem value="lingkungan">Lingkungan Hidup</SelectItem>
+                        <SelectItem value="lingkungan">
+                          Lingkungan Hidup
+                        </SelectItem>
                         <SelectItem value="air">Pelayanan Air</SelectItem>
-                        <SelectItem value="listrik">Listrik & Penerangan</SelectItem>
+                        <SelectItem value="listrik">
+                          Listrik & Penerangan
+                        </SelectItem>
                         <SelectItem value="lainnya">Lainnya</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="title">Judul Laporan</Label>
+                    <Label htmlFor="title" className="text-[#4A5568]">
+                      Judul Laporan
+                    </Label>
                     <Input
                       id="title"
                       placeholder="Masukkan judul laporan"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
+                      className="border-[#E2E8F0] focus:ring-[#9DB17C]"
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description">Deskripsi Laporan</Label>
+                    <Label htmlFor="description" className="text-[#4A5568]">
+                      Deskripsi Laporan
+                    </Label>
                     <Textarea
                       id="description"
                       placeholder="Deskripsikan keluhan atau masalah yang ingin Anda laporkan secara detail"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
+                      className="min-h-[120px] border-[#E2E8F0] focus:ring-[#9DB17C]"
                       rows={5}
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="location">Lokasi</Label>
+                    <Label htmlFor="location" className="text-[#4A5568]">
+                      Lokasi
+                    </Label>
                     <div className="relative">
                       <Input
                         id="location"
                         placeholder="Masukkan alamat lokasi kejadian"
                         value={location}
                         onChange={(e) => setLocation(e.target.value)}
-                        className="pr-10"
+                        className="pr-10 border-[#E2E8F0] focus:ring-[#9DB17C]"
                         required
                       />
                       <MapPin className="h-5 w-5 absolute right-3 top-2.5 text-gray-400" />
@@ -235,28 +267,30 @@ export default function CreateLaporan() {
 
             {step === 2 && (
               <>
-                <CardHeader>
-                  <CardTitle>Lampirkan Media</CardTitle>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl text-[#2D3748]">
+                    Lampirkan Media
+                  </CardTitle>
                   <CardDescription>
                     Tambahkan foto untuk memperkuat laporan Anda (opsional)
                   </CardDescription>
                 </CardHeader>
-                
+
                 <CardContent className="space-y-6">
-                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
-                    <UploadCloud className="h-10 w-10 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-500 mb-4 text-center">
+                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-[#E2E8F0] rounded-lg p-6 bg-gray-50 transition-all hover:bg-gray-100">
+                    <UploadCloud className="h-8 w-8 md:h-10 md:w-10 text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-500 mb-4 text-center max-w-xs mx-auto">
                       Seret & lepas gambar di sini, atau klik tombol di bawah
                     </p>
-                    
+
                     <Label
                       htmlFor="image-upload"
-                      className="cursor-pointer bg-[#9DB17C] text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-[#8CA06B]"
+                      className="cursor-pointer bg-[#9DB17C] text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-[#8CA06B] transition-colors"
                     >
                       <Camera className="h-4 w-4" />
                       <span>Pilih Gambar</span>
                     </Label>
-                    
+
                     <Input
                       id="image-upload"
                       type="file"
@@ -269,20 +303,25 @@ export default function CreateLaporan() {
 
                   {images.length > 0 && (
                     <div>
-                      <Label className="block mb-2">Gambar terpilih ({images.length})</Label>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      <Label className="block mb-3 text-[#4A5568]">
+                        Gambar terpilih ({images.length})
+                      </Label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {images.map((img, index) => (
-                          <div key={index} className="relative rounded-md overflow-hidden border border-gray-200">
-                            <img 
-                              src={img.preview} 
+                          <div
+                            key={index}
+                            className="relative rounded-md overflow-hidden border border-gray-200 aspect-square"
+                          >
+                            <img
+                              src={img.preview}
                               alt={`Preview ${index}`}
-                              className="w-full h-24 object-cover"
+                              className="w-full h-full object-cover"
                             />
                             <Button
                               type="button"
                               variant="destructive"
                               size="icon"
-                              className="absolute top-1 right-1 w-6 h-6"
+                              className="absolute top-1 right-1 w-6 h-6 rounded-full opacity-90 hover:opacity-100"
                               onClick={() => removeImage(index)}
                             >
                               &times;
@@ -298,50 +337,65 @@ export default function CreateLaporan() {
 
             {step === 3 && (
               <>
-                <CardHeader>
-                  <CardTitle>Konfirmasi Laporan</CardTitle>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl text-[#2D3748]">
+                    Konfirmasi Laporan
+                  </CardTitle>
                   <CardDescription>
                     Periksa kembali detail laporan Anda sebelum mengirim
                   </CardDescription>
                 </CardHeader>
-                
+
                 <CardContent className="space-y-6">
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+                  <div className="bg-gray-50 rounded-lg p-5 space-y-5 border border-[#EDF2F7]">
                     <div>
-                      <p className="text-sm text-gray-500">Kategori</p>
-                      <Badge variant="outline" className="bg-[#9DB17C]/10 text-[#9DB17C]">
+                      <p className="text-sm text-gray-500 mb-1">Kategori</p>
+                      <Badge
+                        variant="outline"
+                        className="bg-[#9DB17C]/10 text-[#9DB17C] font-medium"
+                      >
                         {category || "Tidak dipilih"}
                       </Badge>
                     </div>
-                    
+
                     <div>
-                      <p className="text-sm text-gray-500">Judul Laporan</p>
-                      <p className="font-medium">{title || "Tidak ada judul"}</p>
+                      <p className="text-sm text-gray-500 mb-1">
+                        Judul Laporan
+                      </p>
+                      <p className="font-medium text-[#2D3748]">
+                        {title || "Tidak ada judul"}
+                      </p>
                     </div>
-                    
+
                     <div>
-                      <p className="text-sm text-gray-500">Deskripsi</p>
-                      <p className="text-sm">{description || "Tidak ada deskripsi"}</p>
+                      <p className="text-sm text-gray-500 mb-1">Deskripsi</p>
+                      <p className="text-sm text-[#4A5568]">
+                        {description || "Tidak ada deskripsi"}
+                      </p>
                     </div>
-                    
+
                     <div>
-                      <p className="text-sm text-gray-500">Lokasi</p>
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4 text-gray-400" />
-                        <p>{location || "Tidak ada lokasi"}</p>
+                      <p className="text-sm text-gray-500 mb-1">Lokasi</p>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-[#9DB17C]" />
+                        <p className="text-[#4A5568]">
+                          {location || "Tidak ada lokasi"}
+                        </p>
                       </div>
                     </div>
 
                     {images.length > 0 && (
                       <div>
-                        <p className="text-sm text-gray-500 mb-2">Media ({images.length})</p>
-                        <div className="flex gap-2 overflow-x-auto pb-2">
+                        <p className="text-sm text-gray-500 mb-2">
+                          Media ({images.length})
+                        </p>
+                        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 overflow-hidden">
                           {images.map((img, index) => (
-                            <img 
+                            <img
                               key={index}
-                              src={img.preview} 
+                              src={img.preview}
                               alt={`Preview ${index}`}
-                              className="w-16 h-16 object-cover rounded-md border border-gray-200"
+                              className="w-full aspect-square object-cover rounded-md border border-gray-200"
                             />
                           ))}
                         </div>
@@ -355,8 +409,8 @@ export default function CreateLaporan() {
                       <div className="text-sm text-yellow-700">
                         <p className="font-medium">Perhatian</p>
                         <p className="mt-1">
-                          Pastikan data yang Anda masukkan sudah benar. 
-                          Laporan yang sudah dikirim tidak dapat diubah.
+                          Pastikan data yang Anda masukkan sudah benar. Laporan
+                          yang sudah dikirim tidak dapat diubah.
                         </p>
                       </div>
                     </div>
@@ -364,23 +418,24 @@ export default function CreateLaporan() {
                 </CardContent>
               </>
             )}
-            
-            <CardFooter className="flex justify-between pt-6">
+
+            <CardFooter className="flex justify-between pt-6 px-6 pb-6 gap-4">
               {step > 1 ? (
-                <Button 
-                  type="button" 
+                <Button
+                  type="button"
                   variant="outline"
                   onClick={goToPreviousStep}
+                  className="border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 transition-colors"
                 >
                   Kembali
                 </Button>
               ) : (
                 <div></div>
               )}
-              
-              <Button 
-                type="submit" 
-                className="bg-[#9DB17C] hover:bg-[#8CA06B]"
+
+              <Button
+                type="submit"
+                className="bg-[#9DB17C] hover:bg-[#8CA06B] transition-colors flex-1 md:flex-none md:min-w-[140px]"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
