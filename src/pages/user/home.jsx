@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -11,18 +11,34 @@ import CallToAction from "@/components/home-user/call-to-action";
 import FeaturesHighlight from "@/components/home-user/features-highlight";
 import FeedbackCarousel from "@/components/feedback/feedback-carousel";
 import FAQ from "@/components/home-user/faq";
+import { useUserProfile } from "@/hooks/use-auth";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const Home = () => {
   const heroRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const [showProfileAlert, setShowProfileAlert] = useState(false);
+  const [incompleteFields, setIncompleteFields] = useState([]);
+  const [navbarVisible, setNavbarVisible] = useState(true);
+
+  const token = Cookies.get("token");
+  const { data: userProfile } = useUserProfile();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const token = searchParams.get("token");
+    const urlToken = searchParams.get("token");
 
-    if (token) {
-      Cookies.set("token", token, {
+    if (urlToken) {
+      Cookies.set("token", urlToken, {
         path: "/",
         expires: 30,
         sameSite: "Lax",
@@ -31,6 +47,39 @@ const Home = () => {
       navigate("/home", { replace: true });
     }
   }, [location, navigate]);
+
+  useEffect(() => {
+    if (userProfile) {
+      const missingFields = [];
+
+      if (!userProfile.phone_number) missingFields.push("Nomor Telepon");
+      if (!userProfile.address) missingFields.push("Alamat");
+      if (!userProfile.nik) missingFields.push("NIK");
+
+      if (missingFields.length > 0) {
+        setIncompleteFields(missingFields);
+        setShowProfileAlert(true);
+        setNavbarVisible(false);
+      }
+    }
+  }, [userProfile]);
+
+  useEffect(() => {
+    const navbarElement = document.querySelector("nav");
+    if (navbarElement) {
+      if (showProfileAlert) {
+        navbarElement.style.zIndex = "10";
+      } else {
+        navbarElement.style.zIndex = "50";
+        setNavbarVisible(true);
+      }
+    }
+  }, [showProfileAlert]);
+
+  const handleCompleteProfile = () => {
+    navigate("/profile");
+    setShowProfileAlert(false);
+  };
 
   useGSAP(() => {
     const tl = gsap.timeline();
@@ -43,15 +92,53 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="space-y-20">
-      <Hero />
-      <WhyChoose />
-      <HowWorks />
-      <FeaturesHighlight />
-      <FeedbackCarousel />
-      <FAQ />
-      <CallToAction />
-    </div>
+    <>
+      <div className="space-y-20">
+        <Hero ref={heroRef} />
+        <WhyChoose />
+        <HowWorks />
+        <FeaturesHighlight />
+        <FeedbackCarousel />
+        <FAQ />
+        <CallToAction />
+      </div>
+
+      <Dialog
+        open={showProfileAlert}
+        onOpenChange={(open) => {
+          setShowProfileAlert(open);
+          setNavbarVisible(!open);
+        }}
+      >
+        <DialogContent className="z-[100]">
+          <DialogHeader>
+            <DialogTitle>Lengkapi Profil Anda</DialogTitle>
+            <DialogDescription>
+              Silakan lengkapi informasi berikut di profil Anda:
+              <ul className="list-disc pl-5 mt-2">
+                {incompleteFields.map((field) => (
+                  <li key={field}>{field}</li>
+                ))}
+              </ul>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              onClick={handleCompleteProfile}
+              className="bg-[#9CDE9F] hover:bg-green-500"
+            >
+              Lengkapi Profil
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowProfileAlert(false)}
+            >
+              Nanti
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

@@ -358,7 +358,7 @@ export default function UserProfilePage() {
       </div>
 
       <Dialog open={isEditing} onOpenChange={handleCloseDialog}>
-        <DialogContent className="sm:max-w-md max-w-[95vw] rounded-lg">
+        <DialogContent className="sm:max-w-md max-w-[95vw] rounded-lg z-[100]">
           <DialogHeader>
             <DialogTitle>
               {editedField === "image_url"
