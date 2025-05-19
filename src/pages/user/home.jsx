@@ -114,12 +114,24 @@ const Home = () => {
           <DialogHeader>
             <DialogTitle>Lengkapi Profil Anda</DialogTitle>
             <DialogDescription>
-              Silakan lengkapi informasi berikut di profil Anda:
-              <ul className="list-disc pl-5 mt-2">
-                {incompleteFields.map((field) => (
-                  <li key={field}>{field}</li>
-                ))}
+              Untuk meningkatkan pengalaman penggunaan dan memastikan keamanan
+              transaksi, silakan lengkapi data profil Anda. Data ini diperlukan
+              untuk:
+              <ul className="list-disc pl-5 mt-2 space-y-1">
+                <li>Verifikasi identitas pengguna</li>
+                <li>Pengiriman dokumen penting</li>
+                <li>Komunikasi terkait layanan</li>
               </ul>
+              <div className="mt-3 p-3 bg-amber-50 rounded-md border border-amber-200">
+                <p className="font-medium text-amber-700">
+                  Data yang perlu dilengkapi:
+                </p>
+                <ul className="list-disc pl-5 mt-1 text-amber-700">
+                  {incompleteFields.map((field) => (
+                    <li key={field}>{field}</li>
+                  ))}
+                </ul>
+              </div>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
