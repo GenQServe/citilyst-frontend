@@ -193,7 +193,7 @@ export default function UserProfilePage() {
       setIsEditing(false);
     } else if (
       editedField &&
-      ["name", "email", "nik", "phone_number", "address"].includes(editedField)
+      ["name", "nik", "phone_number", "address"].includes(editedField)
     ) {
       const payload = {};
       payload[editedField] = editForm[editedField];
@@ -226,7 +226,7 @@ export default function UserProfilePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
-            <Card className="overflow-hidden border-none shadow-lg bg-white">
+            <Card className="overflow-hidden border-none shadow-lg bg-white py-0">
               <CardHeader className="relative px-4 sm:px-6 pt-6 pb-4 border-b bg-[#9DB17C]/5">
                 <div className="flex flex-col items-center text-center">
                   <div className="relative group mb-3">
@@ -274,7 +274,7 @@ export default function UserProfilePage() {
                 </div>
               </CardHeader>
 
-              <CardContent className="px-4 sm:px-6 pt-6 pb-6 bg-gradient-to-b from-[#9DB17C]/5 to-transparent">
+              <CardContent className="px-4 sm:px-6 pb-6 bg-gradient-to-b from-[#9DB17C]/5 to-transparent">
                 <div className="flex flex-col gap-4 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <FaCalendarAlt className="h-3 w-3 text-[#9DB17C]" />
@@ -324,7 +324,6 @@ export default function UserProfilePage() {
                     label="Email"
                     value={user?.email}
                     loading={false}
-                    onEdit={() => handleEditClick("email")}
                   />
 
                   <ProfileCard
@@ -366,8 +365,6 @@ export default function UserProfilePage() {
                 : `Ubah ${
                     editedField === "name"
                       ? "Nama"
-                      : editedField === "email"
-                      ? "Email"
                       : editedField === "nik"
                       ? "NIK"
                       : editedField === "phone_number"
@@ -417,8 +414,6 @@ export default function UserProfilePage() {
                 {`${
                   editedField === "name"
                     ? "Nama"
-                    : editedField === "email"
-                    ? "Email"
                     : editedField === "nik"
                     ? "NIK"
                     : editedField === "phone_number"
@@ -434,8 +429,6 @@ export default function UserProfilePage() {
                 placeholder={`Masukkan ${
                   editedField === "name"
                     ? "nama"
-                    : editedField === "email"
-                    ? "email"
                     : editedField === "nik"
                     ? "NIK"
                     : editedField === "phone_number"
@@ -452,8 +445,6 @@ export default function UserProfilePage() {
                 {`${
                   editedField === "name"
                     ? "Nama"
-                    : editedField === "email"
-                    ? "Email"
                     : editedField === "nik"
                     ? "NIK"
                     : "Nomor Telepon"
@@ -467,8 +458,6 @@ export default function UserProfilePage() {
                 placeholder={`Masukkan ${
                   editedField === "name"
                     ? "nama"
-                    : editedField === "email"
-                    ? "email"
                     : editedField === "nik"
                     ? "NIK"
                     : "nomor telepon"

@@ -106,7 +106,7 @@ const FAQ = () => {
   return (
     <section
       ref={sectionRef}
-      className="py-16 md:py-20 lg:py-24 bg-[#F4FFEE] overflow-hidden"
+      className="py-16 md:py-20 lg:py-24 overflow-hidden"
     >
       <div className="container mx-auto px-5 md:px-8 lg:px-10">
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 md:gap-16 items-center">

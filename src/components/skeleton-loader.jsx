@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export const PageSkeleton = () => {
   return (
-    <div className="w-full h-screen bg-[#F4FFEE]">
+    <div className="w-full h-screen">
       <div className="fixed top-0 w-full p-4 bg-[#9CDE9F] shadow-sm">
         <div className="flex items-center justify-between container mx-auto">
           <Skeleton className="h-8 w-32" />

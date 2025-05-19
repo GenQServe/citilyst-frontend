@@ -19,7 +19,7 @@ const UserLayout = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F4FFEE]">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#F4FFEE] via-[#E8F7E4] to-[#D6EFDB]">
       <FloatingNavbar />
 
       <main ref={mainRef} className="flex-1 pt-20 pb-12">

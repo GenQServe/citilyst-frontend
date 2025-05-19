@@ -49,7 +49,7 @@ const Home = () => {
   }, [location, navigate]);
 
   useEffect(() => {
-    if (userProfile) {
+    if (token && userProfile) {
       const missingFields = [];
 
       if (!userProfile.phone_number) missingFields.push("Nomor Telepon");
@@ -62,7 +62,7 @@ const Home = () => {
         setNavbarVisible(false);
       }
     }
-  }, [userProfile]);
+  }, [userProfile, token]);
 
   useEffect(() => {
     const navbarElement = document.querySelector("nav");
@@ -110,40 +110,70 @@ const Home = () => {
           setNavbarVisible(!open);
         }}
       >
-        <DialogContent className="z-[100]">
+        <DialogContent className="z-[100] max-w-[95%] w-full sm:max-w-md rounded-lg bg-gradient-to-b from-[#F4FFEE] to-[#E0F5E0]">
           <DialogHeader>
-            <DialogTitle>Lengkapi Profil Anda</DialogTitle>
-            <DialogDescription>
-              Untuk meningkatkan pengalaman penggunaan dan memastikan keamanan
-              transaksi, silakan lengkapi data profil Anda. Data ini diperlukan
-              untuk:
-              <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li>Verifikasi identitas pengguna</li>
-                <li>Pengiriman dokumen penting</li>
-                <li>Komunikasi terkait layanan</li>
+            <DialogTitle className="text-left text-xl text-green-800">
+              Lengkapi Profil CityList Anda
+            </DialogTitle>
+            <DialogDescription className="text-green-700 text-left">
+              Untuk mengoptimalkan pengalaman pelaporan dan memastikan
+              keakuratan informasi, silakan lengkapi data profil Anda. Profil
+              lengkap membantu kami:
+              <ul className="mt-3 space-y-2">
+                <li className="flex items-start">
+                  <span className="mr-2 mt-1 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-green-100">
+                    <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                  </span>
+                  <span className="text-left">
+                    Memverifikasi pelaporan dari warga yang sah
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2 mt-1 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-green-100">
+                    <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                  </span>
+                  <span className="text-left">
+                    Memetakan lokasi permasalahan dengan tepat
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2 mt-1 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-green-100">
+                    <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                  </span>
+                  <span className="text-left">
+                    Mengirim update status penanganan masalah
+                  </span>
+                </li>
               </ul>
-              <div className="mt-3 p-3 bg-amber-50 rounded-md border border-amber-200">
+              <div className="mt-4 p-3 bg-amber-50 rounded-md border border-amber-200">
                 <p className="font-medium text-amber-700">
                   Data yang perlu dilengkapi:
                 </p>
-                <ul className="list-disc pl-5 mt-1 text-amber-700">
+                <ul className="mt-2 space-y-1.5">
                   {incompleteFields.map((field) => (
-                    <li key={field}>{field}</li>
+                    <li
+                      key={field}
+                      className="flex items-center text-amber-700"
+                    >
+                      <span className="mr-2 text-amber-500">•</span>
+                      {field}
+                    </li>
                   ))}
                 </ul>
               </div>
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="sm:justify-center gap-2 mt-2">
             <Button
               onClick={handleCompleteProfile}
-              className="bg-[#9CDE9F] hover:bg-green-500"
+              className="bg-[#9CDE9F] hover:bg-green-500 flex-1 sm:flex-none text-green-900 hover:text-white"
             >
               Lengkapi Profil
             </Button>
             <Button
               variant="outline"
               onClick={() => setShowProfileAlert(false)}
+              className="flex-1 sm:flex-none border-green-300 text-green-800 hover:bg-green-50"
             >
               Nanti
             </Button>

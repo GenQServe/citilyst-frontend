@@ -71,7 +71,7 @@ const FeaturesHighlight = () => {
   return (
     <section
       ref={sectionRef}
-      className="py-14 md:py-16 lg:py-20 bg-[#F4FFEE] overflow-hidden"
+      className="py-14 md:py-16 lg:py-20 overflow-hidden"
     >
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-12 items-center">

@@ -39,7 +39,7 @@ const FeedbackCarousel = () => {
 
   if (isError) {
     return (
-      <div className="py-16 bg-[#F4FFEE]">
+      <div className="py-16">
         <div className="container mx-auto px-4">
           <h2
             ref={titleRef}
@@ -77,7 +77,7 @@ const FeedbackCarousel = () => {
   const feedbacks = data?.data || [];
 
   return (
-    <section className="py-16 bg-[#F4FFEE]">
+    <section className="py-16">
       <div className="container mx-auto px-4">
         <h2
           ref={titleRef}

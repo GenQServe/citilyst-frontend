@@ -40,10 +40,7 @@ const Hero = () => {
   };
 
   return (
-    <section
-      ref={heroRef}
-      className="py-12 md:py-20 bg-[#F4FFEE] overflow-hidden "
-    >
+    <section ref={heroRef} className="py-12 md:py-20 overflow-hidden ">
       <div className="container mx-auto px-4 sm:px-5 md:px-8 lg:px-4 xl:px-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
           <div ref={textRef} className="space-y-6 items-start">
