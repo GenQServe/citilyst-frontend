@@ -10,10 +10,22 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Menu, X, User, LogOut, Bell } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuthState } from "@/hooks/use-auth-state";
 import { images } from "@/constants/images";
+import { useUserProfile } from "@/hooks/use-auth";
+import Cookies from "js-cookie";
 
 const FloatingNavbar = () => {
   const navbarRef = useRef(null);
@@ -23,7 +35,17 @@ const FloatingNavbar = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isFloating, setIsFloating] = useState(false);
-  const { user, handleLogout } = useAuthState();
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const { handleLogout } = useAuthState();
+
+  const token = Cookies.get("token");
+
+  const { data: user, isLoading } = useUserProfile({
+    enabled: !!token,
+    onError: () => {
+      Cookies.remove("token");
+    },
+  });
 
   useEffect(() => {
     const navbar = navbarRef.current;
@@ -106,308 +128,388 @@ const FloatingNavbar = () => {
     navigate("/home", { replace: true });
   };
 
+  const confirmLogout = () => {
+    Cookies.remove("token");
+    navigate("/home", { replace: true });
+  };
+
   return (
-    <nav
-      ref={navbarRef}
-      className="w-full fixed top-0 left-0 z-50 bg-[#9CDE9F]"
-    >
-      <div
-        ref={navbarContentRef}
-        className="container mx-auto px-4 flex items-center justify-between"
+    <>
+      <nav
+        ref={navbarRef}
+        className="w-full fixed top-0 left-0 z-50 bg-[#9CDE9F]"
       >
-        <a href="#" onClick={handleLogoClick} className="flex items-center">
-          <img
-            src={images.cityListLogo}
-            alt="CityList Logo"
-            className="h-11 w-auto"
-            style={{ minWidth: 120, maxWidth: 180 }}
-          />
-        </a>
+        <div
+          ref={navbarContentRef}
+          className="container mx-auto px-4 flex items-center justify-between"
+        >
+          <a href="#" onClick={handleLogoClick} className="flex items-center">
+            <img
+              src={images.cityListLogo}
+              alt="CityList Logo"
+              className="h-11 w-auto"
+              style={{ minWidth: 120, maxWidth: 180 }}
+            />
+          </a>
 
-        <div className="hidden lg:flex items-center justify-center flex-1">
-          <div className="flex items-center gap-2">
-            <Link
-              to="/home"
-              className={cn(
-                "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
-                isActiveLink("/home") && "bg-[#9DB17C] text-black font-medium"
-              )}
-            >
-              Beranda
-            </Link>
-            <Link
-              to="/user/create-report"
-              className={cn(
-                "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
-                isActiveLink("/user/create-report") &&
-                  "bg-[#9DB17C] text-black font-medium"
-              )}
-            >
-              Buat Laporan
-            </Link>
-            <Link
-              to="/user/check-status"
-              className={cn(
-                "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
-                isActiveLink("/user/check-status") &&
-                  "bg-[#9DB17C] text-black font-medium"
-              )}
-            >
-              Cek Status
-            </Link>
-            <Link
-              to="/user/notifications"
-              className={cn(
-                "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
-                isActiveLink("/user/notifications") &&
-                  "bg-[#9DB17C] text-black font-medium"
-              )}
-            >
-              Notifikasi
-            </Link>
-          </div>
-        </div>
-
-        <div className="hidden lg:flex items-center gap-2">
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="rounded-full h-10 w-10 p-0 overflow-hidden border-2 border-[#9DB17C]/50 hover:border-[#9DB17C] transition-all"
-                >
-                  <Avatar className="h-full w-full">
-                    <AvatarImage src={user.image_url} alt={user.name} />
-                    <AvatarFallback className="bg-[#9DB17C] text-white">
-                      {user.name?.charAt(0) || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="w-64 mt-2 shadow-lg border border-gray-100 rounded-xl overflow-hidden p-0"
-                sideOffset={8}
+          <div className="hidden lg:flex items-center justify-center flex-1">
+            <div className="flex items-center gap-2">
+              <Link
+                to="/home"
+                className={cn(
+                  "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
+                  isActiveLink("/home") && "bg-[#9DB17C] text-black font-medium"
+                )}
               >
-                <div className="bg-[#9DB17C]/10 p-4">
-                  <div className="flex items-center justify-start gap-3">
-                    <Avatar className="h-12 w-12 border-2 border-[#9DB17C]">
+                Beranda
+              </Link>
+              <Link
+                to="/user/create-report"
+                className={cn(
+                  "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
+                  isActiveLink("/user/create-report") &&
+                    "bg-[#9DB17C] text-black font-medium"
+                )}
+              >
+                Buat Laporan
+              </Link>
+              <Link
+                to="/user/check-status"
+                className={cn(
+                  "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
+                  isActiveLink("/user/check-status") &&
+                    "bg-[#9DB17C] text-black font-medium"
+                )}
+              >
+                Cek Status
+              </Link>
+              <Link
+                to="/user/notifications"
+                className={cn(
+                  "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
+                  isActiveLink("/user/notifications") &&
+                    "bg-[#9DB17C] text-black font-medium"
+                )}
+              >
+                Notifikasi
+              </Link>
+            </div>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-2">
+            {!token ? (
+              <>
+                <Link to="/login">
+                  <Button
+                    size="sm"
+                    className="rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
+                  >
+                    Masuk
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
+                  >
+                    Daftar
+                  </Button>
+                </Link>
+              </>
+            ) : isLoading ? (
+              <div className="h-10 w-10 rounded-full bg-[#9DB17C]/30 animate-pulse"></div>
+            ) : user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="rounded-full h-10 w-10 p-0 overflow-hidden border-2 border-[#9DB17C]/50 hover:border-[#9DB17C] transition-all"
+                  >
+                    <Avatar className="h-full w-full">
                       <AvatarImage src={user.image_url} alt={user.name} />
                       <AvatarFallback className="bg-[#9DB17C] text-white">
                         {user.name?.charAt(0) || "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-semibold text-sm">{user.name}</p>
-                      <p className="text-xs text-muted-foreground truncate w-[180px]">
-                        {user.email}
-                      </p>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-64 mt-2 shadow-lg border border-gray-100 rounded-xl overflow-hidden p-0"
+                  sideOffset={8}
+                >
+                  <div className="bg-[#9DB17C]/10 p-4">
+                    <div className="flex items-center justify-start gap-3">
+                      <Avatar className="h-12 w-12 border-2 border-[#9DB17C]">
+                        <AvatarImage src={user.image_url} alt={user.name} />
+                        <AvatarFallback className="bg-[#9DB17C] text-white">
+                          {user.name?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col space-y-1 leading-none">
+                        <p className="font-semibold text-sm">{user.name}</p>
+                        <p className="text-xs text-muted-foreground truncate w-[180px]">
+                          {user.email}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="p-2">
-                  <Link to="/profile">
-                    <DropdownMenuItem className="cursor-pointer hover:bg-[#9DB17C]/10 rounded-md h-10 flex items-center px-3">
-                      <User className="mr-2 h-4 w-4 text-[#9DB17C]" />
-                      <span>Profil</span>
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link to="/user/notifications">
-                    <DropdownMenuItem className="cursor-pointer hover:bg-[#9DB17C]/10 rounded-md h-10 flex items-center px-3">
-                      <Bell className="mr-2 h-4 w-4 text-[#9DB17C]" />
-                      <span>Notifikasi</span>
-                    </DropdownMenuItem>
-                  </Link>
-                </div>
+                  <div className="p-2">
+                    <Link to="/profile">
+                      <DropdownMenuItem className="cursor-pointer hover:bg-[#9DB17C]/10 rounded-md h-10 flex items-center px-3">
+                        <User className="mr-2 h-4 w-4 text-[#9DB17C]" />
+                        <span>Profil</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link to="/user/notifications">
+                      <DropdownMenuItem className="cursor-pointer hover:bg-[#9DB17C]/10 rounded-md h-10 flex items-center px-3">
+                        <Bell className="mr-2 h-4 w-4 text-[#9DB17C]" />
+                        <span>Notifikasi</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  </div>
 
-                <DropdownMenuSeparator className="bg-gray-200" />
-                <div className="p-2">
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="cursor-pointer hover:bg-red-50 rounded-md h-10 flex items-center px-3 text-red-500 hover:text-red-600"
+                  <DropdownMenuSeparator className="bg-gray-200" />
+                  <div className="p-2">
+                    <DropdownMenuItem
+                      onClick={() => setLogoutDialogOpen(true)}
+                      className="cursor-pointer hover:bg-red-50 rounded-md h-10 flex items-center px-3 text-red-500 hover:text-red-600"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Keluar</span>
+                    </DropdownMenuItem>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button
+                    size="sm"
+                    className="rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Keluar</span>
-                  </DropdownMenuItem>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <>
-              <Link to="/login">
-                <Button
-                  size="sm"
-                  className="rounded-full bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none"
-                >
-                  Masuk
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
-                >
-                  Daftar
-                </Button>
-              </Link>
-            </>
-          )}
-        </div>
+                    Masuk
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10"
+                  >
+                    Daftar
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
 
-        <div className="lg:hidden">
-          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full text-black hover:bg-[#9DB17C] focus:bg-[#9DB17C] relative flex items-center justify-center"
-                onClick={toggleMenu}
+          <div className="lg:hidden">
+            <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full text-black hover:bg-[#9DB17C] focus:bg-[#9DB17C] relative flex items-center justify-center"
+                  onClick={toggleMenu}
+                >
+                  <span className="w-6 h-6 relative flex items-center justify-center">
+                    <Menu
+                      className={`absolute transition-all duration-300 ${
+                        menuOpen
+                          ? "opacity-0 rotate-90 scale-0"
+                          : "opacity-100 rotate-0 scale-100"
+                      }`}
+                      size={24}
+                    />
+                    <X
+                      className={`absolute transition-all duration-300 ${
+                        menuOpen
+                          ? "opacity-100 rotate-0 scale-100"
+                          : "opacity-0 -rotate-90 scale-0"
+                      }`}
+                      size={24}
+                    />
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                ref={dropdownRef}
+                align="end"
+                className="w-[100vw] bg-[#9CDE9F] border-none mt-2 px-6 py-4 shadow-lg rounded-b-xl"
+                sideOffset={8}
+                onCloseAutoFocus={(e) => e.preventDefault()}
               >
-                <span className="w-6 h-6 relative flex items-center justify-center">
-                  <Menu
-                    className={`absolute transition-all duration-300 ${
-                      menuOpen
-                        ? "opacity-0 rotate-90 scale-0"
-                        : "opacity-100 rotate-0 scale-100"
-                    }`}
-                    size={24}
-                  />
-                  <X
-                    className={`absolute transition-all duration-300 ${
-                      menuOpen
-                        ? "opacity-100 rotate-0 scale-100"
-                        : "opacity-0 -rotate-90 scale-0"
-                    }`}
-                    size={24}
-                  />
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              ref={dropdownRef}
-              align="end"
-              className="w-[100vw] bg-[#9CDE9F] border-none mt-2 px-6 py-4 shadow-lg rounded-b-xl"
-              sideOffset={8}
-              onCloseAutoFocus={(e) => e.preventDefault()}
-            >
-              <div className="flex flex-col gap-4 animate-in slide-in-from-top-5 duration-300">
-                <Link
-                  to="/home"
-                  className={cn(
-                    "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
-                    isActiveLink("/home") && "bg-[#9DB17C] rounded-md px-3 py-2"
-                  )}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Beranda
-                </Link>
-                <Link
-                  to="/user/create-report"
-                  className={cn(
-                    "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
-                    isActiveLink("/user/create-report") &&
-                      "bg-[#9DB17C] rounded-md px-3 py-2"
-                  )}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Buat Laporan
-                </Link>
-                <Link
-                  to="/user/check-status"
-                  className={cn(
-                    "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
-                    isActiveLink("/user/check-status") &&
-                      "bg-[#9DB17C] rounded-md px-3 py-2"
-                  )}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Cek Status
-                </Link>
-                <Link
-                  to="/user/notifications"
-                  className={cn(
-                    "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
-                    isActiveLink("/user/notifications") &&
-                      "bg-[#9DB17C] rounded-md px-3 py-2"
-                  )}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Notifikasi
-                </Link>
-                <div className="pt-4 mt-2 border-t border-[#8CA06B]/30">
-                  {user ? (
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3 py-2">
-                        <Avatar className="h-12 w-12 border-2 border-[#9DB17C]/50">
-                          <AvatarImage src={user.image_url} />
-                          <AvatarFallback className="bg-[#9DB17C] text-white">
-                            {user.name?.charAt(0) || "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{user.name}</p>
-                          <p className="text-xs text-gray-600 truncate w-[200px]">
-                            {user.email}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 gap-2">
-                        <Link to="/profile">
+                <div className="flex flex-col gap-4 animate-in slide-in-from-top-5 duration-300">
+                  <Link
+                    to="/home"
+                    className={cn(
+                      "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                      isActiveLink("/home") &&
+                        "bg-[#9DB17C] rounded-md px-3 py-2"
+                    )}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Beranda
+                  </Link>
+                  <Link
+                    to="/user/create-report"
+                    className={cn(
+                      "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                      isActiveLink("/user/create-report") &&
+                        "bg-[#9DB17C] rounded-md px-3 py-2"
+                    )}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Buat Laporan
+                  </Link>
+                  <Link
+                    to="/user/check-status"
+                    className={cn(
+                      "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                      isActiveLink("/user/check-status") &&
+                        "bg-[#9DB17C] rounded-md px-3 py-2"
+                    )}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Cek Status
+                  </Link>
+                  <Link
+                    to="/user/notifications"
+                    className={cn(
+                      "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                      isActiveLink("/user/notifications") &&
+                        "bg-[#9DB17C] rounded-md px-3 py-2"
+                    )}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Notifikasi
+                  </Link>
+                  <div className="pt-4 mt-2 border-t border-[#8CA06B]/30">
+                    {!token ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        <Link to="/login">
                           <Button
                             size="sm"
                             className="w-full rounded-lg bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none h-10"
                             onClick={() => setMenuOpen(false)}
                           >
-                            <User className="mr-2 h-4 w-4" />
-                            Profil
+                            Masuk
                           </Button>
                         </Link>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="w-full rounded-lg border-red-400 text-red-500 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 h-10"
-                          onClick={() => {
-                            handleLogout();
-                            setMenuOpen(false);
-                          }}
-                        >
-                          <LogOut className="mr-2 h-4 w-4" />
-                          Keluar
-                        </Button>
+                        <Link to="/register">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full rounded-lg border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10 h-10"
+                            onClick={() => setMenuOpen(false)}
+                          >
+                            Daftar
+                          </Button>
+                        </Link>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2">
-                      <Link to="/login">
-                        <Button
-                          size="sm"
-                          className="w-full rounded-lg bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none h-10"
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          Masuk
-                        </Button>
-                      </Link>
-                      <Link to="/register">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="w-full rounded-lg border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10 h-10"
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          Daftar
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
+                    ) : isLoading ? (
+                      <div className="h-12 flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-[#9DB17C]/30 animate-pulse"></div>
+                      </div>
+                    ) : user ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 py-2">
+                          <Avatar className="h-12 w-12 border-2 border-[#9DB17C]/50">
+                            <AvatarImage src={user.image_url} />
+                            <AvatarFallback className="bg-[#9DB17C] text-white">
+                              {user.name?.charAt(0) || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">{user.name}</p>
+                            <p className="text-xs text-gray-600 truncate w-[200px]">
+                              {user.email}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 gap-2">
+                          <Link to="/profile">
+                            <Button
+                              size="sm"
+                              className="w-full rounded-lg bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none h-10"
+                              onClick={() => setMenuOpen(false)}
+                            >
+                              <User className="mr-2 h-4 w-4" />
+                              Profil
+                            </Button>
+                          </Link>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full rounded-lg border-red-400 text-red-500 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 h-10"
+                            onClick={() => {
+                              setMenuOpen(false);
+                              setLogoutDialogOpen(true);
+                            }}
+                          >
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Keluar
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        <Link to="/login">
+                          <Button
+                            size="sm"
+                            className="w-full rounded-lg bg-[#9DB17C] text-white hover:bg-[#8CA06B] focus:bg-[#8CA06B] border-none h-10"
+                            onClick={() => setMenuOpen(false)}
+                          >
+                            Masuk
+                          </Button>
+                        </Link>
+                        <Link to="/register">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full rounded-lg border-[#9DB17C] text-[#9DB17C] hover:bg-[#9DB17C]/10 hover:text-[#8CA06B] focus:bg-[#9DB17C]/10 h-10"
+                            onClick={() => setMenuOpen(false)}
+                          >
+                            Daftar
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      <AlertDialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
+        <AlertDialogContent className="rounded-xl w-full max-w-[320px] md:max-w-[380px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center">
+              Konfirmasi Logout
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              Apakah Anda yakin ingin keluar dari akun ini?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="mt-0 w-full sm:w-auto border-[#9DB17C] text-[#9DB17C]">
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white"
+              onClick={confirmLogout}
+            >
+              Ya, Logout
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
