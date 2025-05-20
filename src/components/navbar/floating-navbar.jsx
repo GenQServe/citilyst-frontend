@@ -129,7 +129,11 @@ const FloatingNavbar = () => {
   };
 
   const confirmLogout = () => {
-    Cookies.remove("token");
+    Object.keys(Cookies.get()).forEach((cookieName) => {
+      Cookies.remove(cookieName);
+    });
+    localStorage.clear();
+    sessionStorage.clear();
     navigate("/home", { replace: true });
   };
 

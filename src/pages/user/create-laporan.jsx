@@ -340,7 +340,7 @@ export default function CreateLaporan() {
           </div>
 
           <div className="mb-8">
-            <Progress value={progress} className="h-2 bg-[#9CDE9F]" />
+            <Progress value={progress} className="bg-[#9CDE9F]" />
 
             <div className="flex items-center justify-between mt-4">
               {[1, 2, 3].map((s) => (
@@ -427,8 +427,14 @@ export default function CreateLaporan() {
                                   value={category.id}
                                   className="cursor-pointer"
                                 >
-                                  {category.name.charAt(0).toUpperCase() +
-                                    category.name.slice(1)}
+                                  {category.name
+                                    .split(" ")
+                                    .map(
+                                      (word) =>
+                                        word.charAt(0).toUpperCase() +
+                                        word.slice(1)
+                                    )
+                                    .join(" ")}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -573,9 +579,9 @@ export default function CreateLaporan() {
 
                 {step === 2 && (
                   <>
-                    <CardHeader className="bg-gradient-to-r from-[#9DB17C]/10 to-[#4E9F60]/5 border-b border-gray-100">
+                    <CardHeader className="border-b border-gray-100">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#4E9F60] bg-opacity-10 rounded-full">
+                        <div className="p-2 bg-opacity-10 rounded-full">
                           <Camera className="h-5 w-5 text-[#4E9F60]" />
                         </div>
                         <div>
@@ -704,9 +710,9 @@ export default function CreateLaporan() {
 
                 {step === 3 && (
                   <>
-                    <CardHeader className="bg-gradient-to-r from-[#9DB17C]/10 to-[#4E9F60]/5 border-b border-gray-100">
+                    <CardHeader className="border-b border-gray-100">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#4E9F60] bg-opacity-10 rounded-full">
+                        <div className="p-2 bg-opacity-10 rounded-full">
                           <CheckCircle className="h-5 w-5 text-[#4E9F60]" />
                         </div>
                         <div>

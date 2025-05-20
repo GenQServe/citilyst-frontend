@@ -20,6 +20,7 @@ export function useGenerateReportDescription() {
     mutationFn: generateReportDescription,
     onSuccess: (data) => {
       dispatch(setGeneratedReport(data.data));
+      dispatch(setIsSubmitting(false));
       return data;
     },
     onError: (error) => {
@@ -57,7 +58,7 @@ export function useUploadReportImages() {
         "Laporan berhasil dikirim! Tim kami akan segera meninjau laporan Anda."
       );
       dispatch(clearReportForm());
-      navigate("/user/laporan-saya", {
+      navigate("/user/check-status", {
         state: {
           success: true,
           message:
