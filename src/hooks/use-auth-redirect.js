@@ -19,12 +19,12 @@ export function useAuthRedirect() {
         } else {
           if (location.pathname === "/") {
             if (decoded.role === "admin") {
-              setInitialRedirect("/walikota");
+              setInitialRedirect("/admin/dashboard");
             } else {
               setInitialRedirect("/home");
             }
           } else if (
-            location.pathname.startsWith("/walikota") &&
+            location.pathname.startsWith("/admin/dashboard") &&
             decoded.role === "user"
           ) {
             setInitialRedirect("/home");
@@ -33,7 +33,7 @@ export function useAuthRedirect() {
               location.pathname === "/profile") &&
             decoded.role === "admin"
           ) {
-            setInitialRedirect("/walikota");
+            setInitialRedirect("/admin/dashboard");
           }
         }
       } catch (error) {
