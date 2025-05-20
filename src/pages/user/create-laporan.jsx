@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
@@ -43,7 +43,11 @@ import {
   useDistrictsWithVillages,
   useReportCategories,
 } from "@/hooks/use-locations";
-import { useGenerateReportDescription } from "@/hooks/use-reports";
+import {
+  useGenerateReportDescription,
+  useSubmitReport,
+  useUploadReportImages,
+} from "@/hooks/use-reports";
 import {
   setCategory,
   setTitle,
@@ -54,7 +58,9 @@ import {
   setImages,
   setStep,
   setIsSubmitting,
+  clearReportForm,
 } from "@/features/slices/reportSlice";
+import ReactMarkdown from "react-markdown";
 
 export default function CreateLaporan() {
   const navigate = useNavigate();
@@ -63,6 +69,7 @@ export default function CreateLaporan() {
   const fileInputRef = useRef(null);
   const pageRef = useRef(null);
   const titleRef = useRef(null);
+  const previewRef = useRef(null);
 
   const {
     categoryId,
@@ -72,6 +79,8 @@ export default function CreateLaporan() {
     districtId,
     villageId,
     location,
+    reportId,
+    formalDescription,
     images,
     step,
     isSubmitting,
@@ -85,6 +94,10 @@ export default function CreateLaporan() {
     useReportCategories();
   const { mutate: generateDescription, isPending: isGeneratingDescription } =
     useGenerateReportDescription();
+  const { mutate: submitReportMutation, isPending: isSubmittingReport } =
+    useSubmitReport();
+  const { mutate: uploadImages, isPending: isUploadingImages } =
+    useUploadReportImages();
 
   const districts = districtsData?.data || [];
   const categories = categoriesData?.data || [];
@@ -147,21 +160,57 @@ export default function CreateLaporan() {
         return;
       }
 
-      const reportData = {
-        user_id: decoded.sub,
-        category_key: selectedCategory.key,
-        district_id: districtId,
-        village_id: villageId,
-        description: description,
-        location: location,
-      };
+      if (reportId) {
+        submitFinalReport(decoded.sub);
+      } else {
+        const reportData = {
+          user_id: decoded.sub,
+          category_key: selectedCategory.key,
+          district_id: districtId,
+          village_id: villageId,
+          description: description,
+          location: location,
+        };
 
-      generateDescription(reportData);
+        generateDescription(reportData);
+      }
     } catch (error) {
       console.error("Submit error:", error);
       toast.error("Terjadi kesalahan saat mengirim laporan");
       dispatch(setIsSubmitting(false));
     }
+  };
+
+  const submitFinalReport = (userId) => {
+    const finalReport = {
+      report_id: reportId,
+      user_id: userId,
+      district_id: districtId,
+      village_id: villageId,
+      location: location,
+      category_key: categoryKey,
+      formal_description: formalDescription,
+    };
+
+    submitReportMutation(finalReport, {
+      onSuccess: () => {
+        if (images.length > 0) {
+          uploadImages({ reportId, images });
+        } else {
+          toast.success(
+            "Laporan berhasil dikirim! Tim kami akan segera meninjau laporan Anda."
+          );
+          dispatch(clearReportForm());
+          navigate("/user/laporan-saya", {
+            state: {
+              success: true,
+              message:
+                "Laporan berhasil dikirim! Tim kami akan segera meninjau laporan Anda.",
+            },
+          });
+        }
+      },
+    });
   };
 
   const goToPreviousStep = () => {
@@ -260,6 +309,20 @@ export default function CreateLaporan() {
     return fullLocation;
   };
 
+  useEffect(() => {
+    if (reportId && formalDescription && step === 3) {
+      if (previewRef.current) {
+        previewRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [reportId, formalDescription, step]);
+
+  const isLoading =
+    isSubmitting ||
+    isGeneratingDescription ||
+    isSubmittingReport ||
+    isUploadingImages;
+
   return (
     <div className="min-h-screen py-12">
       <div className="container mx-auto px-4">
@@ -277,7 +340,7 @@ export default function CreateLaporan() {
           </div>
 
           <div className="mb-8">
-            <Progress value={progress} className="h-2 bg-gray-200" />
+            <Progress value={progress} className="h-2 bg-[#9CDE9F]" />
 
             <div className="flex items-center justify-between mt-4">
               {[1, 2, 3].map((s) => (
@@ -732,6 +795,22 @@ export default function CreateLaporan() {
                               </div>
                             </div>
                           )}
+
+                          {reportId && formalDescription && (
+                            <div
+                              ref={previewRef}
+                              className="border-t border-gray-200 pt-4"
+                            >
+                              <p className="text-sm text-gray-500 mb-2">
+                                Format Resmi Laporan
+                              </p>
+                              <div className="p-4 rounded-lg bg-white border border-gray-200 prose prose-sm max-w-none">
+                                <ReactMarkdown>
+                                  {formalDescription}
+                                </ReactMarkdown>
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
@@ -759,6 +838,7 @@ export default function CreateLaporan() {
                       variant="outline"
                       onClick={goToPreviousStep}
                       className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                      disabled={isLoading}
                     >
                       Kembali
                     </Button>
@@ -773,9 +853,9 @@ export default function CreateLaporan() {
                         ? "bg-[#4E9F60] hover:bg-[#3d7d4c]"
                         : "bg-[#9DB17C] hover:bg-[#8CA06B]"
                     } transition-colors min-w-[140px]`}
-                    disabled={isSubmitting || isGeneratingDescription}
+                    disabled={isLoading}
                   >
-                    {isSubmitting || isGeneratingDescription ? (
+                    {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Memproses...
@@ -785,8 +865,10 @@ export default function CreateLaporan() {
                         Lanjutkan
                         <ChevronRight className="ml-1 h-4 w-4" />
                       </>
-                    ) : (
+                    ) : reportId ? (
                       "Kirim Laporan"
+                    ) : (
+                      "Pratinjau Laporan"
                     )}
                   </Button>
                 </CardFooter>
@@ -798,6 +880,7 @@ export default function CreateLaporan() {
                 variant="ghost"
                 className="text-white bg-red-500 hover:bg-red-600 transition-colors"
                 onClick={() => navigate(-1)}
+                disabled={isLoading}
               >
                 <Home className="mr-1 h-4 w-4" />
                 Kembali ke Beranda
