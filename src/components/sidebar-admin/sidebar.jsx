@@ -57,7 +57,8 @@ export default function CustomSidebar({ isOpen, toggleSidebar, isMobile }) {
     <>
       <div
         className={cn(
-          "fixed top-0 left-0 z-30 h-full bg-white border-r border-gray-200 shadow-lg transition-all duration-300 overflow-y-auto md:pt-28 lg:pt-16",
+          "fixed top-0 left-0 z-30 h-full bg-white border-r border-gray-200 shadow-lg transition-all duration-300",
+          isMobile ? "pt-16" : "md:pt-28 lg:pt-16",
           isMobile ? "w-[270px]" : "w-[280px]",
           isOpen
             ? "translate-x-0"
