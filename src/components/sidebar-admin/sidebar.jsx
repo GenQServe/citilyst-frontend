@@ -1,15 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { images } from "@/constants/images";
 import {
   LayoutDashboard,
   Package,
-  User,
-  History,
+  ClipboardList,
   LogOut,
   ChevronRight,
-  Menu,
-  X,
-  Recycle,
 } from "lucide-react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
@@ -22,24 +19,9 @@ const menus = [
     icon: LayoutDashboard,
   },
   {
-    label: "Dropoff",
-    path: "/dropoff",
-    icon: Package,
-  },
-  {
-    label: "Waste Types",
+    label: "Manage-Report",
     path: "/waste-types",
-    icon: Recycle,
-  },
-  {
-    label: "Profile",
-    path: "/profile",
-    icon: User,
-  },
-  {
-    label: "History",
-    path: "/history",
-    icon: History,
+    icon: ClipboardList,
   },
 ];
 
@@ -74,20 +56,6 @@ export default function CustomSidebar({ isOpen, toggleSidebar, isMobile }) {
 
   return (
     <>
-      {isMobile && (
-        <button
-          onClick={toggleSidebar}
-          className="fixed top-[72px] left-4 z-50 h-10 w-10 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-200"
-          aria-label="Toggle sidebar"
-        >
-          {isOpen ? (
-            <X className="h-5 w-5 text-gray-700" />
-          ) : (
-            <Menu className="h-5 w-5 text-gray-700" />
-          )}
-        </button>
-      )}
-
       <div
         className={cn(
           "fixed top-0 left-0 z-30 h-full bg-white border-r border-gray-200 shadow-lg transition-all duration-300 overflow-y-auto md:pt-28 lg:pt-16",
@@ -101,12 +69,17 @@ export default function CustomSidebar({ isOpen, toggleSidebar, isMobile }) {
       >
         <div className="p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold shadow-md">
-              T4C
+            <div>
+              <img
+                src={images.logo}
+                alt="CityList Logo"
+                className="h-11 w-auto object-contain"
+                style={{ width: '100%', maxWidth: '180px' }}
+              />
             </div>
             <div>
               <span className="font-bold text-xl whitespace-nowrap">
-                Trash4Cash
+                CityList
               </span>
               <p className="text-xs text-gray-500 mt-[-2px]">
                 Welcome, {getUserName()}

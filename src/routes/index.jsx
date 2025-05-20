@@ -103,7 +103,7 @@ export const userRoutes = [
 
 export const walikotaRoutes = [
   {
-    path: "/walikota",
+    path: "/",
     element: (
       <ProtectedRoute allowedRoles={["admin"]}>
         <WalikotaLayout />
@@ -112,7 +112,7 @@ export const walikotaRoutes = [
     children: [
       {
         path: "",
-        element: <Navigate to="/walikota/dashboard" replace />,
+        element: <Navigate to="/dashboard" replace />,
       },
       {
         path: "dashboard",
