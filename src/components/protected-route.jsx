@@ -31,7 +31,7 @@ export const ProtectedRoute = ({
         decoded.role === "user"
           ? "/home"
           : decoded.role === "admin"
-          ? "/walikota"
+          ? "/admin/dashboard"
           : "/home";
       return <Navigate to={redirectTo} state={{ from: location }} replace />;
     }
@@ -60,7 +60,7 @@ export const PublicRoute = ({
           decoded.role === "user"
             ? "/home"
             : decoded.role === "admin"
-            ? "/walikota"
+            ? "/admin/dashboard"
             : "/home";
         return (
           <Navigate to={redirectTo || "/"} state={{ from: location }} replace />

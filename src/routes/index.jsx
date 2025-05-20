@@ -12,6 +12,7 @@ import CheckStatusPage from "@/pages/user/check-status";
 import NotificationsPage from "@/pages/user/notifications";
 import NotFoundPage from "@/pages/404";
 import { ProtectedRoute, PublicRoute } from "@/components/protected-route";
+import ManageReports from "@/pages/admin/manage-reports";
 
 export const publicRoutes = [
   {
@@ -112,11 +113,15 @@ export const walikotaRoutes = [
     children: [
       {
         path: "",
-        element: <Navigate to="/dashboard" replace />,
+        element: <Navigate to="/admin/dashboard" replace />,
       },
       {
-        path: "dashboard",
+        path: "admin/dashboard",
         element: <WalikotaDashboard />,
+      },
+      {
+        path: "admin/manage-report",
+        element: <ManageReports />
       },
     ],
   },

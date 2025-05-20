@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 import { images } from "@/constants/images";
 import {
   LayoutDashboard,
-  Package,
   ClipboardList,
   LogOut,
   ChevronRight,
@@ -15,12 +14,12 @@ import { toast } from "sonner";
 const menus = [
   {
     label: "Dashboard",
-    path: "/dashboard",
+    path: "/admin/dashboard",
     icon: LayoutDashboard,
   },
   {
     label: "Manage-Report",
-    path: "/waste-types",
+    path: "/admin/manage-report",
     icon: ClipboardList,
   },
 ];

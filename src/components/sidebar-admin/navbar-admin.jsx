@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
 import { images } from "@/constants/images";
 import { Menu, Bell, Search, ChevronDown, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
