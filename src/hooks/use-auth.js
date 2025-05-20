@@ -36,7 +36,27 @@ export function useLogin() {
     onSuccess: (data) => {
       toast.success(data.message);
       Cookies.set("token", data.data.token);
-      navigate("/home", { replace: true });
+      
+      // Decode JWT token to check user role
+      try {
+        const token = data.data.token;
+        // Assuming the token is in format: header.payload.signature
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const decoded = JSON.parse(window.atob(base64));
+        
+        // Redirect based on role with a slight delay
+        setTimeout(() => {
+          if (decoded.role === 'admin') {
+            navigate('/admin/dashboard', { replace: true });
+          } else {
+            navigate('/home', { replace: true });
+          }
+        }, 100);
+      } catch (error) {
+        // If token decoding fails, default to home
+        navigate('/home', { replace: true });
+      }
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Login failed");
