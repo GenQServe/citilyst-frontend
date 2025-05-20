@@ -1,11 +1,59 @@
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
+import CustomSidebar from "@/components/sidebar-admin/sidebar";
+import Footer from "@/components/footer";
 
 const WalikotaLayout = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      if (window.innerWidth >= 1024) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const isMobileView = windowWidth < 1024;
+
   return (
-    <div className="min-h-screen bg-background">
-      <main className="p-6">
-        <Outlet />
-      </main>
+    <div className="flex min-h-screen flex-col bg-gray-50">
+      <Navbar isMobileView={isMobileView} toggleSidebar={toggleSidebar} />
+
+      <div className="flex h-full flex-1 pt-[60px]">
+        <CustomSidebar
+          isOpen={isSidebarOpen}
+          toggleSidebar={toggleSidebar}
+          isMobile={isMobileView}
+          role="admin"
+        />
+
+        <main
+          className={`flex-1 transition-all duration-300 p-6 ${
+            isMobileView
+              ? "ml-0"
+              : isSidebarOpen
+              ? "ml-0 lg:ml-[280px]"
+              : "ml-0"
+          }`}
+        >
+          <Outlet />
+        </main>
+      </div>
+
+      <Footer />
     </div>
   );
 };
