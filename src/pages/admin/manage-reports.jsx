@@ -294,22 +294,24 @@ const ManageReports = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Kelola Laporan</h1>
         <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="search"
-              placeholder="Cari laporan..."
-              className="w-[250px] pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
         </div>
       </div>
       
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle>Daftar Laporan Warga</CardTitle>
+        <CardHeader className="pb-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <CardTitle className="text-lg md:text-xl">Daftar Laporan Warga</CardTitle>
+          <div className="flex-1 flex justify-end">
+            <div className="relative w-full max-w-xs">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Input
+                type="search"
+                placeholder="Cari laporan..."
+                className="w-full pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
