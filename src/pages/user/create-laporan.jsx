@@ -40,6 +40,15 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
   useDistrictsWithVillages,
   useReportCategories,
 } from "@/hooks/use-locations";
@@ -71,6 +80,8 @@ export default function CreateLaporan() {
   const titleRef = useRef(null);
   const previewRef = useRef(null);
 
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+
   const {
     categoryId,
     categoryKey,
@@ -82,6 +93,7 @@ export default function CreateLaporan() {
     reportId,
     formalDescription,
     images,
+    imagesUrl,
     step,
     isSubmitting,
   } = useSelector((state) => state.report);
@@ -111,12 +123,23 @@ export default function CreateLaporan() {
     const files = Array.from(e.target.files);
 
     if (files.length > 0) {
+      if (files.length > 2) {
+        toast.warning("Maksimal 2 foto yang dapat diunggah");
+        const limitedFiles = files.slice(0, 2);
+        const newImages = limitedFiles.map((file) => ({
+          file,
+          preview: URL.createObjectURL(file),
+        }));
+        dispatch(setImages(newImages));
+        return;
+      }
+
       const newImages = files.map((file) => ({
         file,
         preview: URL.createObjectURL(file),
       }));
 
-      dispatch(setImages([...images, ...newImages]));
+      dispatch(setImages(newImages));
     }
   };
 
@@ -136,6 +159,14 @@ export default function CreateLaporan() {
       return;
     }
 
+    if (!reportId) {
+      submitInitialReport();
+    } else {
+      setConfirmDialogOpen(true);
+    }
+  };
+
+  const submitInitialReport = () => {
     dispatch(setIsSubmitting(true));
 
     try {
@@ -160,20 +191,16 @@ export default function CreateLaporan() {
         return;
       }
 
-      if (reportId) {
-        submitFinalReport(decoded.sub);
-      } else {
-        const reportData = {
-          user_id: decoded.sub,
-          category_key: selectedCategory.key,
-          district_id: districtId,
-          village_id: villageId,
-          description: description,
-          location: location,
-        };
+      const reportData = {
+        user_id: decoded.sub,
+        category_key: selectedCategory.key,
+        district_id: districtId,
+        village_id: villageId,
+        description: description,
+        location: location,
+      };
 
-        generateDescription(reportData);
-      }
+      generateDescription(reportData);
     } catch (error) {
       console.error("Submit error:", error);
       toast.error("Terjadi kesalahan saat mengirim laporan");
@@ -181,36 +208,64 @@ export default function CreateLaporan() {
     }
   };
 
-  const submitFinalReport = (userId) => {
-    const finalReport = {
-      report_id: reportId,
-      user_id: userId,
-      district_id: districtId,
-      village_id: villageId,
-      location: location,
-      category_key: categoryKey,
-      formal_description: formalDescription,
-    };
+  const finalizeReport = () => {
+    setConfirmDialogOpen(false);
+    dispatch(setIsSubmitting(true));
 
-    submitReportMutation(finalReport, {
-      onSuccess: () => {
-        if (images.length > 0) {
-          uploadImages({ reportId, images });
-        } else {
-          toast.success(
-            "Laporan berhasil dikirim! Tim kami akan segera meninjau laporan Anda."
-          );
-          dispatch(clearReportForm());
-          navigate("/user/laporan-saya", {
-            state: {
-              success: true,
-              message:
-                "Laporan berhasil dikirim! Tim kami akan segera meninjau laporan Anda.",
+    try {
+      const token = Cookies.get("token");
+      if (!token) {
+        toast.error("Silakan login terlebih dahulu");
+        dispatch(setIsSubmitting(false));
+        return;
+      }
+
+      const decoded = jwtDecode(token);
+      if (!decoded || !decoded.sub) {
+        toast.error("Token tidak valid");
+        dispatch(setIsSubmitting(false));
+        return;
+      }
+
+      if (images.length > 0) {
+        uploadImages(
+          { reportId, images },
+          {
+            onSuccess: (data) => {
+              const finalReport = {
+                report_id: reportId,
+                user_id: decoded.sub,
+                district_id: districtId,
+                village_id: villageId,
+                location: location,
+                category_key: categoryKey,
+                formal_description: formalDescription,
+                images_url: data.data,
+              };
+
+              submitReportMutation(finalReport);
             },
-          });
-        }
-      },
-    });
+          }
+        );
+      } else {
+        const finalReport = {
+          report_id: reportId,
+          user_id: decoded.sub,
+          district_id: districtId,
+          village_id: villageId,
+          location: location,
+          category_key: categoryKey,
+          formal_description: formalDescription,
+          images_url: [],
+        };
+
+        submitReportMutation(finalReport);
+      }
+    } catch (error) {
+      console.error("Submit error:", error);
+      toast.error("Terjadi kesalahan saat mengirim laporan");
+      dispatch(setIsSubmitting(false));
+    }
   };
 
   const goToPreviousStep = () => {
@@ -243,12 +298,23 @@ export default function CreateLaporan() {
     );
 
     if (files.length > 0) {
+      if (files.length > 2) {
+        toast.warning("Maksimal 2 foto yang dapat diunggah");
+        const limitedFiles = files.slice(0, 2);
+        const newImages = limitedFiles.map((file) => ({
+          file,
+          preview: URL.createObjectURL(file),
+        }));
+        dispatch(setImages(newImages));
+        return;
+      }
+
       const newImages = files.map((file) => ({
         file,
         preview: URL.createObjectURL(file),
       }));
 
-      dispatch(setImages([...images, ...newImages]));
+      dispatch(setImages(newImages));
     }
   };
 
@@ -443,23 +509,6 @@ export default function CreateLaporan() {
 
                         <div className="space-y-2">
                           <Label
-                            htmlFor="title"
-                            className="text-[#4A5568] font-medium"
-                          >
-                            Judul Laporan
-                          </Label>
-                          <Input
-                            id="title"
-                            placeholder="Contoh: Jalan Berlubang di Depan Pasar Minggu"
-                            value={title}
-                            onChange={(e) => dispatch(setTitle(e.target.value))}
-                            className="border-gray-200 focus-visible:ring-[#9DB17C] h-11"
-                            required
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label
                             htmlFor="description"
                             className="text-[#4A5568] font-medium"
                           >
@@ -475,11 +524,15 @@ export default function CreateLaporan() {
                             className="min-h-[150px] border-gray-200 focus-visible:ring-[#9DB17C]"
                             rows={5}
                             required
+                            maxLength={200}
                           />
-                          <p className="text-xs text-gray-500 mt-1">
-                            Semakin detail informasi yang Anda berikan, semakin
-                            mudah pihak berwenang menindaklanjuti
-                          </p>
+                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <p>
+                              Semakin detail informasi yang Anda berikan,
+                              semakin mudah pihak berwenang menindaklanjuti
+                            </p>
+                            <p>{description.length}/200</p>
+                          </div>
                         </div>
 
                         <div className="space-y-2">
@@ -590,7 +643,7 @@ export default function CreateLaporan() {
                           </CardTitle>
                           <CardDescription>
                             Foto akan membantu petugas menilai tingkat keparahan
-                            masalah
+                            masalah (maksimal 2 foto)
                           </CardDescription>
                         </div>
                       </div>
@@ -645,7 +698,7 @@ export default function CreateLaporan() {
                             <div className="border-t border-gray-100 pt-5">
                               <div className="flex items-center justify-between mb-3">
                                 <Label className="font-medium text-[#4A5568]">
-                                  Foto terlampir ({images.length})
+                                  Foto terlampir ({images.length}/2)
                                 </Label>
                                 {images.length > 0 && (
                                   <Button
@@ -660,7 +713,7 @@ export default function CreateLaporan() {
                                   </Button>
                                 )}
                               </div>
-                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                              <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
                                 {images.map((img, index) => (
                                   <div
                                     key={index}
@@ -698,7 +751,7 @@ export default function CreateLaporan() {
                               <p className="mt-1">
                                 Foto yang jelas dan dari berbagai sudut akan
                                 membantu petugas menilai situasi dengan lebih
-                                baik.
+                                baik. Maksimal 2 foto yang dapat diunggah.
                               </p>
                             </div>
                           </div>
@@ -749,15 +802,6 @@ export default function CreateLaporan() {
                             </Badge>
                           </div>
 
-                          <div className="border-t border-gray-200 pt-4">
-                            <p className="text-sm text-gray-500 mb-1">
-                              Judul Laporan
-                            </p>
-                            <h3 className="font-semibold text-xl text-gray-800">
-                              {title || "Tidak ada judul"}
-                            </h3>
-                          </div>
-
                           <div>
                             <p className="text-sm text-gray-500 mb-1">
                               Deskripsi
@@ -782,7 +826,7 @@ export default function CreateLaporan() {
                               <p className="text-sm text-gray-500 mb-2">
                                 Media ({images.length} foto)
                               </p>
-                              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                              <div className="grid grid-cols-2 gap-3">
                                 {images.map((img, index) => (
                                   <div
                                     key={index}
@@ -798,6 +842,35 @@ export default function CreateLaporan() {
                                     </div>
                                   </div>
                                 ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {isGeneratingDescription && !reportId && (
+                            <div className="border-t border-gray-200 pt-4">
+                              <p className="text-sm text-gray-500 mb-2">
+                                Menyiapkan Format Resmi Laporan...
+                              </p>
+                              <div className="p-4 rounded-lg bg-white border border-gray-200">
+                                <div className="space-y-4">
+                                  <div className="flex space-x-3 items-center">
+                                    <Skeleton className="h-5 w-5 rounded-full" />
+                                    <Skeleton className="h-5 w-48" />
+                                  </div>
+                                  <Skeleton className="h-4 w-full" />
+                                  <Skeleton className="h-4 w-full" />
+                                  <Skeleton className="h-4 w-[90%]" />
+                                  <Skeleton className="h-4 w-[85%]" />
+                                  <div className="pt-2">
+                                    <Skeleton className="h-4 w-[70%]" />
+                                    <Skeleton className="h-4 w-[80%] mt-2" />
+                                    <Skeleton className="h-4 w-[75%] mt-2" />
+                                  </div>
+                                  <div className="pt-2">
+                                    <Skeleton className="h-4 w-full" />
+                                    <Skeleton className="h-4 w-[60%] mt-2" />
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           )}
@@ -881,20 +954,65 @@ export default function CreateLaporan() {
               </form>
             </Card>
 
-            <div className="mt-6 text-center">
+            <div className="mt-6 text-right">
               <Button
                 variant="ghost"
                 className="text-white bg-red-500 hover:bg-red-600 transition-colors"
-                onClick={() => navigate(-1)}
+                onClick={() => {
+                  dispatch(clearReportForm());
+                }}
                 disabled={isLoading}
               >
                 <Home className="mr-1 h-4 w-4" />
-                Kembali ke Beranda
+                Reset Laporan
               </Button>
             </div>
           </div>
         </div>
       </div>
+
+      <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Pengiriman Laporan</DialogTitle>
+            <DialogDescription>
+              Laporan yang telah dikirim tidak dapat diubah atau dibatalkan.
+              Pastikan semua informasi yang Anda berikan sudah benar.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-4 bg-amber-50 rounded-md border border-amber-200 text-amber-700 text-sm">
+            <p className="font-medium">Perhatian:</p>
+            <p>Dengan mengklik "Kirim Laporan", Anda menyatakan bahwa:</p>
+            <ul className="list-disc pl-5 mt-2 space-y-1">
+              <li>Semua informasi yang diberikan adalah benar</li>
+              <li>Anda bertanggung jawab atas laporan yang dikirimkan</li>
+              <li>Laporan ini dapat ditindaklanjuti oleh pihak berwenang</li>
+            </ul>
+          </div>
+          <DialogFooter className="sm:justify-between">
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDialogOpen(false)}
+            >
+              Batalkan
+            </Button>
+            <Button
+              className="bg-[#4E9F60] hover:bg-[#3d7d4c]"
+              onClick={finalizeReport}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Memproses...
+                </>
+              ) : (
+                "Kirim Laporan"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

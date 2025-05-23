@@ -10,6 +10,7 @@ import {
   setGeneratedReport,
   setIsSubmitting,
   clearReportForm,
+  setImagesUrl,
 } from "@/features/slices/reportSlice";
 import { useNavigate } from "react-router-dom";
 
@@ -34,10 +35,23 @@ export function useGenerateReportDescription() {
 
 export function useSubmitReport() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   return useMutation({
     mutationFn: submitReport,
     onSuccess: (data) => {
+      if (data.data.file_url) {
+        window.open(data.data.file_url, "_blank");
+      }
+      toast.success("Laporan berhasil dikirim! Berkas laporan telah diunduh.");
+      dispatch(clearReportForm());
+      navigate("/user/check-status", {
+        state: {
+          success: true,
+          message:
+            "Laporan berhasil dikirim! Tim kami akan segera meninjau laporan Anda.",
+        },
+      });
       return data;
     },
     onError: (error) => {
@@ -49,22 +63,12 @@ export function useSubmitReport() {
 
 export function useUploadReportImages() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   return useMutation({
     mutationFn: uploadReportImages,
-    onSuccess: () => {
-      toast.success(
-        "Laporan berhasil dikirim! Tim kami akan segera meninjau laporan Anda."
-      );
-      dispatch(clearReportForm());
-      navigate("/user/check-status", {
-        state: {
-          success: true,
-          message:
-            "Laporan berhasil dikirim! Tim kami akan segera meninjau laporan Anda.",
-        },
-      });
+    onSuccess: (data) => {
+      dispatch(setImagesUrl(data.data));
+      return data;
     },
     onError: (error) => {
       toast.error(

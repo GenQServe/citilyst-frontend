@@ -12,6 +12,7 @@ const initialState = {
   reportId: Cookies.get("report_id") || "",
   formalDescription: Cookies.get("formal_description") || "",
   images: [],
+  imagesUrl: JSON.parse(Cookies.get("images_url") || "[]"),
   step: 1,
   isSubmitting: false,
 };
@@ -49,6 +50,10 @@ export const reportSlice = createSlice({
     setImages: (state, action) => {
       state.images = action.payload;
     },
+    setImagesUrl: (state, action) => {
+      state.imagesUrl = action.payload;
+      Cookies.set("images_url", JSON.stringify(action.payload));
+    },
     setStep: (state, action) => {
       state.step = action.payload;
     },
@@ -71,6 +76,7 @@ export const reportSlice = createSlice({
       Cookies.remove("report_location");
       Cookies.remove("report_id");
       Cookies.remove("formal_description");
+      Cookies.remove("images_url");
 
       return {
         ...initialState,
@@ -84,6 +90,7 @@ export const reportSlice = createSlice({
         reportId: "",
         formalDescription: "",
         images: [],
+        imagesUrl: [],
         step: 1,
         isSubmitting: false,
       };
@@ -99,6 +106,7 @@ export const {
   setVillageId,
   setLocation,
   setImages,
+  setImagesUrl,
   setStep,
   setIsSubmitting,
   setGeneratedReport,
