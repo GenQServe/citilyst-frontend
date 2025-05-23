@@ -233,7 +233,7 @@ export default function CheckStatusPage() {
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 md:px-8">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
               <ClipboardCheck className="h-10 w-10 text-[#9DB17C]" />
-              <h1 className="text-2xl sm:text-3xl font-bold">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#9DB17C]">
                 Cek Status Laporan
               </h1>
             </div>
@@ -257,7 +257,7 @@ export default function CheckStatusPage() {
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 md:px-8">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
               <ClipboardCheck className="h-10 w-10 text-[#9DB17C]" />
-              <h1 className="text-2xl sm:text-3xl font-bold">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#9DB17C]">
                 Cek Status Laporan
               </h1>
             </div>
@@ -297,7 +297,7 @@ export default function CheckStatusPage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
             <div className="flex items-center gap-3">
               <ClipboardCheck className="h-10 w-10 text-[#9DB17C]" />
-              <h1 className="text-2xl sm:text-3xl font-bold">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#9DB17C]">
                 Cek Status Laporan
               </h1>
             </div>
