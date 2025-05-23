@@ -14,24 +14,11 @@ export const getAllReports = async () => {
 
 export const updateReport = async ({ reportId, data }) => {
   try {
-    // Get user_id from JWT token
-    const token = Cookies.get("token");
-    let userId = null;
-
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        userId = decoded.sub;
-      } catch (error) {
-        console.error("Error decoding JWT token:", error);
-      }
-    }
-
+    const userId = data.user_id;
     if (!userId) {
-      throw new Error("User authentication required");
+      throw new Error("User ID pelapor diperlukan");
     }
 
-    // Map statuses to format expected by backend
     const statusMap = {
       PENDING: "pending",
       INPROGRESS: "in_progress",
@@ -39,7 +26,6 @@ export const updateReport = async ({ reportId, data }) => {
       REJECTED: "rejected",
     };
 
-    // Format the data according to what the API expects
     const formattedData = {
       report_id: reportId,
       user_id: userId,

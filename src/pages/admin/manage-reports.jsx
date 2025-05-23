@@ -259,6 +259,7 @@ const ManageReports = () => {
       await updateReportMutation.mutateAsync({
         reportId: selectedReport.id,
         data: {
+          user_id: selectedReport.user_id,
           status: formattedStatus,
           feedback: feedback || "",
         },
