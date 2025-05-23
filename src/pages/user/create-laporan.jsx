@@ -1002,7 +1002,7 @@ export default function CreateLaporan() {
       </Dialog>
 
       <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
             <DialogTitle className="text-[#4E9F60]">
               Laporan Berhasil Dikirim
