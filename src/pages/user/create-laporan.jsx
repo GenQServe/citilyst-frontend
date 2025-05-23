@@ -16,6 +16,11 @@ import {
   Loader2,
   Calendar,
   Info,
+  ExternalLink,
+  ArrowLeft,
+  ArrowRight,
+  ImagePlus,
+  FileCheck2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -81,6 +86,9 @@ export default function CreateLaporan() {
   const previewRef = useRef(null);
 
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [successFileUrl, setSuccessFileUrl] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const {
     categoryId,
@@ -107,7 +115,17 @@ export default function CreateLaporan() {
   const { mutate: generateDescription, isPending: isGeneratingDescription } =
     useGenerateReportDescription();
   const { mutate: submitReportMutation, isPending: isSubmittingReport } =
-    useSubmitReport();
+    useSubmitReport({
+      onSuccess: (data) => {
+        if (data?.data?.file_url) {
+          setSuccessFileUrl(data.data.file_url);
+        }
+        setSuccessMessage(
+          "Laporan berhasil dikirim! Berkas laporan telah diunduh. Lihat laporan kamu di sini."
+        );
+        setSuccessDialogOpen(true);
+      },
+    });
   const { mutate: uploadImages, isPending: isUploadingImages } =
     useUploadReportImages();
 
@@ -121,7 +139,6 @@ export default function CreateLaporan() {
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-
     if (files.length > 0) {
       if (files.length > 2) {
         toast.warning("Maksimal 2 foto yang dapat diunggah");
@@ -133,12 +150,10 @@ export default function CreateLaporan() {
         dispatch(setImages(newImages));
         return;
       }
-
       const newImages = files.map((file) => ({
         file,
         preview: URL.createObjectURL(file),
       }));
-
       dispatch(setImages(newImages));
     }
   };
@@ -151,14 +166,12 @@ export default function CreateLaporan() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (step < 3) {
       dispatch(setStep(step + 1));
       setProgress(step === 1 ? 66 : 100);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-
     if (!reportId) {
       submitInitialReport();
     } else {
@@ -168,7 +181,6 @@ export default function CreateLaporan() {
 
   const submitInitialReport = () => {
     dispatch(setIsSubmitting(true));
-
     try {
       const token = Cookies.get("token");
       if (!token) {
@@ -176,21 +188,18 @@ export default function CreateLaporan() {
         dispatch(setIsSubmitting(false));
         return;
       }
-
       const decoded = jwtDecode(token);
       if (!decoded || !decoded.sub) {
         toast.error("Token tidak valid");
         dispatch(setIsSubmitting(false));
         return;
       }
-
       const selectedCategory = categories.find((cat) => cat.id === categoryId);
       if (!selectedCategory) {
         toast.error("Kategori tidak valid");
         dispatch(setIsSubmitting(false));
         return;
       }
-
       const reportData = {
         user_id: decoded.sub,
         category_key: selectedCategory.key,
@@ -199,10 +208,8 @@ export default function CreateLaporan() {
         description: description,
         location: location,
       };
-
       generateDescription(reportData);
     } catch (error) {
-      console.error("Submit error:", error);
       toast.error("Terjadi kesalahan saat mengirim laporan");
       dispatch(setIsSubmitting(false));
     }
@@ -211,7 +218,6 @@ export default function CreateLaporan() {
   const finalizeReport = () => {
     setConfirmDialogOpen(false);
     dispatch(setIsSubmitting(true));
-
     try {
       const token = Cookies.get("token");
       if (!token) {
@@ -219,14 +225,12 @@ export default function CreateLaporan() {
         dispatch(setIsSubmitting(false));
         return;
       }
-
       const decoded = jwtDecode(token);
       if (!decoded || !decoded.sub) {
         toast.error("Token tidak valid");
         dispatch(setIsSubmitting(false));
         return;
       }
-
       if (images.length > 0) {
         uploadImages(
           { reportId, images },
@@ -242,8 +246,17 @@ export default function CreateLaporan() {
                 formal_description: formalDescription,
                 images_url: data.data,
               };
-
-              submitReportMutation(finalReport);
+              submitReportMutation(finalReport, {
+                onSuccess: (res) => {
+                  if (res?.data?.file_url) {
+                    setSuccessFileUrl(res.data.file_url);
+                  }
+                  setSuccessMessage(
+                    "Laporan berhasil dikirim! Berkas laporan telah diunduh. Lihat laporan kamu di sini."
+                  );
+                  setSuccessDialogOpen(true);
+                },
+              });
             },
           }
         );
@@ -258,11 +271,19 @@ export default function CreateLaporan() {
           formal_description: formalDescription,
           images_url: [],
         };
-
-        submitReportMutation(finalReport);
+        submitReportMutation(finalReport, {
+          onSuccess: (res) => {
+            if (res?.data?.file_url) {
+              setSuccessFileUrl(res.data.file_url);
+            }
+            setSuccessMessage(
+              "Laporan berhasil dikirim! Berkas laporan telah diunduh. Lihat laporan kamu di sini."
+            );
+            setSuccessDialogOpen(true);
+          },
+        });
       }
     } catch (error) {
-      console.error("Submit error:", error);
       toast.error("Terjadi kesalahan saat mengirim laporan");
       dispatch(setIsSubmitting(false));
     }
@@ -292,11 +313,9 @@ export default function CreateLaporan() {
     e.preventDefault();
     e.stopPropagation();
     e.currentTarget.classList.remove("border-[#9DB17C]", "bg-[#9DB17C]/5");
-
     const files = Array.from(e.dataTransfer.files).filter((file) =>
       file.type.startsWith("image/")
     );
-
     if (files.length > 0) {
       if (files.length > 2) {
         toast.warning("Maksimal 2 foto yang dapat diunggah");
@@ -308,12 +327,10 @@ export default function CreateLaporan() {
         dispatch(setImages(newImages));
         return;
       }
-
       const newImages = files.map((file) => ({
         file,
         preview: URL.createObjectURL(file),
       }));
-
       dispatch(setImages(newImages));
     }
   };
@@ -352,7 +369,6 @@ export default function CreateLaporan() {
   const getSelectedVillageName = () => {
     const district = districts.find((dist) => dist.id === districtId);
     if (!district) return "";
-
     const village = district.villages.find((v) => v.id === villageId);
     return village ? village.name : "";
   };
@@ -360,9 +376,7 @@ export default function CreateLaporan() {
   const getFullLocation = () => {
     const districtName = getSelectedDistrictName();
     const villageName = getSelectedVillageName();
-
     let fullLocation = "";
-
     if (districtName && villageName) {
       fullLocation = `Kecamatan ${districtName}, Kelurahan ${villageName}`;
       if (location) {
@@ -371,7 +385,6 @@ export default function CreateLaporan() {
     } else {
       fullLocation = location || "Tidak ada lokasi";
     }
-
     return fullLocation;
   };
 
@@ -390,49 +403,57 @@ export default function CreateLaporan() {
     isUploadingImages;
 
   return (
-    <div className="min-h-screen py-12">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen py-8">
+      <div className="container mx-auto px-2 sm:px-4">
         <div ref={pageRef} className="w-full max-w-3xl mx-auto">
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 sm:mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#e6f4ea] shadow-sm mb-4">
+              <FileCheck2 className="h-5 w-5 text-[#4E9F60]" />
+              <span className="text-[#4E9F60] font-semibold text-sm tracking-wide">
+                Formulir Laporan Warga
+              </span>
+            </div>
             <h1
               ref={titleRef}
-              className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#4E9F60] to-[#9DB17C]"
+              className="text-2xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-[#4E9F60] to-[#9DB17C] drop-shadow-sm"
             >
-              Buat Laporan
+              Buat Laporan Baru
             </h1>
-            <p className="text-gray-600 mt-2">
-              Sampaikan masalah di lingkungan sekitar Anda dengan mudah
+            <p className="text-gray-600 mt-2 sm:mt-3 text-base sm:text-lg">
+              Sampaikan masalah di lingkungan sekitar Anda dengan mudah dan
+              cepat
             </p>
           </div>
 
-          <div className="mb-8">
-            <Progress value={progress} className="bg-[#9CDE9F]" />
-
-            <div className="flex items-center justify-between mt-4">
+          <div className="mb-8 sm:mb-10">
+            <Progress
+              value={progress}
+              className="bg-[#9CDE9F] h-2 rounded-full"
+            />
+            <div className="flex items-center justify-between mt-4 sm:mt-6 gap-2">
               {[1, 2, 3].map((s) => (
-                <div key={s} className="flex flex-col items-center">
+                <div key={s} className="flex flex-col items-center flex-1">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow transition-all duration-300 ${
                       s === step
-                        ? "bg-[#4E9F60] text-white ring-4 ring-[#9DB17C]/20"
+                        ? "bg-[#4E9F60] text-white ring-4 ring-[#9DB17C]/30 scale-110"
                         : s < step
                         ? "bg-[#9DB17C] text-white"
                         : "bg-white border-2 border-gray-200 text-gray-400"
                     }`}
                   >
                     {s < step ? (
-                      <CheckCircle className="h-5 w-5" />
+                      <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6" />
                     ) : s === 1 ? (
-                      <FileText className="h-5 w-5" />
+                      <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
                     ) : s === 2 ? (
-                      <Camera className="h-5 w-5" />
+                      <ImagePlus className="h-5 w-5 sm:h-6 sm:w-6" />
                     ) : (
-                      <CheckCircle className="h-5 w-5" />
+                      <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6" />
                     )}
                   </div>
-
                   <span
-                    className={`text-sm mt-2 font-medium ${
+                    className={`text-xs sm:text-base mt-2 sm:mt-3 font-semibold ${
                       s === step ? "text-[#4E9F60]" : "text-gray-500"
                     }`}
                   >
@@ -448,32 +469,31 @@ export default function CreateLaporan() {
           </div>
 
           <div>
-            <Card className="shadow-lg border-0 overflow-hidden">
+            <Card className="shadow-2xl border-0 overflow-hidden bg-white/90 backdrop-blur-md">
               <form ref={formRef} onSubmit={handleSubmit} className="space-y-1">
                 {step === 1 && (
                   <>
-                    <CardHeader className="border-b border-gray-100">
+                    <CardHeader className="border-b border-gray-100 bg-[#f7fafc]">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-opacity-10 rounded-full">
-                          <FileText className="h-5 w-5 text-[#4E9F60]" />
+                        <div className="p-2 bg-[#4E9F60]/10 rounded-full">
+                          <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
                         </div>
                         <div>
-                          <CardTitle className="text-xl text-[#2D3748]">
+                          <CardTitle className="text-lg sm:text-2xl text-[#2D3748] font-bold">
                             Detail Laporan
                           </CardTitle>
-                          <CardDescription>
+                          <CardDescription className="text-gray-600">
                             Masukkan informasi detail laporan Anda
                           </CardDescription>
                         </div>
                       </div>
                     </CardHeader>
-
-                    <CardContent className="pt-6 pb-2 px-6">
-                      <div className="space-y-6">
+                    <CardContent className="pt-6 sm:pt-8 pb-2 sm:pb-4 px-3 sm:px-8">
+                      <div className="space-y-6 sm:space-y-7">
                         <div className="space-y-2">
                           <Label
                             htmlFor="category"
-                            className="text-[#4A5568] font-medium"
+                            className="text-[#4A5568] font-semibold"
                           >
                             Kategori Laporan
                           </Label>
@@ -483,7 +503,7 @@ export default function CreateLaporan() {
                             required
                             disabled={isLoadingCategories}
                           >
-                            <SelectTrigger className="w-full border-gray-200 focus-visible:ring-[#9DB17C] h-11">
+                            <SelectTrigger className="w-full border-gray-200 focus-visible:ring-[#9DB17C] h-11 sm:h-12 rounded-lg text-base">
                               <SelectValue placeholder="Pilih kategori laporan" />
                             </SelectTrigger>
                             <SelectContent className="shadow-lg">
@@ -506,11 +526,10 @@ export default function CreateLaporan() {
                             </SelectContent>
                           </Select>
                         </div>
-
                         <div className="space-y-2">
                           <Label
                             htmlFor="description"
-                            className="text-[#4A5568] font-medium"
+                            className="text-[#4A5568] font-semibold"
                           >
                             Deskripsi Laporan
                           </Label>
@@ -521,12 +540,12 @@ export default function CreateLaporan() {
                             onChange={(e) =>
                               dispatch(setDescription(e.target.value))
                             }
-                            className="min-h-[150px] border-gray-200 focus-visible:ring-[#9DB17C]"
+                            className="min-h-[120px] sm:min-h-[150px] border-gray-200 focus-visible:ring-[#9DB17C] rounded-lg text-base"
                             rows={5}
                             required
                             maxLength={200}
                           />
-                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                          <div className="flex flex-col sm:flex-row justify-between text-xs text-gray-500 mt-1 gap-1">
                             <p>
                               Semakin detail informasi yang Anda berikan,
                               semakin mudah pihak berwenang menindaklanjuti
@@ -534,76 +553,75 @@ export default function CreateLaporan() {
                             <p>{description.length}/200</p>
                           </div>
                         </div>
-
-                        <div className="space-y-2">
-                          <Label
-                            htmlFor="district"
-                            className="text-[#4A5568] font-medium"
-                          >
-                            Kecamatan
-                          </Label>
-                          <Select
-                            value={districtId}
-                            onValueChange={handleDistrictChange}
-                            required
-                            disabled={isLoadingDistricts}
-                          >
-                            <SelectTrigger className="w-full border-gray-200 focus-visible:ring-[#9DB17C] h-11">
-                              <SelectValue placeholder="Pilih kecamatan" />
-                            </SelectTrigger>
-                            <SelectContent className="shadow-lg">
-                              {districts.map((district) => (
-                                <SelectItem
-                                  key={district.id}
-                                  value={district.id}
-                                  className="cursor-pointer"
-                                >
-                                  {district.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                          <div className="space-y-2">
+                            <Label
+                              htmlFor="district"
+                              className="text-[#4A5568] font-semibold"
+                            >
+                              Kecamatan
+                            </Label>
+                            <Select
+                              value={districtId}
+                              onValueChange={handleDistrictChange}
+                              required
+                              disabled={isLoadingDistricts}
+                            >
+                              <SelectTrigger className="w-full border-gray-200 focus-visible:ring-[#9DB17C] h-11 sm:h-12 rounded-lg text-base">
+                                <SelectValue placeholder="Pilih kecamatan" />
+                              </SelectTrigger>
+                              <SelectContent className="shadow-lg">
+                                {districts.map((district) => (
+                                  <SelectItem
+                                    key={district.id}
+                                    value={district.id}
+                                    className="cursor-pointer"
+                                  >
+                                    {district.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label
+                              htmlFor="village"
+                              className="text-[#4A5568] font-semibold"
+                            >
+                              Kelurahan
+                            </Label>
+                            <Select
+                              value={villageId}
+                              onValueChange={(value) =>
+                                dispatch(setVillageId(value))
+                              }
+                              required
+                              disabled={
+                                !districtId ||
+                                villagesInSelectedDistrict.length === 0
+                              }
+                            >
+                              <SelectTrigger className="w-full border-gray-200 focus-visible:ring-[#9DB17C] h-11 sm:h-12 rounded-lg text-base">
+                                <SelectValue placeholder="Pilih kelurahan" />
+                              </SelectTrigger>
+                              <SelectContent className="shadow-lg">
+                                {villagesInSelectedDistrict.map((village) => (
+                                  <SelectItem
+                                    key={village.id}
+                                    value={village.id}
+                                    className="cursor-pointer"
+                                  >
+                                    {village.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
-
-                        <div className="space-y-2">
-                          <Label
-                            htmlFor="village"
-                            className="text-[#4A5568] font-medium"
-                          >
-                            Kelurahan
-                          </Label>
-                          <Select
-                            value={villageId}
-                            onValueChange={(value) =>
-                              dispatch(setVillageId(value))
-                            }
-                            required
-                            disabled={
-                              !districtId ||
-                              villagesInSelectedDistrict.length === 0
-                            }
-                          >
-                            <SelectTrigger className="w-full border-gray-200 focus-visible:ring-[#9DB17C] h-11">
-                              <SelectValue placeholder="Pilih kelurahan" />
-                            </SelectTrigger>
-                            <SelectContent className="shadow-lg">
-                              {villagesInSelectedDistrict.map((village) => (
-                                <SelectItem
-                                  key={village.id}
-                                  value={village.id}
-                                  className="cursor-pointer"
-                                >
-                                  {village.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
                         <div className="space-y-2">
                           <Label
                             htmlFor="location"
-                            className="text-[#4A5568] font-medium"
+                            className="text-[#4A5568] font-semibold"
                           >
                             Detail Lokasi Kejadian
                           </Label>
@@ -615,7 +633,7 @@ export default function CreateLaporan() {
                               onChange={(e) =>
                                 dispatch(setLocation(e.target.value))
                               }
-                              className="pr-10 border-gray-200 focus-visible:ring-[#9DB17C] h-11"
+                              className="pr-10 border-gray-200 focus-visible:ring-[#9DB17C] h-11 sm:h-12 rounded-lg text-base"
                               required
                             />
                             <MapPin className="h-5 w-5 absolute right-3 top-3 text-gray-400" />
@@ -632,56 +650,51 @@ export default function CreateLaporan() {
 
                 {step === 2 && (
                   <>
-                    <CardHeader className="border-b border-gray-100">
+                    <CardHeader className="border-b border-gray-100 bg-[#f7fafc]">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-opacity-10 rounded-full">
-                          <Camera className="h-5 w-5 text-[#4E9F60]" />
+                        <div className="p-2 bg-[#4E9F60]/10 rounded-full">
+                          <Camera className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
                         </div>
                         <div>
-                          <CardTitle className="text-xl text-[#2D3748]">
+                          <CardTitle className="text-lg sm:text-2xl text-[#2D3748] font-bold">
                             Tambah Dokumentasi
                           </CardTitle>
-                          <CardDescription>
+                          <CardDescription className="text-gray-600">
                             Foto akan membantu petugas menilai tingkat keparahan
                             masalah (maksimal 2 foto)
                           </CardDescription>
                         </div>
                       </div>
                     </CardHeader>
-
-                    <CardContent className="pt-6 pb-2 px-6">
-                      <div className="space-y-6">
+                    <CardContent className="pt-6 sm:pt-8 pb-2 sm:pb-4 px-3 sm:px-8">
+                      <div className="space-y-6 sm:space-y-7">
                         <div
-                          className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-8 bg-gray-50 hover:bg-gray-50/80 transition-all duration-300 cursor-pointer group"
+                          className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-10 bg-gray-50 hover:bg-gray-50/80 transition-all duration-300 cursor-pointer group"
                           onDragOver={handleDragOver}
                           onDragLeave={handleDragLeave}
                           onDrop={handleDrop}
                           onClick={triggerFileInput}
                         >
-                          <div className="w-16 h-16 mb-4 rounded-full bg-[#4E9F60]/10 flex items-center justify-center">
-                            <UploadCloud className="h-8 w-8 text-[#4E9F60]" />
+                          <div className="w-14 h-14 sm:w-20 sm:h-20 mb-4 rounded-full bg-[#4E9F60]/10 flex items-center justify-center">
+                            <UploadCloud className="h-8 w-8 sm:h-10 sm:w-10 text-[#4E9F60]" />
                           </div>
-
-                          <h3 className="text-base font-medium text-gray-700 mb-1">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-1">
                             Unggah Foto
                           </h3>
-                          <p className="text-sm text-gray-500 mb-4 text-center max-w-xs">
+                          <p className="text-sm sm:text-base text-gray-500 mb-4 text-center max-w-xs">
                             Seret & lepas gambar di sini, atau klik untuk
                             memilih file
                           </p>
-
                           <Button
                             type="button"
                             className="bg-[#4E9F60] hover:bg-[#3d7d4c] transition-colors"
                           >
-                            <Camera className="mr-2 h-4 w-4" />
+                            <Camera className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                             Pilih Foto
                           </Button>
-
                           <p className="text-xs text-gray-500 mt-4">
                             Format: JPG, PNG, HEIC (maks. 5MB per foto)
                           </p>
-
                           <Input
                             ref={fileInputRef}
                             id="image-upload"
@@ -692,12 +705,11 @@ export default function CreateLaporan() {
                             onChange={handleImageUpload}
                           />
                         </div>
-
                         {images.length > 0 && (
                           <div>
                             <div className="border-t border-gray-100 pt-5">
                               <div className="flex items-center justify-between mb-3">
-                                <Label className="font-medium text-[#4A5568]">
+                                <Label className="font-semibold text-[#4A5568]">
                                   Foto terlampir ({images.length}/2)
                                 </Label>
                                 {images.length > 0 && (
@@ -708,12 +720,12 @@ export default function CreateLaporan() {
                                     className="text-red-500 hover:text-red-600 hover:bg-red-50 h-8 px-2"
                                     onClick={() => dispatch(setImages([]))}
                                   >
-                                    <Trash2 className="h-3.5 w-3.5 mr-1" />
+                                    <Trash2 className="h-4 w-4 mr-1" />
                                     Hapus semua
                                   </Button>
                                 )}
                               </div>
-                              <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
+                              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                 {images.map((img, index) => (
                                   <div
                                     key={index}
@@ -728,10 +740,10 @@ export default function CreateLaporan() {
                                     <Button
                                       type="button"
                                       size="icon"
-                                      className="absolute top-2 right-2 w-7 h-7 rounded-full opacity-0 group-hover:opacity-100 bg-white text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 shadow-sm"
+                                      className="absolute top-2 right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full opacity-0 group-hover:opacity-100 bg-white text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 shadow-sm"
                                       onClick={() => removeImage(index)}
                                     >
-                                      <Trash2 className="h-3.5 w-3.5" />
+                                      <Trash2 className="h-4 w-4" />
                                     </Button>
                                     <Badge className="absolute bottom-2 left-2 bg-black/60 text-white text-xs hover:bg-black/60">
                                       Foto {index + 1}
@@ -742,12 +754,11 @@ export default function CreateLaporan() {
                             </div>
                           </div>
                         )}
-
-                        <div className="rounded-lg border border-blue-100 bg-blue-50 p-4">
+                        <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 sm:p-5">
                           <div className="flex gap-3">
-                            <Info className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                            <div className="text-sm text-blue-700">
-                              <p className="font-medium">Tips</p>
+                            <Info className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 flex-shrink-0" />
+                            <div className="text-sm sm:text-base text-blue-700">
+                              <p className="font-semibold">Tips</p>
                               <p className="mt-1">
                                 Foto yang jelas dan dari berbagai sudut akan
                                 membantu petugas menilai situasi dengan lebih
@@ -763,37 +774,36 @@ export default function CreateLaporan() {
 
                 {step === 3 && (
                   <>
-                    <CardHeader className="border-b border-gray-100">
+                    <CardHeader className="border-b border-gray-100 bg-[#f7fafc]">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-opacity-10 rounded-full">
-                          <CheckCircle className="h-5 w-5 text-[#4E9F60]" />
+                        <div className="p-2 bg-[#4E9F60]/10 rounded-full">
+                          <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
                         </div>
                         <div>
-                          <CardTitle className="text-xl text-[#2D3748]">
+                          <CardTitle className="text-lg sm:text-2xl text-[#2D3748] font-bold">
                             Konfirmasi Laporan
                           </CardTitle>
-                          <CardDescription>
+                          <CardDescription className="text-gray-600">
                             Periksa kembali detail laporan Anda sebelum mengirim
                           </CardDescription>
                         </div>
                       </div>
                     </CardHeader>
-
-                    <CardContent className="pt-6 pb-2 px-6">
-                      <div className="space-y-6">
-                        <div className="bg-gray-50 rounded-xl p-5 space-y-5 border border-gray-100">
-                          <div className="flex items-center gap-4">
+                    <CardContent className="pt-6 sm:pt-8 pb-2 sm:pb-4 px-3 sm:px-8">
+                      <div className="space-y-6 sm:space-y-7">
+                        <div className="bg-gray-50 rounded-xl p-4 sm:p-6 space-y-5 sm:space-y-6 border border-gray-100">
+                          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                             <Badge
                               variant="outline"
-                              className="bg-[#4E9F60]/10 text-[#4E9F60] font-medium py-1.5 px-3 rounded-lg"
+                              className="bg-[#4E9F60]/10 text-[#4E9F60] font-semibold py-1.5 px-3 rounded-lg"
                             >
                               {getSelectedCategoryName()}
                             </Badge>
                             <Badge
                               variant="outline"
-                              className="bg-gray-100/80 text-gray-700 font-medium py-1.5 px-3 rounded-lg flex items-center gap-1.5"
+                              className="bg-gray-100/80 text-gray-700 font-semibold py-1.5 px-3 rounded-lg flex items-center gap-1.5"
                             >
-                              <Calendar className="h-3.5 w-3.5" />
+                              <Calendar className="h-4 w-4" />
                               {new Date().toLocaleDateString("id-ID", {
                                 day: "numeric",
                                 month: "long",
@@ -801,7 +811,6 @@ export default function CreateLaporan() {
                               })}
                             </Badge>
                           </div>
-
                           <div>
                             <p className="text-sm text-gray-500 mb-1">
                               Deskripsi
@@ -810,7 +819,6 @@ export default function CreateLaporan() {
                               {description || "Tidak ada deskripsi"}
                             </p>
                           </div>
-
                           <div className="border-t border-gray-200 pt-4">
                             <p className="text-sm text-gray-500 mb-1">Lokasi</p>
                             <div className="flex items-center gap-2 p-3 rounded-lg bg-gray-100/50">
@@ -820,13 +828,12 @@ export default function CreateLaporan() {
                               </p>
                             </div>
                           </div>
-
                           {images.length > 0 && (
                             <div className="border-t border-gray-200 pt-4">
                               <p className="text-sm text-gray-500 mb-2">
                                 Media ({images.length} foto)
                               </p>
-                              <div className="grid grid-cols-2 gap-3">
+                              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                 {images.map((img, index) => (
                                   <div
                                     key={index}
@@ -845,7 +852,6 @@ export default function CreateLaporan() {
                               </div>
                             </div>
                           )}
-
                           {isGeneratingDescription && !reportId && (
                             <div className="border-t border-gray-200 pt-4">
                               <p className="text-sm text-gray-500 mb-2">
@@ -874,7 +880,6 @@ export default function CreateLaporan() {
                               </div>
                             </div>
                           )}
-
                           {reportId && formalDescription && (
                             <div
                               ref={previewRef}
@@ -891,12 +896,11 @@ export default function CreateLaporan() {
                             </div>
                           )}
                         </div>
-
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 sm:p-5">
                           <div className="flex gap-3">
-                            <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0" />
-                            <div className="text-sm text-amber-700">
-                              <p className="font-medium">Perhatian</p>
+                            <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600 flex-shrink-0" />
+                            <div className="text-sm sm:text-base text-amber-700">
+                              <p className="font-semibold">Perhatian</p>
                               <p className="mt-1">
                                 Dengan mengirimkan laporan ini, Anda menyatakan
                                 bahwa informasi yang diberikan adalah benar.
@@ -910,39 +914,39 @@ export default function CreateLaporan() {
                   </>
                 )}
 
-                <CardFooter className="bg-gray-50/80 border-t border-gray-100 flex justify-between py-5 px-6 gap-4">
+                <CardFooter className="border-t border-gray-100 flex flex-col sm:flex-row justify-between py-5 sm:py-7 px-3 sm:px-8 gap-3 sm:gap-4 bg-[#f7fafc]">
                   {step > 1 ? (
                     <Button
                       type="button"
                       variant="outline"
                       onClick={goToPreviousStep}
-                      className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                      className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
                       disabled={isLoading}
                     >
+                      <ArrowLeft className="mr-2 h-5 w-5" />
                       Kembali
                     </Button>
                   ) : (
                     <div></div>
                   )}
-
                   <Button
                     type="submit"
                     className={`${
                       step === 3
                         ? "bg-[#4E9F60] hover:bg-[#3d7d4c]"
                         : "bg-[#9DB17C] hover:bg-[#8CA06B]"
-                    } transition-colors min-w-[140px]`}
+                    } transition-colors min-w-[140px] sm:min-w-[180px] font-semibold px-6 py-3 rounded-lg text-base sm:text-lg w-full sm:w-auto`}
                     disabled={isLoading}
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                         Memproses...
                       </>
                     ) : step < 3 ? (
                       <>
                         Lanjutkan
-                        <ChevronRight className="ml-1 h-4 w-4" />
+                        <ArrowRight className="ml-2 h-5 w-5" />
                       </>
                     ) : reportId ? (
                       "Kirim Laporan"
@@ -953,17 +957,16 @@ export default function CreateLaporan() {
                 </CardFooter>
               </form>
             </Card>
-
-            <div className="mt-6 text-right">
+            <div className="mt-6 sm:mt-8 text-right">
               <Button
                 variant="ghost"
-                className="text-white bg-red-500 hover:bg-red-600 transition-colors"
+                className="text-white bg-red-500 hover:bg-red-600 transition-colors font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
                 onClick={() => {
                   dispatch(clearReportForm());
                 }}
                 disabled={isLoading}
               >
-                <Home className="mr-1 h-4 w-4" />
+                <Home className="mr-2 h-5 w-5" />
                 Reset Laporan
               </Button>
             </div>
@@ -980,8 +983,8 @@ export default function CreateLaporan() {
               Pastikan semua informasi yang Anda berikan sudah benar.
             </DialogDescription>
           </DialogHeader>
-          <div className="p-4 bg-amber-50 rounded-md border border-amber-200 text-amber-700 text-sm">
-            <p className="font-medium">Perhatian:</p>
+          <div className="p-4 bg-amber-50 rounded-md border border-amber-200 text-amber-700 text-base">
+            <p className="font-semibold">Perhatian:</p>
             <p>Dengan mengklik "Kirim Laporan", Anda menyatakan bahwa:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
               <li>Semua informasi yang diberikan adalah benar</li>
@@ -993,22 +996,61 @@ export default function CreateLaporan() {
             <Button
               variant="outline"
               onClick={() => setConfirmDialogOpen(false)}
+              className="font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
             >
               Batalkan
             </Button>
             <Button
-              className="bg-[#4E9F60] hover:bg-[#3d7d4c]"
+              className="bg-[#4E9F60] hover:bg-[#3d7d4c] font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
               onClick={finalizeReport}
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Memproses...
                 </>
               ) : (
                 "Kirim Laporan"
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#4E9F60]">
+              Laporan Berhasil Dikirim
+            </DialogTitle>
+            <DialogDescription className="text-base sm:text-lg">
+              {successMessage && (
+                <span>
+                  {successMessage.split("di sini")[0]}
+                  <a
+                    href={successFileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#4E9F60] underline font-semibold inline-flex items-center"
+                  >
+                    di sini <ExternalLink className="ml-1 h-5 w-5" />
+                  </a>
+                  .
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              className="bg-[#4E9F60] hover:bg-[#3d7d4c] font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
+              onClick={() => {
+                setSuccessDialogOpen(false);
+                dispatch(clearReportForm());
+                navigate("/user/check-status");
+              }}
+            >
+              Lihat Status Laporan
             </Button>
           </DialogFooter>
         </DialogContent>
