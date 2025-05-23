@@ -35,23 +35,11 @@ export function useGenerateReportDescription() {
 
 export function useSubmitReport() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   return useMutation({
     mutationFn: submitReport,
     onSuccess: (data) => {
-      if (data.data.file_url) {
-        window.open(data.data.file_url, "_blank");
-      }
-      toast.success("Laporan berhasil dikirim! Berkas laporan telah diunduh.");
-      dispatch(clearReportForm());
-      navigate("/user/check-status", {
-        state: {
-          success: true,
-          message:
-            "Laporan berhasil dikirim! Tim kami akan segera meninjau laporan Anda.",
-        },
-      });
+      dispatch(setIsSubmitting(false));
       return data;
     },
     onError: (error) => {
