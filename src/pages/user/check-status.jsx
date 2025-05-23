@@ -7,6 +7,7 @@ import {
   RefreshCcw,
   Eye,
   Search,
+  Filter,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,12 +34,19 @@ import { ReportDetailDialog } from "@/components/user/report-detail-dialog";
 import { ReportEmptyState } from "@/components/user/report-empty-state";
 import { ReportLoading } from "@/components/user/report-loading";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function CheckStatusPage() {
   const [selectedReportId, setSelectedReportId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [globalFilter, setGlobalFilter] = useState("");
   const [navbarBlurred, setNavbarBlurred] = useState(false);
+  const [statusFilter, setStatusFilter] = useState([]);
   const { data, isLoading, isError, error, refetch } = useUserReports();
 
   useEffect(() => {
@@ -66,27 +74,37 @@ export default function CheckStatusPage() {
 
   const closeDialog = () => setIsDialogOpen(false);
 
+  const capitalizeWords = (str) => {
+    if (!str) return "";
+    return str
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   const getStatusBadge = (status) => {
     const statusMap = {
       pending: {
         label: "Menunggu",
-        class: "bg-yellow-100 text-yellow-800 border-yellow-200",
+        class:
+          "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200",
       },
       in_progress: {
         label: "Diproses",
-        class: "bg-blue-100 text-blue-800 border-blue-200",
+        class: "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200",
       },
       inprogress: {
         label: "Diproses",
-        class: "bg-blue-100 text-blue-800 border-blue-200",
+        class: "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200",
       },
       resolved: {
         label: "Selesai",
-        class: "bg-green-100 text-green-800 border-green-200",
+        class:
+          "bg-green-100 text-green-800 border-green-200 hover:bg-green-200",
       },
       rejected: {
         label: "Ditolak",
-        class: "bg-red-100 text-red-800 border-red-200",
+        class: "bg-red-100 text-red-800 border-red-200 hover:bg-red-200",
       },
     };
     const statusKey = status?.toLowerCase?.() ?? "";
@@ -104,7 +122,7 @@ export default function CheckStatusPage() {
         header: "Kategori",
         cell: ({ row }) => (
           <div className="font-semibold text-gray-900">
-            {row.getValue("category_name")}
+            {capitalizeWords(row.getValue("category_name"))}
           </div>
         ),
       },
@@ -171,8 +189,15 @@ export default function CheckStatusPage() {
     return reports.find((report) => report.report_id === selectedReportId);
   }, [selectedReportId, reports]);
 
+  const filteredData = useMemo(() => {
+    if (!statusFilter || statusFilter.length === 0) return reports;
+    return reports.filter((report) =>
+      statusFilter.includes(report.status.toLowerCase())
+    );
+  }, [reports, statusFilter]);
+
   const table = useReactTable({
-    data: reports,
+    data: filteredData,
     columns,
     state: { globalFilter },
     getCoreRowModel: getCoreRowModel(),
@@ -183,6 +208,23 @@ export default function CheckStatusPage() {
       pagination: { pageSize: 10 },
     },
   });
+
+  const statusOptions = [
+    { value: "pending", label: "Menunggu" },
+    { value: "in_progress", label: "Diproses" },
+    { value: "resolved", label: "Selesai" },
+    { value: "rejected", label: "Ditolak" },
+  ];
+
+  const toggleStatusFilter = (status) => {
+    setStatusFilter((prev) => {
+      if (prev.includes(status)) {
+        return prev.filter((s) => s !== status);
+      } else {
+        return [...prev, status];
+      }
+    });
+  };
 
   const renderContent = () => {
     if (isLoading) {
@@ -283,14 +325,45 @@ export default function CheckStatusPage() {
                   <CardTitle className="text-lg sm:text-xl">
                     Daftar Laporan
                   </CardTitle>
-                  <div className="relative w-full sm:w-72">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      placeholder="Cari laporan..."
-                      value={globalFilter}
-                      onChange={(e) => setGlobalFilter(e.target.value)}
-                      className="pl-10 py-2 rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
-                    />
+                  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-72">
+                      <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Cari laporan..."
+                        value={globalFilter}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
+                        className="pl-10 py-2 rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                      />
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="sm:w-auto w-full gap-2"
+                        >
+                          <Filter className="h-4 w-4" />
+                          Filter Status
+                          {statusFilter.length > 0 && (
+                            <Badge variant="secondary" className="ml-1">
+                              {statusFilter.length}
+                            </Badge>
+                          )}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        {statusOptions.map((option) => (
+                          <DropdownMenuCheckboxItem
+                            key={option.value}
+                            checked={statusFilter.includes(option.value)}
+                            onCheckedChange={() =>
+                              toggleStatusFilter(option.value)
+                            }
+                          >
+                            {option.label}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </CardHeader>
@@ -348,7 +421,7 @@ export default function CheckStatusPage() {
                             colSpan={columns.length}
                             className="h-24 text-center"
                           >
-                            Tidak ada data yang sesuai dengan pencarian
+                            Tidak ada data yang sesuai dengan filter
                           </TableCell>
                         </TableRow>
                       )}
@@ -358,7 +431,8 @@ export default function CheckStatusPage() {
                 <div className="flex flex-col gap-2 sm:flex-row items-center justify-between py-4">
                   <div className="text-sm text-gray-600 w-full sm:w-auto text-center sm:text-left">
                     Menampilkan {table.getFilteredRowModel().rows.length} dari{" "}
-                    {reports.length} laporan
+                    {filteredData.length} laporan
+                    {statusFilter.length > 0 && " (difilter)"}
                   </div>
                   <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-end">
                     <Button
@@ -370,6 +444,14 @@ export default function CheckStatusPage() {
                     >
                       Sebelumnya
                     </Button>
+                    <div className="flex items-center gap-1 px-2">
+                      <span className="text-sm font-medium">
+                        {table.getState().pagination.pageIndex + 1}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        dari {table.getPageCount()}
+                      </span>
+                    </div>
                     <Button
                       variant="outline"
                       size="sm"

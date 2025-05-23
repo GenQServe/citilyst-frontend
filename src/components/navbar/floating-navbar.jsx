@@ -20,7 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Menu, X, User, LogOut, Bell } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuthState } from "@/hooks/use-auth-state";
 import { images } from "@/constants/images";
@@ -141,11 +141,11 @@ const FloatingNavbar = () => {
     <>
       <nav
         ref={navbarRef}
-        className="w-full fixed top-0 left-0 z-50 bg-[#9CDE9F]"
+        className="w-full fixed top-0 left-0 z-50 bg-[#9CDE9F] shadow transition-all duration-300"
       >
         <div
           ref={navbarContentRef}
-          className="container mx-auto px-4 flex items-center justify-between"
+          className="container mx-auto px-2 sm:px-4 flex items-center justify-between"
         >
           <a href="#" onClick={handleLogoClick} className="flex items-center">
             <img
@@ -161,8 +161,9 @@ const FloatingNavbar = () => {
               <Link
                 to="/home"
                 className={cn(
-                  "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
-                  isActiveLink("/home") && "bg-[#9DB17C] text-black font-medium"
+                  "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black transition",
+                  isActiveLink("/home") &&
+                    "bg-[#9DB17C] text-black font-semibold"
                 )}
               >
                 Beranda
@@ -170,9 +171,9 @@ const FloatingNavbar = () => {
               <Link
                 to="/user/create-report"
                 className={cn(
-                  "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
+                  "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black transition",
                   isActiveLink("/user/create-report") &&
-                    "bg-[#9DB17C] text-black font-medium"
+                    "bg-[#9DB17C] text-black font-semibold"
                 )}
               >
                 Buat Laporan
@@ -180,22 +181,12 @@ const FloatingNavbar = () => {
               <Link
                 to="/user/check-status"
                 className={cn(
-                  "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
+                  "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black transition",
                   isActiveLink("/user/check-status") &&
-                    "bg-[#9DB17C] text-black font-medium"
+                    "bg-[#9DB17C] text-black font-semibold"
                 )}
               >
                 Cek Status
-              </Link>
-              <Link
-                to="/user/notifications"
-                className={cn(
-                  "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black",
-                  isActiveLink("/user/notifications") &&
-                    "bg-[#9DB17C] text-black font-medium"
-                )}
-              >
-                Notifikasi
               </Link>
             </div>
           </div>
@@ -265,12 +256,6 @@ const FloatingNavbar = () => {
                       <DropdownMenuItem className="cursor-pointer hover:bg-[#9DB17C]/10 rounded-md h-10 flex items-center px-3">
                         <User className="mr-2 h-4 w-4 text-[#9DB17C]" />
                         <span>Profil</span>
-                      </DropdownMenuItem>
-                    </Link>
-                    <Link to="/user/notifications">
-                      <DropdownMenuItem className="cursor-pointer hover:bg-[#9DB17C]/10 rounded-md h-10 flex items-center px-3">
-                        <Bell className="mr-2 h-4 w-4 text-[#9DB17C]" />
-                        <span>Notifikasi</span>
                       </DropdownMenuItem>
                     </Link>
                   </div>
@@ -379,17 +364,6 @@ const FloatingNavbar = () => {
                     onClick={() => setMenuOpen(false)}
                   >
                     Cek Status
-                  </Link>
-                  <Link
-                    to="/user/notifications"
-                    className={cn(
-                      "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
-                      isActiveLink("/user/notifications") &&
-                        "bg-[#9DB17C] rounded-md px-3 py-2"
-                    )}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Notifikasi
                   </Link>
                   <div className="pt-4 mt-2 border-t border-[#8CA06B]/30">
                     {!token ? (
