@@ -274,7 +274,7 @@ export default function UserProfilePage() {
                 </div>
               </CardHeader>
 
-              <CardContent className="px-4 sm:px-6 py-4 sm:py-6">
+              <CardContent className="px-4 sm:px-6 pb-6">
                 <div className="flex flex-col gap-4 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <FaCalendarAlt className="h-3 w-3 text-[#9DB17C]" />
