@@ -9,7 +9,6 @@ import VerifyOtpPage from "@/pages/auth/verify-otp";
 import UserProfilePage from "@/pages/user/me";
 import CreateLaporan from "@/pages/user/create-laporan";
 import CheckStatusPage from "@/pages/user/check-status";
-import NotificationsPage from "@/pages/user/notifications";
 import NotFoundPage from "@/pages/404";
 import { ProtectedRoute, PublicRoute } from "@/components/protected-route";
 import ManageReports from "@/pages/admin/manage-reports";
@@ -90,14 +89,6 @@ export const userRoutes = [
           </ProtectedRoute>
         ),
       },
-      {
-        path: "user/notifications",
-        element: (
-          <ProtectedRoute allowedRoles={["user"]}>
-            <NotificationsPage />
-          </ProtectedRoute>
-        ),
-      },
     ],
   },
 ];
@@ -121,7 +112,7 @@ export const walikotaRoutes = [
       },
       {
         path: "admin/manage-report",
-        element: <ManageReports />
+        element: <ManageReports />,
       },
     ],
   },

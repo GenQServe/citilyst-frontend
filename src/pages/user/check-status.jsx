@@ -7,6 +7,7 @@ import {
   RefreshCcw,
   Eye,
   Search,
+  Filter,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,12 +34,19 @@ import { ReportDetailDialog } from "@/components/user/report-detail-dialog";
 import { ReportEmptyState } from "@/components/user/report-empty-state";
 import { ReportLoading } from "@/components/user/report-loading";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function CheckStatusPage() {
   const [selectedReportId, setSelectedReportId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [globalFilter, setGlobalFilter] = useState("");
   const [navbarBlurred, setNavbarBlurred] = useState(false);
+  const [statusFilter, setStatusFilter] = useState([]);
   const { data, isLoading, isError, error, refetch } = useUserReports();
 
   useEffect(() => {
@@ -66,27 +74,37 @@ export default function CheckStatusPage() {
 
   const closeDialog = () => setIsDialogOpen(false);
 
+  const capitalizeWords = (str) => {
+    if (!str) return "";
+    return str
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   const getStatusBadge = (status) => {
     const statusMap = {
       pending: {
         label: "Menunggu",
-        class: "bg-yellow-100 text-yellow-800 border-yellow-200",
+        class:
+          "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200",
       },
       in_progress: {
         label: "Diproses",
-        class: "bg-blue-100 text-blue-800 border-blue-200",
+        class: "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200",
       },
       inprogress: {
         label: "Diproses",
-        class: "bg-blue-100 text-blue-800 border-blue-200",
+        class: "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200",
       },
       resolved: {
         label: "Selesai",
-        class: "bg-green-100 text-green-800 border-green-200",
+        class:
+          "bg-green-100 text-green-800 border-green-200 hover:bg-green-200",
       },
       rejected: {
         label: "Ditolak",
-        class: "bg-red-100 text-red-800 border-red-200",
+        class: "bg-red-100 text-red-800 border-red-200 hover:bg-red-200",
       },
     };
     const statusKey = status?.toLowerCase?.() ?? "";
@@ -103,7 +121,9 @@ export default function CheckStatusPage() {
         accessorKey: "category_name",
         header: "Kategori",
         cell: ({ row }) => (
-          <div className="font-medium">{row.getValue("category_name")}</div>
+          <div className="font-semibold text-gray-900">
+            {capitalizeWords(row.getValue("category_name"))}
+          </div>
         ),
       },
       {
@@ -115,7 +135,7 @@ export default function CheckStatusPage() {
           const location = row.getValue("location");
           return (
             <div
-              className="max-w-[200px] truncate"
+              className="max-w-[160px] truncate text-gray-700"
               title={`${location}, ${village}, ${district}`}
             >
               {village}, {district}
@@ -128,7 +148,11 @@ export default function CheckStatusPage() {
         header: "Tanggal",
         cell: ({ row }) => {
           const date = row.getValue("created_at");
-          return format(new Date(date), "dd MMM yyyy", { locale: id });
+          return (
+            <span className="text-gray-700">
+              {format(new Date(date), "dd MMM yyyy", { locale: id })}
+            </span>
+          );
         },
       },
       {
@@ -147,8 +171,9 @@ export default function CheckStatusPage() {
               handleOpenDetail(row.original.report_id);
             }}
             className="hover:bg-gray-100"
+            aria-label="Lihat Detail"
           >
-            <Eye className="h-4 w-4" />
+            <Eye className="h-5 w-5 text-primary" />
           </Button>
         ),
       },
@@ -164,8 +189,15 @@ export default function CheckStatusPage() {
     return reports.find((report) => report.report_id === selectedReportId);
   }, [selectedReportId, reports]);
 
+  const filteredData = useMemo(() => {
+    if (!statusFilter || statusFilter.length === 0) return reports;
+    return reports.filter((report) =>
+      statusFilter.includes(report.status.toLowerCase())
+    );
+  }, [reports, statusFilter]);
+
   const table = useReactTable({
-    data: reports,
+    data: filteredData,
     columns,
     state: { globalFilter },
     getCoreRowModel: getCoreRowModel(),
@@ -177,17 +209,36 @@ export default function CheckStatusPage() {
     },
   });
 
+  const statusOptions = [
+    { value: "pending", label: "Menunggu" },
+    { value: "in_progress", label: "Diproses" },
+    { value: "resolved", label: "Selesai" },
+    { value: "rejected", label: "Ditolak" },
+  ];
+
+  const toggleStatusFilter = (status) => {
+    setStatusFilter((prev) => {
+      if (prev.includes(status)) {
+        return prev.filter((s) => s !== status);
+      } else {
+        return [...prev, status];
+      }
+    });
+  };
+
   const renderContent = () => {
     if (isLoading) {
       return (
         <div className="flex flex-col items-center w-full">
-          <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-8">
+          <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 md:px-8">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
-              <ClipboardCheck className="h-8 w-8 text-[#9DB17C]" />
-              <h1 className="text-3xl font-bold">Cek Status Laporan</h1>
+              <ClipboardCheck className="h-10 w-10 text-[#9DB17C]" />
+              <h1 className="text-2xl sm:text-3xl font-bold">
+                Cek Status Laporan
+              </h1>
             </div>
             <p className="text-gray-600 mb-4">Memuat data laporan Anda...</p>
-            <Card>
+            <Card className="rounded-xl shadow-md border-0">
               <CardHeader className="pb-2">
                 <CardTitle>Daftar Laporan</CardTitle>
               </CardHeader>
@@ -203,17 +254,19 @@ export default function CheckStatusPage() {
     if (isError) {
       return (
         <div className="flex flex-col items-center w-full">
-          <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-8">
+          <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 md:px-8">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
-              <ClipboardCheck className="h-8 w-8 text-[#9DB17C]" />
-              <h1 className="text-3xl font-bold">Cek Status Laporan</h1>
+              <ClipboardCheck className="h-10 w-10 text-[#9DB17C]" />
+              <h1 className="text-2xl sm:text-3xl font-bold">
+                Cek Status Laporan
+              </h1>
             </div>
-            <Card className="border-red-200 bg-red-50">
+            <Card className="border-red-200 bg-red-50 rounded-xl shadow-md border-0">
               <CardContent className="pt-6">
                 <div className="flex flex-col sm:flex-row items-start gap-3">
-                  <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+                  <AlertCircle className="h-6 w-6 text-red-500 mt-0.5" />
                   <div>
-                    <p className="font-medium text-red-700">
+                    <p className="font-semibold text-red-700">
                       Gagal memuat data
                     </p>
                     <p className="text-sm text-red-600 mt-1">
@@ -226,7 +279,7 @@ export default function CheckStatusPage() {
                       className="mt-4"
                       onClick={refetch}
                     >
-                      <RefreshCcw className="h-3.5 w-3.5 mr-2" />
+                      <RefreshCcw className="h-4 w-4 mr-2" />
                       Coba lagi
                     </Button>
                   </div>
@@ -240,47 +293,82 @@ export default function CheckStatusPage() {
 
     return (
       <div className="flex flex-col items-center w-full">
-        <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-8">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 md:px-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
             <div className="flex items-center gap-3">
-              <ClipboardCheck className="h-8 w-8 text-[#9DB17C]" />
-              <h1 className="text-3xl font-bold">Cek Status Laporan</h1>
+              <ClipboardCheck className="h-10 w-10 text-[#9DB17C]" />
+              <h1 className="text-2xl sm:text-3xl font-bold">
+                Cek Status Laporan
+              </h1>
             </div>
             {hasReports && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={refetch}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto rounded-lg border-gray-300"
               >
-                <RefreshCcw className="h-3.5 w-3.5 mr-2" />
+                <RefreshCcw className="h-4 w-4 mr-2" />
                 Refresh Data
               </Button>
             )}
           </div>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 text-base sm:text-lg">
             {hasReports
               ? `Anda memiliki ${reports.length} laporan. Lihat status dan detail laporan Anda di bawah ini.`
               : "Anda dapat melacak dan memantau status laporan yang telah Anda buat di halaman ini."}
           </p>
           {hasReports ? (
-            <Card className="shadow-sm">
+            <Card className="shadow-lg border-0 rounded-2xl">
               <CardHeader className="pb-2">
-                <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-                  <CardTitle>Daftar Laporan</CardTitle>
-                  <div className="relative w-full sm:w-72">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-                    <Input
-                      placeholder="Cari laporan..."
-                      value={globalFilter}
-                      onChange={(e) => setGlobalFilter(e.target.value)}
-                      className="pl-8 bg-white"
-                    />
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <CardTitle className="text-lg sm:text-xl">
+                    Daftar Laporan
+                  </CardTitle>
+                  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-72">
+                      <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Cari laporan..."
+                        value={globalFilter}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
+                        className="pl-10 py-2 rounded-lg border-gray-300 bg-gray-50 focus:bg-white"
+                      />
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="sm:w-auto w-full gap-2"
+                        >
+                          <Filter className="h-4 w-4" />
+                          Filter Status
+                          {statusFilter.length > 0 && (
+                            <Badge variant="secondary" className="ml-1">
+                              {statusFilter.length}
+                            </Badge>
+                          )}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        {statusOptions.map((option) => (
+                          <DropdownMenuCheckboxItem
+                            key={option.value}
+                            checked={statusFilter.includes(option.value)}
+                            onCheckedChange={() =>
+                              toggleStatusFilter(option.value)
+                            }
+                          >
+                            {option.label}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border bg-white overflow-x-auto">
+                <div className="rounded-xl border bg-white overflow-x-auto">
                   <Table className="min-w-[600px] md:min-w-0">
                     <TableHeader>
                       {table.getHeaderGroups().map((headerGroup) => (
@@ -288,7 +376,7 @@ export default function CheckStatusPage() {
                           {headerGroup.headers.map((header) => (
                             <TableHead
                               key={header.id}
-                              className="font-semibold whitespace-nowrap"
+                              className="font-semibold whitespace-nowrap text-gray-700 bg-gray-50"
                             >
                               {header.isPlaceholder
                                 ? null
@@ -308,8 +396,7 @@ export default function CheckStatusPage() {
                             key={row.id}
                             data-state={row.getIsSelected() && "selected"}
                             className={cn(
-                              "cursor-pointer",
-                              "hover:bg-[#F5F8F2]"
+                              "cursor-pointer transition hover:bg-[#F5F8F2] group"
                             )}
                             onClick={() =>
                               handleOpenDetail(row.original.report_id)
@@ -318,7 +405,7 @@ export default function CheckStatusPage() {
                             {row.getVisibleCells().map((cell) => (
                               <TableCell
                                 key={cell.id}
-                                className="whitespace-nowrap max-w-[120px] md:max-w-none overflow-hidden text-ellipsis"
+                                className="whitespace-nowrap max-w-[120px] md:max-w-none overflow-hidden text-ellipsis text-gray-800 group-hover:text-primary"
                               >
                                 {flexRender(
                                   cell.column.columnDef.cell,
@@ -334,34 +421,43 @@ export default function CheckStatusPage() {
                             colSpan={columns.length}
                             className="h-24 text-center"
                           >
-                            Tidak ada data yang sesuai dengan pencarian
+                            Tidak ada data yang sesuai dengan filter
                           </TableCell>
                         </TableRow>
                       )}
                     </TableBody>
                   </Table>
                 </div>
-                <div className="flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0 space-x-0 sm:space-x-2 py-4">
+                <div className="flex flex-col gap-2 sm:flex-row items-center justify-between py-4">
                   <div className="text-sm text-gray-600 w-full sm:w-auto text-center sm:text-left">
                     Menampilkan {table.getFilteredRowModel().rows.length} dari{" "}
-                    {reports.length} laporan
+                    {filteredData.length} laporan
+                    {statusFilter.length > 0 && " (difilter)"}
                   </div>
-                  <div className="flex items-center space-x-2 w-full sm:w-auto justify-center sm:justify-end">
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-end">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => table.previousPage()}
                       disabled={!table.getCanPreviousPage()}
-                      className="w-1/2 sm:w-auto"
+                      className="w-1/2 sm:w-auto rounded-lg border-gray-300"
                     >
                       Sebelumnya
                     </Button>
+                    <div className="flex items-center gap-1 px-2">
+                      <span className="text-sm font-medium">
+                        {table.getState().pagination.pageIndex + 1}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        dari {table.getPageCount()}
+                      </span>
+                    </div>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => table.nextPage()}
                       disabled={!table.getCanNextPage()}
-                      className="w-1/2 sm:w-auto"
+                      className="w-1/2 sm:w-auto rounded-lg border-gray-300"
                     >
                       Berikutnya
                     </Button>
@@ -380,7 +476,7 @@ export default function CheckStatusPage() {
   return (
     <div
       className={cn(
-        "container py-6 px-1 sm:py-10 sm:px-4 md:px-6 transition-all duration-300 max-w-full mx-auto",
+        "container py-6 px-2 sm:py-10 sm:px-4 md:px-6 transition-all duration-300 max-w-full mx-auto",
         navbarBlurred && "filter backdrop-blur-sm"
       )}
     >
