@@ -6,7 +6,6 @@ import {
   FaMapMarkerAlt,
   FaPhoneAlt,
   FaEnvelope,
-  FaHeart,
 } from "react-icons/fa";
 import { images } from "@/constants/images";
 
@@ -16,8 +15,8 @@ const Footer = () => {
   return (
     <footer className="bg-[#9CDE9F] text-black py-8">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between gap-8">
-          <div className="max-w-md">
+        <div className="flex flex-col gap-10 md:gap-8 md:flex-row md:justify-between">
+          <div className="max-w-md flex-1">
             <div className="mb-4">
               <img
                 src={images.cityListLogo}
@@ -51,7 +50,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="w-full flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             <div>
               <h4 className="font-semibold text-base mb-3">Menu</h4>
               <div className="flex flex-col gap-2">
@@ -140,7 +139,7 @@ const Footer = () => {
 
         <div className="h-px bg-[#4E9F60]/20 my-6" />
 
-        <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-gray-500 text-center md:text-left">
             © {currentYear} CityList. All rights reserved
           </p>

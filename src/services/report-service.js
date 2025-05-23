@@ -6,7 +6,7 @@ export const generateReportDescription = async (reportData) => {
 };
 
 export const submitReport = async (reportData) => {
-  const response = await api.post("/reports", reportData);
+  const response = await api.post("/reports/", reportData);
   return response.data;
 };
 
@@ -15,7 +15,7 @@ export const uploadReportImages = async ({ reportId, images }) => {
   formData.append("report_id", reportId);
 
   images.forEach((image) => {
-    formData.append("images", image.file);
+    formData.append("files", image.file);
   });
 
   const response = await api.post("/reports/images", formData, {
