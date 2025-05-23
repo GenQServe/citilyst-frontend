@@ -88,7 +88,6 @@ export default function CreateLaporan() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [successFileUrl, setSuccessFileUrl] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const {
     categoryId,
@@ -115,17 +114,7 @@ export default function CreateLaporan() {
   const { mutate: generateDescription, isPending: isGeneratingDescription } =
     useGenerateReportDescription();
   const { mutate: submitReportMutation, isPending: isSubmittingReport } =
-    useSubmitReport({
-      onSuccess: (data) => {
-        if (data?.data?.file_url) {
-          setSuccessFileUrl(data.data.file_url);
-        }
-        setSuccessMessage(
-          "Laporan berhasil dikirim! Berkas laporan telah diunduh. Lihat laporan kamu di sini."
-        );
-        setSuccessDialogOpen(true);
-      },
-    });
+    useSubmitReport();
   const { mutate: uploadImages, isPending: isUploadingImages } =
     useUploadReportImages();
 
@@ -251,9 +240,6 @@ export default function CreateLaporan() {
                   if (res?.data?.file_url) {
                     setSuccessFileUrl(res.data.file_url);
                   }
-                  setSuccessMessage(
-                    "Laporan berhasil dikirim! Berkas laporan telah diunduh. Lihat laporan kamu di sini."
-                  );
                   setSuccessDialogOpen(true);
                 },
               });
@@ -276,9 +262,6 @@ export default function CreateLaporan() {
             if (res?.data?.file_url) {
               setSuccessFileUrl(res.data.file_url);
             }
-            setSuccessMessage(
-              "Laporan berhasil dikirim! Berkas laporan telah diunduh. Lihat laporan kamu di sini."
-            );
             setSuccessDialogOpen(true);
           },
         });
@@ -1025,20 +1008,16 @@ export default function CreateLaporan() {
               Laporan Berhasil Dikirim
             </DialogTitle>
             <DialogDescription className="text-base sm:text-lg">
-              {successMessage && (
-                <span>
-                  {successMessage.split("di sini")[0]}
-                  <a
-                    href={successFileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#4E9F60] underline font-semibold inline-flex items-center"
-                  >
-                    di sini <ExternalLink className="ml-1 h-5 w-5" />
-                  </a>
-                  .
-                </span>
-              )}
+              Laporan berhasil dikirim! Berkas laporan telah diunduh.{" "}
+              <a
+                href={successFileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#4E9F60] underline font-semibold inline-flex items-center"
+              >
+                Lihat laporan kamu disini{" "}
+                <ExternalLink className="ml-1 h-4 w-4" />
+              </a>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
