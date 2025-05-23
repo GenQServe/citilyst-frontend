@@ -473,7 +473,7 @@ export default function CreateLaporan() {
               <form ref={formRef} onSubmit={handleSubmit} className="space-y-1">
                 {step === 1 && (
                   <>
-                    <CardHeader className="border-b border-gray-100 bg-[#f7fafc]">
+                    <CardHeader className="border-b border-gray-100">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-[#4E9F60]/10 rounded-full">
                           <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
@@ -650,7 +650,7 @@ export default function CreateLaporan() {
 
                 {step === 2 && (
                   <>
-                    <CardHeader className="border-b border-gray-100 bg-[#f7fafc]">
+                    <CardHeader className="border-b border-gray-100">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-[#4E9F60]/10 rounded-full">
                           <Camera className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
@@ -774,7 +774,7 @@ export default function CreateLaporan() {
 
                 {step === 3 && (
                   <>
-                    <CardHeader className="border-b border-gray-100 bg-[#f7fafc]">
+                    <CardHeader className="border-b border-gray-100">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-[#4E9F60]/10 rounded-full">
                           <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
@@ -914,7 +914,7 @@ export default function CreateLaporan() {
                   </>
                 )}
 
-                <CardFooter className="border-t border-gray-100 flex flex-col sm:flex-row justify-between py-5 sm:py-7 px-3 sm:px-8 gap-3 sm:gap-4 bg-[#f7fafc]">
+                <CardFooter className="border-t border-gray-100 flex flex-col sm:flex-row justify-between py-5 sm:py-7 px-3 sm:px-8 gap-3 sm:gap-4">
                   {step > 1 ? (
                     <Button
                       type="button"
@@ -975,7 +975,7 @@ export default function CreateLaporan() {
       </div>
 
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-lg">
           <DialogHeader>
             <DialogTitle>Konfirmasi Pengiriman Laporan</DialogTitle>
             <DialogDescription>
@@ -992,7 +992,7 @@ export default function CreateLaporan() {
               <li>Laporan ini dapat ditindaklanjuti oleh pihak berwenang</li>
             </ul>
           </div>
-          <DialogFooter className="sm:justify-between">
+          <DialogFooter className="sm:justify-between gap-3 sm:gap-4 mt-4">
             <Button
               variant="outline"
               onClick={() => setConfirmDialogOpen(false)}
