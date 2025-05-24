@@ -26,7 +26,6 @@ import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
 
 const NavbarAdmin = ({ toggleSidebar, isMobileView }) => {
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -86,7 +85,7 @@ const NavbarAdmin = ({ toggleSidebar, isMobileView }) => {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-2 hover:bg-gray-100"
+                  className="flex items-center gap-2 hover:bg-[#a1e6a4]"
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="/placeholder-avatar.jpg" />
@@ -108,12 +107,6 @@ const NavbarAdmin = ({ toggleSidebar, isMobileView }) => {
                   <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/walikota/profile")}>
-                  Pengaturan Profil
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/walikota/settings")}>
-                  Pengaturan Sistem
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   className="text-red-500 focus:text-red-500" 

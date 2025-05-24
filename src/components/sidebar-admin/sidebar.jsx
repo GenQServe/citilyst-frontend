@@ -144,7 +144,7 @@ export default function CustomSidebar({ isOpen, toggleSidebar, isMobile }) {
 
       {isMobile && isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-20"
+          className="fixed inset-0 bg-black bg-opacity-100 z-20"
           onClick={toggleSidebar}
         ></div>
       )}

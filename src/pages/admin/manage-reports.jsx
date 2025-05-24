@@ -393,46 +393,63 @@ const ManageReports = () => {
               Page {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount()}
             </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                className="hidden h-8 w-8 p-0 lg:flex"
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <span className="sr-only">Go to first page</span>
-                <ChevronLeft className="h-4 w-4" />
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                className="h-8 w-8 p-0"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <span className="sr-only">Go to previous page</span>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                className="h-8 w-8 p-0"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                <span className="sr-only">Go to next page</span>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                className="hidden h-8 w-8 p-0 lg:flex"
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-              >
-                <span className="sr-only">Go to last page</span>
-                <ChevronRight className="h-4 w-4" />
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              className="hidden h-8 w-20 p-0 lg:flex items-center justify-center gap-1"
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="text-xs">First</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-8 w-8 p-0 flex items-center justify-center"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            {/* Page number buttons - show up to 3 pages */}
+            {Array.from({ length: Math.min(3, table.getPageCount()) }).map((_, i) => {
+              const pageIndex = i + Math.max(0, 
+                Math.min(
+                  table.getPageCount() - 3,
+                  table.getState().pagination.pageIndex - 1
+                )
+              );
+              return (
+                <Button
+                  key={pageIndex}
+                  variant={pageIndex === table.getState().pagination.pageIndex ? "default" : "outline"}
+                  className="h-8 w-8 p-0"
+                  onClick={() => table.setPageIndex(pageIndex)}
+                >
+                  {pageIndex + 1}
+                </Button>
+              );
+            })}
+            
+            <Button
+              variant="outline"
+              className="h-8 w-8 p-0 flex items-center justify-center"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              className="hidden h-8 w-20 p-0 lg:flex items-center justify-center gap-1"
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+            >
+              <span className="text-xs">Last</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
           </div>
         </CardFooter>
       </Card>

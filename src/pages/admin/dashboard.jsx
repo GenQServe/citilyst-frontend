@@ -154,10 +154,10 @@ const WalikotaDashboard = () => {
         </p>
       </div>
 
-      {/* Stats Overview - Now a 4-card row including Summary Card */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+      {/* Stats Overview - Now in a 2x2 grid with more subtle colors */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
         {/* Pending Reports Card */}
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 shadow-md hover:shadow-lg transition-shadow">
+        <Card className="bg-gray-50 border-gray-200 shadow-sm hover:shadow transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -171,7 +171,7 @@ const WalikotaDashboard = () => {
                   <h3 className="text-3xl font-bold mt-1">{reportsStats?.pendingReports || 0}</h3>
                 )}
               </div>
-              <div className="h-14 w-14 bg-amber-200 rounded-full flex items-center justify-center">
+              <div className="h-14 w-14 bg-amber-100 rounded-full flex items-center justify-center">
                 <AlertTriangle className="h-7 w-7 text-amber-600" />
               </div>
             </div>
@@ -179,7 +179,7 @@ const WalikotaDashboard = () => {
         </Card>
 
         {/* Resolved Reports Card */}
-        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-md hover:shadow-lg transition-shadow">
+        <Card className="bg-gray-50 border-gray-200 shadow-sm hover:shadow transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -193,7 +193,7 @@ const WalikotaDashboard = () => {
                   <h3 className="text-3xl font-bold mt-1">{reportsStats?.resolvedReports || 0}</h3>
                 )}
               </div>
-              <div className="h-14 w-14 bg-emerald-200 rounded-full flex items-center justify-center">
+              <div className="h-14 w-14 bg-emerald-100 rounded-full flex items-center justify-center">
                 <CheckCircle2 className="h-7 w-7 text-emerald-600" />
               </div>
             </div>
@@ -201,7 +201,7 @@ const WalikotaDashboard = () => {
         </Card>
 
         {/* Total Users Card */}
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-md hover:shadow-lg transition-shadow">
+        <Card className="bg-gray-50 border-gray-200 shadow-sm hover:shadow transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -215,15 +215,15 @@ const WalikotaDashboard = () => {
                   <h3 className="text-3xl font-bold mt-1">{usersData?.totalUsers || 0}</h3>
                 )}
               </div>
-              <div className="h-14 w-14 bg-blue-200 rounded-full flex items-center justify-center">
+              <div className="h-14 w-14 bg-blue-100 rounded-full flex items-center justify-center">
                 <Users className="h-7 w-7 text-blue-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Summary Card - Now part of the 4-card row */}
-        <Card className="shadow-md bg-gradient-to-br from-gray-50 to-gray-100">
+        {/* Summary Card */}
+        <Card className="bg-gray-50 border-gray-200 shadow-sm hover:shadow transition-shadow">
           <CardContent className="p-6">
             <p className="text-gray-600 text-sm font-medium mb-2">Ringkasan</p>
             {isLoadingStats ? (
@@ -239,7 +239,7 @@ const WalikotaDashboard = () => {
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-amber-400 to-green-400"
+                    className="h-full bg-gradient-to-r from-blue-400 to-emerald-400"
                     style={{ 
                       width: `${reportsStats ? (100 * reportsStats.resolvedReports / (reportsStats.totalReports || 1)) : 0}%` 
                     }}
@@ -255,10 +255,10 @@ const WalikotaDashboard = () => {
         </Card>
       </div>
 
-      {/* Main Content - Side by side layout for reports and chart */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      {/* Main Content - Now stacked vertically */}
+      <div className="space-y-6 mb-8">
         {/* Recent Reports Card */}
-        <Card className="shadow-md">
+        <Card className="shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-xl font-semibold">Laporan Terbaru</CardTitle>
           </CardHeader>
@@ -308,7 +308,7 @@ const WalikotaDashboard = () => {
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={() => navigate('/admin/manage-reports')}
+                onClick={() => navigate('/admin/manage-report')}
                 className="hover:bg-gray-100"
               >
                 Lihat Semua Laporan
@@ -318,7 +318,7 @@ const WalikotaDashboard = () => {
         </Card>
         
         {/* Reports Chart Card */}
-        <Card className="shadow-md">
+        <Card className="shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-xl font-semibold">Grafik Laporan Bulanan</CardTitle>
           </CardHeader>
