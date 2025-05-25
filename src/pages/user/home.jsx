@@ -31,7 +31,10 @@ const Home = () => {
   const [navbarVisible, setNavbarVisible] = useState(true);
 
   const token = Cookies.get("token");
-  const { data: userProfile } = useUserProfile();
+
+  const { data: userProfile } = useUserProfile({
+    enabled: !!token,
+  });
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);

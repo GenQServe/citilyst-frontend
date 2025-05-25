@@ -9,6 +9,7 @@ export function useAuthRedirect() {
 
   useEffect(() => {
     const token = Cookies.get("token");
+
     if (token) {
       try {
         const decoded = jwtDecode(token);
@@ -16,6 +17,13 @@ export function useAuthRedirect() {
 
         if (decoded.exp < currentTime) {
           Cookies.remove("token");
+
+          if (
+            location.pathname === "/user/create-report" ||
+            location.pathname === "/user/check-status"
+          ) {
+            setInitialRedirect("/login");
+          }
         } else {
           if (location.pathname === "/") {
             if (decoded.role === "admin") {
@@ -38,6 +46,22 @@ export function useAuthRedirect() {
         }
       } catch (error) {
         Cookies.remove("token");
+
+        if (
+          location.pathname === "/user/create-report" ||
+          location.pathname === "/user/check-status"
+        ) {
+          setInitialRedirect("/login");
+        }
+      }
+    } else {
+      if (
+        location.pathname.startsWith("/admin/") ||
+        location.pathname === "/profile" ||
+        location.pathname === "/user/create-report" ||
+        location.pathname === "/user/check-status"
+      ) {
+        setInitialRedirect("/login");
       }
     }
   }, [location.pathname]);
