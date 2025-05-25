@@ -87,7 +87,7 @@ Aplikasi ini juga menyediakan dashboard khusus untuk admin/petugas kota agar dap
 1. **Clone repository**
 
    ```sh
-   git clone <url-repo>
+   git clone https://github.com/GenQServe/citilyst-frontend.git
    cd citilyst-fe
    ```
 
