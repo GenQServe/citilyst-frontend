@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import useGSAP from "@/hooks/use-gsap";
 import { Button } from "@/components/ui/button";
+import Cookies from "js-cookie";
 
 const CallToAction = () => {
   const sectionRef = useRef(null);
@@ -41,11 +42,21 @@ const CallToAction = () => {
   }, []);
 
   const handleCreateReport = () => {
-    navigate("/user/create-report");
+    const token = Cookies.get("token");
+    if (!token) {
+      navigate("/login", { state: { returnTo: "/user/create-report" } });
+    } else {
+      navigate("/user/create-report");
+    }
   };
 
   const handleCheckStatus = () => {
-    navigate("/user/check-status");
+    const token = Cookies.get("token");
+    if (!token) {
+      navigate("/login", { state: { returnTo: "/user/check-status" } });
+    } else {
+      navigate("/user/check-status");
+    }
   };
 
   return (
