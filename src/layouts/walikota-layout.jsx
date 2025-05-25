@@ -6,11 +6,15 @@ import Navbar from "@/components/sidebar-admin/navbar-admin";
 const WalikotaLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [isTablet, setIsTablet] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-      if (window.innerWidth >= 1024) {
+      const width = window.innerWidth;
+      setWindowWidth(width);
+      setIsTablet(width >= 640 && width < 1024);
+
+      if (width >= 1024) {
         setIsSidebarOpen(true);
       } else {
         setIsSidebarOpen(false);
@@ -26,23 +30,27 @@ const WalikotaLayout = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const isMobileView = windowWidth < 1024;
+  const isMobileView = windowWidth < 640;
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
-      <Navbar isMobileView={isMobileView} toggleSidebar={toggleSidebar} />
+      <Navbar
+        isMobileView={isMobileView}
+        isTablet={isTablet}
+        toggleSidebar={toggleSidebar}
+      />
 
-      <div className="flex h-full flex-1 pt-[60px]">
+      <div className="flex h-full flex-1 pt-[60px] sm:pt-[64px]">
         <CustomSidebar
           isOpen={isSidebarOpen}
           toggleSidebar={toggleSidebar}
-          isMobile={isMobileView}
+          isMobile={windowWidth < 1024}
           role="admin"
         />
 
         <main
-          className={`flex-1 transition-all duration-300 p-6 ${
-            isMobileView
+          className={`flex-1 transition-all duration-300 px-4 py-6 sm:p-6 ${
+            windowWidth < 1024
               ? "ml-0"
               : isSidebarOpen
               ? "ml-0 lg:ml-[280px]"

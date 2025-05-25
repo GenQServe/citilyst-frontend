@@ -74,7 +74,7 @@ export default function CustomSidebar({ isOpen, toggleSidebar, isMobile }) {
                 src={images.logo}
                 alt="CityList Logo"
                 className="h-11 w-auto object-contain"
-                style={{ width: '100%', maxWidth: '180px' }}
+                style={{ width: "100%", maxWidth: "180px" }}
               />
             </div>
             <div>
@@ -144,7 +144,7 @@ export default function CustomSidebar({ isOpen, toggleSidebar, isMobile }) {
 
       {isMobile && isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-100 z-20"
+          className="fixed inset-0 bg-gray-500/30 backdrop-blur-sm z-20"
           onClick={toggleSidebar}
         ></div>
       )}
