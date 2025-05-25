@@ -36,6 +36,7 @@ const FloatingNavbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isFloating, setIsFloating] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [loginRedirectDialog, setLoginRedirectDialog] = useState(false);
   const { handleLogout } = useAuthState();
 
   const token = Cookies.get("token");
@@ -137,6 +138,16 @@ const FloatingNavbar = () => {
     navigate("/home", { replace: true });
   };
 
+  const handleProtectedRouteClick = (e, path) => {
+    if (!token) {
+      e.preventDefault();
+      setLoginRedirectDialog(true);
+      return false;
+    }
+    navigate(path);
+    return true;
+  };
+
   return (
     <>
       <nav
@@ -168,8 +179,10 @@ const FloatingNavbar = () => {
               >
                 Beranda
               </Link>
-              <Link
-                to="/user/create-report"
+              <button
+                onClick={(e) =>
+                  handleProtectedRouteClick(e, "/user/create-report")
+                }
                 className={cn(
                   "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black transition",
                   isActiveLink("/user/create-report") &&
@@ -177,9 +190,11 @@ const FloatingNavbar = () => {
                 )}
               >
                 Buat Laporan
-              </Link>
-              <Link
-                to="/user/check-status"
+              </button>
+              <button
+                onClick={(e) =>
+                  handleProtectedRouteClick(e, "/user/check-status")
+                }
                 className={cn(
                   "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-[#9DB17C] hover:text-black focus:bg-[#9DB17C] focus:text-black transition",
                   isActiveLink("/user/check-status") &&
@@ -187,7 +202,7 @@ const FloatingNavbar = () => {
                 )}
               >
                 Cek Status
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -343,28 +358,34 @@ const FloatingNavbar = () => {
                   >
                     Beranda
                   </Link>
-                  <Link
-                    to="/user/create-report"
+                  <button
+                    onClick={(e) => {
+                      if (handleProtectedRouteClick(e, "/user/create-report")) {
+                        setMenuOpen(false);
+                      }
+                    }}
                     className={cn(
-                      "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                      "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2 justify-start bg-transparent hover:bg-transparent",
                       isActiveLink("/user/create-report") &&
                         "bg-[#9DB17C] rounded-md px-3 py-2"
                     )}
-                    onClick={() => setMenuOpen(false)}
                   >
                     Buat Laporan
-                  </Link>
-                  <Link
-                    to="/user/check-status"
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      if (handleProtectedRouteClick(e, "/user/check-status")) {
+                        setMenuOpen(false);
+                      }
+                    }}
                     className={cn(
-                      "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2",
+                      "text-lg transition-colors hover:text-black flex items-center gap-2 text-black py-2 justify-start bg-transparent hover:bg-transparent",
                       isActiveLink("/user/check-status") &&
                         "bg-[#9DB17C] rounded-md px-3 py-2"
                     )}
-                    onClick={() => setMenuOpen(false)}
                   >
                     Cek Status
-                  </Link>
+                  </button>
                   <div className="pt-4 mt-2 border-t border-[#8CA06B]/30">
                     {!token ? (
                       <div className="grid grid-cols-2 gap-2">
@@ -483,6 +504,39 @@ const FloatingNavbar = () => {
               onClick={confirmLogout}
             >
               Ya, Logout
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={loginRedirectDialog}
+        onOpenChange={setLoginRedirectDialog}
+      >
+        <AlertDialogContent className="rounded-xl w-full max-w-[320px] md:max-w-[380px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center">
+              Login Diperlukan
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              Anda perlu login terlebih dahulu untuk mengakses halaman ini.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-col sm:flex-row gap-2">
+            <AlertDialogCancel
+              className="mt-0 w-full sm:w-auto border-[#9DB17C] text-[#9DB17C]"
+              onClick={() => setLoginRedirectDialog(false)}
+            >
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="w-full sm:w-auto bg-[#9DB17C] hover:bg-[#8CA06B] text-white"
+              onClick={() => {
+                setLoginRedirectDialog(false);
+                navigate("/login");
+              }}
+            >
+              Login
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

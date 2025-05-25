@@ -17,16 +17,28 @@ export function useAuthState() {
       } catch (error) {
         Cookies.remove("token");
         setUser(null);
+        if (!location.pathname.startsWith("/login")) {
+          navigate("/login", { replace: true });
+        }
       }
     } else {
       setUser(null);
+      if (
+        !location.pathname.startsWith("/login") &&
+        !location.pathname.startsWith("/register") &&
+        !location.pathname.startsWith("/verify-otp") &&
+        !location.pathname === "/home" &&
+        !location.pathname === "/"
+      ) {
+        navigate("/login", { replace: true });
+      }
     }
   };
 
   const handleLogout = () => {
     Cookies.remove("token");
     setUser(null);
-    navigate("/home", { replace: true });
+    navigate("/login", { replace: true });
   };
 
   useEffect(() => {
