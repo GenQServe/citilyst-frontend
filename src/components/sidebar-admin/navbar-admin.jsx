@@ -25,7 +25,7 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
 
-const NavbarAdmin = ({ toggleSidebar, isMobileView }) => {
+const NavbarAdmin = ({ toggleSidebar, isMobileView, isTablet }) => {
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ const NavbarAdmin = ({ toggleSidebar, isMobileView }) => {
     try {
       const token = Cookies.get("token");
       if (!token) return { name: "Admin", role: "admin" };
-      
+
       const decoded = jwtDecode(token);
       return {
         name: decoded.name || "Admin",
@@ -53,63 +53,88 @@ const NavbarAdmin = ({ toggleSidebar, isMobileView }) => {
     navigate("/login", { replace: true });
   };
 
+  const getInitials = (name) => {
+    if (!name) return "A";
+    const names = name.split(" ");
+    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    return (
+      names[0].charAt(0) + names[names.length - 1].charAt(0)
+    ).toUpperCase();
+  };
+
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-40 bg-[#9CDE9F] border-b border-gray-200 shadow-sm">
-        <div className="flex h-16 items-center justify-between px-4">
+        <div className="flex h-14 sm:h-16 items-center justify-between px-2 sm:px-4">
           <div className="flex items-center">
-            {isMobileView && (
+            {(isMobileView || isTablet) && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="mr-2"
+                className="mr-1 sm:mr-2"
                 onClick={toggleSidebar}
                 aria-label="Toggle sidebar"
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             )}
 
-            <div className="ml-4 lg:ml-0">
-                <img
+            <div
+              className={`${
+                isMobileView ? "ml-1" : "ml-4 lg:ml-0"
+              } flex items-center`}
+            >
+              <img
                 src={images.cityListLogo}
                 alt="CityList Logo"
-                className="h-11 w-auto"
-                style={{ minWidth: 120, maxWidth: 180 }}
-                />
+                className="h-8 sm:h-10 md:h-11 w-auto"
+                style={{
+                  minWidth: isMobileView ? 100 : 120,
+                  maxWidth: isMobileView ? 140 : 180,
+                }}
+              />
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-2 hover:bg-[#a1e6a4]"
+                  className="flex items-center gap-1 sm:gap-2 hover:bg-[#a1e6a4] px-1 sm:px-3 py-1"
                 >
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
                     <AvatarImage src="/placeholder-avatar.jpg" />
-                    <AvatarFallback className="bg-[#9DB17C] text-white">
-                      {userInfo.name.charAt(0)}
+                    <AvatarFallback className="bg-[#9DB17C] text-white text-xs sm:text-sm">
+                      {getInitials(userInfo.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="hidden md:block text-left">
-                    <p className="text-sm font-medium">{userInfo.name}</p>
-                    <p className="text-xs text-gray-500">Administrator</p>
+                    <p className="text-sm font-medium line-clamp-1">
+                      {userInfo.name}
+                    </p>
+                    <p className="text-xs text-gray-600">Administrator</p>
                   </div>
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                  <div className="block md:hidden text-left">
+                    <p className="text-xs sm:text-sm font-medium line-clamp-1 max-w-[80px] sm:max-w-[100px]">
+                      {userInfo.name}
+                    </p>
+                  </div>
+                  <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                 </Button>
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end" className="w-56">
                 <div className="p-2">
                   <p className="text-sm font-medium">{userInfo.name}</p>
-                  <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {userInfo.email}
+                  </p>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  className="text-red-500 focus:text-red-500" 
+                <DropdownMenuItem
+                  className="text-red-500 focus:text-red-500 cursor-pointer"
                   onClick={() => setLogoutDialogOpen(true)}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
@@ -122,16 +147,23 @@ const NavbarAdmin = ({ toggleSidebar, isMobileView }) => {
       </header>
 
       <AlertDialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[90%] sm:max-w-lg">
           <AlertDialogHeader>
-            <AlertDialogTitle>Konfirmasi Logout</AlertDialogTitle>
+            <AlertDialogTitle className="text-lg sm:text-xl">
+              Konfirmasi Logout
+            </AlertDialogTitle>
             <AlertDialogDescription>
               Apakah Anda yakin ingin keluar dari akun admin?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction className="bg-red-500 hover:bg-red-600" onClick={handleLogout}>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <AlertDialogCancel className="w-full sm:w-auto mt-2 sm:mt-0">
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-500 hover:bg-red-600 w-full sm:w-auto"
+              onClick={handleLogout}
+            >
               Ya, Logout
             </AlertDialogAction>
           </AlertDialogFooter>

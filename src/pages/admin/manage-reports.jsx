@@ -8,10 +8,10 @@ import {
 } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
+import {
+  Card,
+  CardContent,
+  CardHeader,
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
@@ -53,13 +53,13 @@ import {
 import { toast } from "sonner";
 import { useGetAllReports, useUpdateReport } from "@/hooks/use-manage-report";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 
 const ManageReports = () => {
@@ -79,47 +79,45 @@ const ManageReports = () => {
   const { data, isLoading, isError } = useGetAllReports();
   const updateReportMutation = useUpdateReport();
 
-  // Helper function to handle status display
   const getStatusDisplay = (status) => {
     if (!status) return "-";
-    
+
     status = status.toLowerCase();
-    
+
     if (status === "pending") return "Menunggu";
     if (status === "in_progress" || status === "inprogress") return "Diproses";
     if (status === "resolved") return "Selesai";
     if (status === "rejected") return "Ditolak";
-    
-    return status; // Return original if no match
+
+    return status;
   };
-  
-  // Helper function to get status CSS class
+
   const getStatusClass = (status) => {
     if (!status) return "";
-    
+
     status = status.toLowerCase();
-    
-    if (status === "pending") 
+
+    if (status === "pending")
       return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    if (status === "in_progress" || status === "inprogress") 
+    if (status === "in_progress" || status === "inprogress")
       return "bg-blue-100 text-blue-800 border-blue-200";
-    if (status === "resolved") 
+    if (status === "resolved")
       return "bg-green-100 text-green-800 border-green-200";
-    if (status === "rejected") 
-      return "bg-red-100 text-red-800 border-red-200";
-    
-    return "bg-gray-100 text-gray-800 border-gray-200"; // Default
+    if (status === "rejected") return "bg-red-100 text-red-800 border-red-200";
+
+    return "bg-gray-100 text-gray-800 border-gray-200";
   };
 
   const filteredReports = useMemo(() => {
     if (!data?.data) return [];
-    
+
     const query = searchQuery.toLowerCase();
-    return data.data.filter(report => 
-      report.category_name?.toLowerCase().includes(query) ||
-      report.district_name?.toLowerCase().includes(query) ||
-      report.village_name?.toLowerCase().includes(query) ||
-      getStatusDisplay(report.status).toLowerCase().includes(query)
+    return data.data.filter(
+      (report) =>
+        report.category_name?.toLowerCase().includes(query) ||
+        report.district_name?.toLowerCase().includes(query) ||
+        report.village_name?.toLowerCase().includes(query) ||
+        getStatusDisplay(report.status).toLowerCase().includes(query)
     );
   }, [data, searchQuery]);
 
@@ -130,22 +128,32 @@ const ManageReports = () => {
         header: "Tanggal",
         cell: ({ row }) => {
           const date = new Date(row.original.created_at);
-          return format(date, "dd MMMM yyyy", { locale: id });
+          return format(date, "dd MMM yy", { locale: id });
         },
       },
       {
         accessorKey: "category_name",
         header: "Kategori",
+        cell: ({ row }) => (
+          <div className="max-w-[120px] md:max-w-none truncate">
+            {row.original.category_name || "-"}
+          </div>
+        ),
       },
       {
         accessorKey: "district_name",
         header: "Kecamatan",
+        cell: ({ row }) => (
+          <div className="hidden md:block max-w-[120px] lg:max-w-none truncate">
+            {row.original.district_name || "-"}
+          </div>
+        ),
       },
       {
         accessorKey: "feedback",
         header: "Umpan Balik",
         cell: ({ row }) => (
-          <div className="max-w-[200px] truncate">
+          <div className="hidden md:block max-w-[150px] lg:max-w-[200px] truncate">
             {row.original.feedback || "-"}
           </div>
         ),
@@ -156,7 +164,7 @@ const ManageReports = () => {
         cell: ({ row }) => {
           const status = row.original.status;
           return (
-            <Badge className={getStatusClass(status)}>
+            <Badge className={`text-xs md:text-sm ${getStatusClass(status)}`}>
               {getStatusDisplay(status)}
             </Badge>
           );
@@ -164,7 +172,7 @@ const ManageReports = () => {
       },
       {
         id: "actions",
-        header: "Aksi",
+        header: "",
         cell: ({ row }) => {
           const report = row.original;
           return (
@@ -188,9 +196,7 @@ const ManageReports = () => {
                 <DropdownMenuItem
                   onClick={() => {
                     setSelectedReport(report);
-                    // Handle different status formats
                     let statusValue = report.status.toLowerCase();
-                    // Convert in_progress to inprogress for UI
                     if (statusValue === "in_progress") {
                       statusValue = "inprogress";
                     }
@@ -206,14 +212,14 @@ const ManageReports = () => {
                 <DropdownMenuItem
                   onClick={() => {
                     const downloadFile = (url, filename) => {
-                      const link = document.createElement('a');
+                      const link = document.createElement("a");
                       link.href = url;
-                      link.setAttribute('download', filename || 'laporan.pdf');
+                      link.setAttribute("download", filename || "laporan.pdf");
                       document.body.appendChild(link);
                       link.click();
                       document.body.removeChild(link);
                     };
-                    
+
                     if (report.file_url) {
                       downloadFile(report.file_url, `Laporan-${report.id}.pdf`);
                       toast.success("Mengunduh dokumen laporan");
@@ -251,11 +257,10 @@ const ManageReports = () => {
 
   const handleUpdateReport = async () => {
     if (!selectedReport) return;
-    
+
     try {
-      // Convert UI status to uppercase for internal processing
       const formattedStatus = status.toUpperCase();
-      
+
       await updateReportMutation.mutateAsync({
         reportId: selectedReport.id,
         data: {
@@ -264,11 +269,10 @@ const ManageReports = () => {
           feedback: feedback || "",
         },
       });
-      
+
       setUpdateStatusOpen(false);
     } catch (error) {
       console.error("Update failed:", error);
-      // Error handling is done in the mutation hook
     }
   };
 
@@ -292,17 +296,19 @@ const ManageReports = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Kelola Laporan</h1>
-        <div className="flex items-center gap-2">
-        </div>
+      <div className="flex items-center justify-between flex-col sm:flex-row gap-3">
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+          Kelola Laporan
+        </h1>
       </div>
-      
+
       <Card>
-        <CardHeader className="pb-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <CardTitle className="text-lg md:text-xl">Daftar Laporan Warga</CardTitle>
-          <div className="flex-1 flex justify-end">
-            <div className="relative w-full max-w-xs">
+        <CardHeader className="pb-3 flex flex-col gap-3">
+          <CardTitle className="text-lg md:text-xl">
+            Daftar Laporan Warga
+          </CardTitle>
+          <div className="flex w-full">
+            <div className="relative w-full">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
               <Input
                 type="search"
@@ -314,63 +320,84 @@ const ManageReports = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
+        <CardContent className="px-1 sm:px-6">
+          <div className="overflow-x-auto -mx-1 sm:mx-0">
+            <div className="rounded-md border min-w-full inline-block">
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          className={
+                            header.column.id === "district_name" ||
+                            header.column.id === "feedback"
+                              ? "hidden md:table-cell"
+                              : ""
+                          }
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
                       ))}
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      Tidak ada data laporan
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}
+                        className="text-xs sm:text-sm"
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell
+                            key={cell.id}
+                            className={
+                              cell.column.id === "district_name" ||
+                              cell.column.id === "feedback"
+                                ? "hidden md:table-cell"
+                                : ""
+                            }
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        Tidak ada data laporan
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </CardContent>
-        <CardFooter className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
+        <CardFooter className="flex flex-col xs:flex-row items-center justify-between gap-4 px-2 sm:px-6">
+          <div className="text-xs sm:text-sm text-muted-foreground">
             Total {filteredReports.length} laporan
           </div>
-          <div className="flex items-center space-x-6 lg:space-x-8">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:space-x-6 lg:space-x-8 w-full sm:w-auto">
             <div className="flex items-center space-x-2">
-              <p className="text-sm font-medium">Rows per page</p>
+              <p className="text-xs sm:text-sm font-medium hidden sm:block">
+                Rows per page
+              </p>
               <Select
                 value={`${table.getState().pagination.pageSize}`}
                 onValueChange={(value) => {
@@ -378,7 +405,9 @@ const ManageReports = () => {
                 }}
               >
                 <SelectTrigger className="h-8 w-[70px]">
-                  <SelectValue placeholder={table.getState().pagination.pageSize} />
+                  <SelectValue
+                    placeholder={table.getState().pagination.pageSize}
+                  />
                 </SelectTrigger>
                 <SelectContent side="top">
                   {[5, 10, 20, 30, 40, 50].map((pageSize) => (
@@ -389,121 +418,161 @@ const ManageReports = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
-            </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              className="hidden h-8 w-20 p-0 lg:flex items-center justify-center gap-1"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="text-xs">First</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0 flex items-center justify-center"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            
-            {/* Page number buttons - show up to 3 pages */}
-            {Array.from({ length: Math.min(3, table.getPageCount()) }).map((_, i) => {
-              const pageIndex = i + Math.max(0, 
-                Math.min(
-                  table.getPageCount() - 3,
-                  table.getState().pagination.pageIndex - 1
-                )
-              );
-              return (
+            <div className="flex w-full sm:w-auto justify-between sm:justify-center">
+              <div className="flex items-center text-xs sm:text-sm font-medium">
+                Page {table.getState().pagination.pageIndex + 1} of{" "}
+                {table.getPageCount()}
+              </div>
+              <div className="flex items-center space-x-1 sm:space-x-2">
                 <Button
-                  key={pageIndex}
-                  variant={pageIndex === table.getState().pagination.pageIndex ? "default" : "outline"}
-                  className="h-8 w-8 p-0"
-                  onClick={() => table.setPageIndex(pageIndex)}
+                  variant="outline"
+                  className="hidden lg:flex h-8 w-16 p-0 items-center justify-center gap-1"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
                 >
-                  {pageIndex + 1}
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="text-xs">First</span>
                 </Button>
-              );
-            })}
-            
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0 flex items-center justify-center"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="hidden h-8 w-20 p-0 lg:flex items-center justify-center gap-1"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-            >
-              <span className="text-xs">Last</span>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+                <Button
+                  variant="outline"
+                  className="h-8 w-8 p-0 flex items-center justify-center"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                <div className="hidden sm:flex">
+                  {Array.from({
+                    length: Math.min(3, table.getPageCount()),
+                  }).map((_, i) => {
+                    const pageIndex =
+                      i +
+                      Math.max(
+                        0,
+                        Math.min(
+                          table.getPageCount() - 3,
+                          table.getState().pagination.pageIndex - 1
+                        )
+                      );
+                    return (
+                      <Button
+                        key={pageIndex}
+                        variant={
+                          pageIndex === table.getState().pagination.pageIndex
+                            ? "default"
+                            : "outline"
+                        }
+                        className="h-8 w-8 p-0"
+                        onClick={() => table.setPageIndex(pageIndex)}
+                      >
+                        {pageIndex + 1}
+                      </Button>
+                    );
+                  })}
+                </div>
+
+                <Button
+                  variant="outline"
+                  className="h-8 w-8 p-0 flex items-center justify-center"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  className="hidden lg:flex h-8 w-16 p-0 items-center justify-center gap-1"
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  disabled={!table.getCanNextPage()}
+                >
+                  <span className="text-xs">Last</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </CardFooter>
       </Card>
 
       <Dialog open={userDetailsOpen} onOpenChange={setUserDetailsOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-w-[90%] p-4 sm:p-6 rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-green-800">Detail Pelapor</DialogTitle>
+            <DialogTitle className="text-xl font-semibold text-green-800">
+              Detail Pelapor
+            </DialogTitle>
             <DialogDescription className="text-gray-600">
               Informasi lengkap tentang pelapor dari laporan yang dipilih.
             </DialogDescription>
           </DialogHeader>
           {selectedUser ? (
             <div className="space-y-5 my-2">
-              <div className="grid grid-cols-2 gap-4 p-4 bg-green-50/50 rounded-lg border border-green-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-green-50/50 rounded-lg border border-green-100">
                 <div className="space-y-1">
-                  <Label className="text-xs text-gray-500 font-medium">ID</Label>
-                  <p className="text-sm font-medium truncate">{selectedUser.id}</p>
+                  <Label className="text-xs text-gray-500 font-medium">
+                    ID
+                  </Label>
+                  <p className="text-sm font-medium truncate">
+                    {selectedUser.id}
+                  </p>
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs text-gray-500 font-medium">NIK</Label>
-                  <p className="text-sm font-medium">{selectedUser.nik || "-"}</p>
+                  <Label className="text-xs text-gray-500 font-medium">
+                    NIK
+                  </Label>
+                  <p className="text-sm font-medium">
+                    {selectedUser.nik || "-"}
+                  </p>
                 </div>
-                <div className="space-y-1 col-span-2">
-                  <Label className="text-xs text-gray-500 font-medium">Nama Lengkap</Label>
-                  <p className="text-sm font-semibold">{selectedUser.name || "-"}</p>
+                <div className="space-y-1 col-span-1 sm:col-span-2">
+                  <Label className="text-xs text-gray-500 font-medium">
+                    Nama Lengkap
+                  </Label>
+                  <p className="text-sm font-semibold">
+                    {selectedUser.name || "-"}
+                  </p>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <Label className="text-xs text-gray-500 font-medium">Email</Label>
-                  <p className="text-sm px-3 py-2 bg-gray-50 rounded-md">{selectedUser.email || "-"}</p>
+                  <Label className="text-xs text-gray-500 font-medium">
+                    Email
+                  </Label>
+                  <p className="text-sm px-3 py-2 bg-gray-50 rounded-md break-words">
+                    {selectedUser.email || "-"}
+                  </p>
                 </div>
-                
+
                 <div className="space-y-1">
-                  <Label className="text-xs text-gray-500 font-medium">No. Telepon</Label>
-                  <p className="text-sm px-3 py-2 bg-gray-50 rounded-md">{selectedUser.phone_number || "-"}</p>
+                  <Label className="text-xs text-gray-500 font-medium">
+                    No. Telepon
+                  </Label>
+                  <p className="text-sm px-3 py-2 bg-gray-50 rounded-md">
+                    {selectedUser.phone_number || "-"}
+                  </p>
                 </div>
-                
+
                 <div className="space-y-1">
-                  <Label className="text-xs text-gray-500 font-medium">Alamat</Label>
-                  <p className="text-sm px-3 py-2 bg-gray-50 rounded-md whitespace-pre-line">{selectedUser.address || "-"}</p>
+                  <Label className="text-xs text-gray-500 font-medium">
+                    Alamat
+                  </Label>
+                  <p className="text-sm px-3 py-2 bg-gray-50 rounded-md whitespace-pre-line">
+                    {selectedUser.address || "-"}
+                  </p>
                 </div>
               </div>
             </div>
           ) : (
             <div className="py-4 text-center">
               <Loader2 className="h-6 w-6 animate-spin mx-auto text-gray-400" />
-              <p className="text-sm text-gray-500 mt-2">Memuat data pelapor...</p>
+              <p className="text-sm text-gray-500 mt-2">
+                Memuat data pelapor...
+              </p>
             </div>
           )}
-          <DialogFooter>
-            <Button 
+          <DialogFooter className="sm:justify-end justify-center">
+            <Button
               onClick={() => setUserDetailsOpen(false)}
               className="bg-green-600 hover:bg-green-700"
             >
@@ -514,7 +583,7 @@ const ManageReports = () => {
       </Dialog>
 
       <Dialog open={updateStatusOpen} onOpenChange={setUpdateStatusOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-w-[90%] rounded-lg">
           <DialogHeader>
             <DialogTitle>Update Status Laporan</DialogTitle>
             <DialogDescription>
@@ -537,7 +606,7 @@ const ManageReports = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="feedback">Umpan Balik</Label>
                 <Textarea
@@ -550,13 +619,18 @@ const ManageReports = () => {
               </div>
             </div>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setUpdateStatusOpen(false)}>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setUpdateStatusOpen(false)}
+              className="w-full sm:w-auto"
+            >
               Batal
             </Button>
-            <Button 
+            <Button
               onClick={handleUpdateReport}
               disabled={updateReportMutation.isPending}
+              className="w-full sm:w-auto"
             >
               {updateReportMutation.isPending ? (
                 <>
