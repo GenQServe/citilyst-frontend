@@ -51,6 +51,7 @@ Aplikasi ini juga menyediakan dashboard khusus untuk admin/petugas kota agar dap
 ## Struktur Folder Frontend
 
 ```
+├── .github/workflows/     # Workflow CI/CD (GitHub Actions)
 ├── public/                # File statis (ikon, gambar, favicon)
 ├── src/
 │   ├── assets/            # Gambar, ikon, dan aset statis
