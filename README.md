@@ -89,7 +89,7 @@ Aplikasi ini juga menyediakan dashboard khusus untuk admin/petugas kota agar dap
 
    ```sh
    git clone https://github.com/GenQServe/citilyst-frontend.git
-   cd citilyst-fe
+   cd citilyst-frontend
    ```
 
 2. **Install dependencies**
