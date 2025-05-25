@@ -40,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   ChevronLeft,
   ChevronRight,
@@ -135,7 +136,7 @@ const ManageReports = () => {
         accessorKey: "category_name",
         header: "Kategori",
         cell: ({ row }) => (
-          <div className="max-w-[120px] md:max-w-none truncate">
+          <div className="max-w-[100px] xs:max-w-[120px] md:max-w-none truncate">
             {row.original.category_name || "-"}
           </div>
         ),
@@ -144,7 +145,7 @@ const ManageReports = () => {
         accessorKey: "district_name",
         header: "Kecamatan",
         cell: ({ row }) => (
-          <div className="hidden md:block max-w-[120px] lg:max-w-none truncate">
+          <div className="hidden sm:block max-w-[120px] lg:max-w-none truncate">
             {row.original.district_name || "-"}
           </div>
         ),
@@ -164,7 +165,11 @@ const ManageReports = () => {
         cell: ({ row }) => {
           const status = row.original.status;
           return (
-            <Badge className={`text-xs md:text-sm ${getStatusClass(status)}`}>
+            <Badge
+              className={`text-[10px] xs:text-xs sm:text-sm ${getStatusClass(
+                status
+              )}`}
+            >
               {getStatusDisplay(status)}
             </Badge>
           );
@@ -178,19 +183,22 @@ const ManageReports = () => {
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="h-4 w-4" />
+                <Button variant="ghost" className="h-6 w-6 sm:h-8 sm:w-8 p-0">
+                  <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[160px]">
+              <DropdownMenuContent
+                align="end"
+                className="w-[140px] sm:w-[160px]"
+              >
                 <DropdownMenuItem
                   onClick={() => {
                     setSelectedUser(report.user);
                     setUserDetailsOpen(true);
                   }}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-xs sm:text-sm"
                 >
-                  <Eye className="mr-2 h-4 w-4" />
+                  <Eye className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                   Lihat Pelapor
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -204,9 +212,9 @@ const ManageReports = () => {
                     setFeedback(report.feedback || "");
                     setUpdateStatusOpen(true);
                   }}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-xs sm:text-sm"
                 >
-                  <Edit className="mr-2 h-4 w-4" />
+                  <Edit className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                   Update Status
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -227,9 +235,9 @@ const ManageReports = () => {
                       toast.error("URL dokumen tidak tersedia");
                     }
                   }}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-xs sm:text-sm"
                 >
-                  <Download className="mr-2 h-4 w-4" />
+                  <Download className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                   Unduh Dokumen
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -276,95 +284,138 @@ const ManageReports = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-[50vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-        <span className="ml-2 text-xl text-gray-500">Memuat data...</span>
-      </div>
-    );
-  }
-
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh]">
-        <p className="text-red-500 text-xl mb-4">Gagal memuat data laporan</p>
+        <p className="text-red-500 text-base sm:text-xl mb-4">
+          Gagal memuat data laporan
+        </p>
         <Button onClick={() => window.location.reload()}>Coba Lagi</Button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between flex-col sm:flex-row gap-3">
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+    <div className="space-y-4 sm:space-y-6 p-2 sm:p-4">
+      <div className="flex items-center justify-between flex-col sm:flex-row gap-2 sm:gap-3">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
           Kelola Laporan
         </h1>
       </div>
 
       <Card>
-        <CardHeader className="pb-3 flex flex-col gap-3">
-          <CardTitle className="text-lg md:text-xl">
+        <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4 md:p-6 flex flex-col gap-2 sm:gap-3">
+          <CardTitle className="text-base md:text-lg lg:text-xl">
             Daftar Laporan Warga
           </CardTitle>
           <div className="flex w-full">
             <div className="relative w-full">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Search className="absolute left-2 sm:left-2.5 top-2 sm:top-2.5 h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
               <Input
                 type="search"
                 placeholder="Cari laporan..."
-                className="w-full pl-8"
+                className="w-full h-7 sm:h-9 pl-6 sm:pl-8 text-xs sm:text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
         </CardHeader>
-        <CardContent className="px-1 sm:px-6">
-          <div className="overflow-x-auto -mx-1 sm:mx-0">
+        <CardContent className="p-0 sm:px-2 md:px-4 lg:px-6">
+          <div className="overflow-x-auto">
             <div className="rounded-md border min-w-full inline-block">
               <Table>
                 <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => (
-                        <TableHead
-                          key={header.id}
-                          className={
-                            header.column.id === "district_name" ||
-                            header.column.id === "feedback"
-                              ? "hidden md:table-cell"
-                              : ""
-                          }
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      ))}
+                  {isLoading ? (
+                    <TableRow>
+                      <TableHead className="px-2 py-2 sm:px-3 sm:py-3">
+                        <Skeleton className="h-4 w-16" />
+                      </TableHead>
+                      <TableHead className="px-2 py-2 sm:px-3 sm:py-3">
+                        <Skeleton className="h-4 w-20" />
+                      </TableHead>
+                      <TableHead className="px-2 py-2 sm:px-3 sm:py-3 hidden sm:table-cell">
+                        <Skeleton className="h-4 w-24" />
+                      </TableHead>
+                      <TableHead className="px-2 py-2 sm:px-3 sm:py-3 hidden md:table-cell">
+                        <Skeleton className="h-4 w-24" />
+                      </TableHead>
+                      <TableHead className="px-2 py-2 sm:px-3 sm:py-3">
+                        <Skeleton className="h-4 w-16" />
+                      </TableHead>
+                      <TableHead className="px-2 py-2 sm:px-3 sm:py-3">
+                        <Skeleton className="h-4 w-8" />
+                      </TableHead>
                     </TableRow>
-                  ))}
+                  ) : (
+                    table.getHeaderGroups().map((headerGroup) => (
+                      <TableRow key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => (
+                          <TableHead
+                            key={header.id}
+                            className={`px-2 py-2 sm:px-3 sm:py-3 text-[10px] xs:text-xs sm:text-sm ${
+                              header.column.id === "district_name"
+                                ? "hidden sm:table-cell"
+                                : header.column.id === "feedback"
+                                ? "hidden md:table-cell"
+                                : ""
+                            }`}
+                          >
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                          </TableHead>
+                        ))}
+                      </TableRow>
+                    ))
+                  )}
                 </TableHeader>
                 <TableBody>
-                  {table.getRowModel().rows?.length ? (
+                  {isLoading ? (
+                    Array(5)
+                      .fill(0)
+                      .map((_, index) => (
+                        <TableRow key={`skeleton-${index}`}>
+                          <TableCell className="px-2 py-2 sm:px-3 sm:py-3">
+                            <Skeleton className="h-4 w-12 sm:w-16" />
+                          </TableCell>
+                          <TableCell className="px-2 py-2 sm:px-3 sm:py-3">
+                            <Skeleton className="h-4 w-20 sm:w-28" />
+                          </TableCell>
+                          <TableCell className="px-2 py-2 sm:px-3 sm:py-3 hidden sm:table-cell">
+                            <Skeleton className="h-4 w-24 sm:w-32" />
+                          </TableCell>
+                          <TableCell className="px-2 py-2 sm:px-3 sm:py-3 hidden md:table-cell">
+                            <Skeleton className="h-4 w-32 sm:w-40" />
+                          </TableCell>
+                          <TableCell className="px-2 py-2 sm:px-3 sm:py-3">
+                            <Skeleton className="h-5 w-16 rounded-full" />
+                          </TableCell>
+                          <TableCell className="px-2 py-2 sm:px-3 sm:py-3">
+                            <Skeleton className="h-6 w-6 rounded-full" />
+                          </TableCell>
+                        </TableRow>
+                      ))
+                  ) : table.getRowModel().rows?.length ? (
                     table.getRowModel().rows.map((row) => (
                       <TableRow
                         key={row.id}
                         data-state={row.getIsSelected() && "selected"}
-                        className="text-xs sm:text-sm"
+                        className="text-[10px] xs:text-xs sm:text-sm"
                       >
                         {row.getVisibleCells().map((cell) => (
                           <TableCell
                             key={cell.id}
-                            className={
-                              cell.column.id === "district_name" ||
-                              cell.column.id === "feedback"
+                            className={`px-2 py-2 sm:px-3 sm:py-3 ${
+                              cell.column.id === "district_name"
+                                ? "hidden sm:table-cell"
+                                : cell.column.id === "feedback"
                                 ? "hidden md:table-cell"
                                 : ""
-                            }
+                            }`}
                           >
                             {flexRender(
                               cell.column.columnDef.cell,
@@ -378,7 +429,7 @@ const ManageReports = () => {
                     <TableRow>
                       <TableCell
                         colSpan={columns.length}
-                        className="h-24 text-center"
+                        className="h-16 sm:h-24 text-center text-xs sm:text-sm"
                       >
                         Tidak ada data laporan
                       </TableCell>
@@ -389,192 +440,220 @@ const ManageReports = () => {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col xs:flex-row items-center justify-between gap-4 px-2 sm:px-6">
-          <div className="text-xs sm:text-sm text-muted-foreground">
-            Total {filteredReports.length} laporan
-          </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:space-x-6 lg:space-x-8 w-full sm:w-auto">
-            <div className="flex items-center space-x-2">
-              <p className="text-xs sm:text-sm font-medium hidden sm:block">
-                Rows per page
-              </p>
-              <Select
-                value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value) => {
-                  table.setPageSize(Number(value));
-                }}
-              >
-                <SelectTrigger className="h-8 w-[70px]">
-                  <SelectValue
-                    placeholder={table.getState().pagination.pageSize}
-                  />
-                </SelectTrigger>
-                <SelectContent side="top">
-                  {[5, 10, 20, 30, 40, 50].map((pageSize) => (
-                    <SelectItem key={pageSize} value={`${pageSize}`}>
-                      {pageSize}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex w-full sm:w-auto justify-between sm:justify-center">
-              <div className="flex items-center text-xs sm:text-sm font-medium">
-                Page {table.getState().pagination.pageIndex + 1} of{" "}
-                {table.getPageCount()}
+        <CardFooter className="flex flex-col xs:flex-row items-center justify-between gap-2 xs:gap-4 p-3 sm:p-4 md:p-6">
+          {isLoading ? (
+            <div className="w-full flex flex-col xs:flex-row items-center justify-between gap-2">
+              <Skeleton className="h-4 w-32" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-6 w-20" />
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-6 w-16" />
               </div>
-              <div className="flex items-center space-x-1 sm:space-x-2">
-                <Button
-                  variant="outline"
-                  className="hidden lg:flex h-8 w-16 p-0 items-center justify-center gap-1"
-                  onClick={() => table.setPageIndex(0)}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  <span className="text-xs">First</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-8 w-8 p-0 flex items-center justify-center"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-
-                <div className="hidden sm:flex">
-                  {Array.from({
-                    length: Math.min(3, table.getPageCount()),
-                  }).map((_, i) => {
-                    const pageIndex =
-                      i +
-                      Math.max(
-                        0,
-                        Math.min(
-                          table.getPageCount() - 3,
-                          table.getState().pagination.pageIndex - 1
-                        )
-                      );
-                    return (
-                      <Button
-                        key={pageIndex}
-                        variant={
-                          pageIndex === table.getState().pagination.pageIndex
-                            ? "default"
-                            : "outline"
-                        }
-                        className="h-8 w-8 p-0"
-                        onClick={() => table.setPageIndex(pageIndex)}
-                      >
-                        {pageIndex + 1}
-                      </Button>
-                    );
-                  })}
+            </div>
+          ) : (
+            <>
+              <div className="text-[10px] xs:text-xs sm:text-sm text-muted-foreground">
+                Total {filteredReports.length} laporan
+              </div>
+              <div className="flex flex-col xs:flex-row items-center gap-3 sm:gap-4 lg:gap-6 w-full xs:w-auto">
+                <div className="flex items-center space-x-1 sm:space-x-2">
+                  <p className="text-[10px] xs:text-xs sm:text-sm font-medium hidden xs:block whitespace-nowrap">
+                    Rows per page
+                  </p>
+                  <Select
+                    value={`${table.getState().pagination.pageSize}`}
+                    onValueChange={(value) => {
+                      table.setPageSize(Number(value));
+                    }}
+                  >
+                    <SelectTrigger className="h-6 sm:h-8 w-12 sm:w-[70px] text-[10px] xs:text-xs sm:text-sm">
+                      <SelectValue
+                        placeholder={table.getState().pagination.pageSize}
+                      />
+                    </SelectTrigger>
+                    <SelectContent side="top">
+                      {[5, 10, 20, 30, 40, 50].map((pageSize) => (
+                        <SelectItem
+                          key={pageSize}
+                          value={`${pageSize}`}
+                          className="text-xs sm:text-sm"
+                        >
+                          {pageSize}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+                <div className="flex w-full xs:w-auto justify-between sm:justify-center">
+                  <div className="flex items-center text-[10px] xs:text-xs sm:text-sm font-medium">
+                    Page {table.getState().pagination.pageIndex + 1} of{" "}
+                    {table.getPageCount()}
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Button
+                      variant="outline"
+                      className="hidden lg:flex h-6 sm:h-8 w-12 sm:w-16 p-0 items-center justify-center gap-1"
+                      onClick={() => table.setPageIndex(0)}
+                      disabled={!table.getCanPreviousPage()}
+                    >
+                      <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="text-[10px] xs:text-xs">First</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="h-6 sm:h-8 w-6 sm:w-8 p-0 flex items-center justify-center"
+                      onClick={() => table.previousPage()}
+                      disabled={!table.getCanPreviousPage()}
+                    >
+                      <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
 
-                <Button
-                  variant="outline"
-                  className="h-8 w-8 p-0 flex items-center justify-center"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="hidden lg:flex h-8 w-16 p-0 items-center justify-center gap-1"
-                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <span className="text-xs">Last</span>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+                    <div className="hidden xs:flex">
+                      {Array.from({
+                        length: Math.min(3, table.getPageCount()),
+                      }).map((_, i) => {
+                        const pageIndex =
+                          i +
+                          Math.max(
+                            0,
+                            Math.min(
+                              table.getPageCount() - 3,
+                              table.getState().pagination.pageIndex - 1
+                            )
+                          );
+                        return (
+                          <Button
+                            key={pageIndex}
+                            variant={
+                              pageIndex ===
+                              table.getState().pagination.pageIndex
+                                ? "default"
+                                : "outline"
+                            }
+                            className="h-6 sm:h-8 w-6 sm:w-8 p-0 text-[10px] sm:text-xs"
+                            onClick={() => table.setPageIndex(pageIndex)}
+                          >
+                            {pageIndex + 1}
+                          </Button>
+                        );
+                      })}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      className="h-6 sm:h-8 w-6 sm:w-8 p-0 flex items-center justify-center"
+                      onClick={() => table.nextPage()}
+                      disabled={!table.getCanNextPage()}
+                    >
+                      <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="hidden lg:flex h-6 sm:h-8 w-12 sm:w-16 p-0 items-center justify-center gap-1"
+                      onClick={() =>
+                        table.setPageIndex(table.getPageCount() - 1)
+                      }
+                      disabled={!table.getCanNextPage()}
+                    >
+                      <span className="text-[10px] xs:text-xs">Last</span>
+                      <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </CardFooter>
       </Card>
 
       <Dialog open={userDetailsOpen} onOpenChange={setUserDetailsOpen}>
-        <DialogContent className="sm:max-w-md max-w-[90%] p-4 sm:p-6 rounded-lg">
+        <DialogContent className="sm:max-w-md max-w-[92%] p-4 sm:p-6 rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-green-800">
+            <DialogTitle className="text-base sm:text-xl font-semibold text-green-800">
               Detail Pelapor
             </DialogTitle>
-            <DialogDescription className="text-gray-600">
+            <DialogDescription className="text-xs sm:text-sm text-gray-600">
               Informasi lengkap tentang pelapor dari laporan yang dipilih.
             </DialogDescription>
           </DialogHeader>
           {selectedUser ? (
-            <div className="space-y-5 my-2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-green-50/50 rounded-lg border border-green-100">
+            <div className="space-y-4 sm:space-y-5 my-1 sm:my-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-4 bg-green-50/50 rounded-lg border border-green-100">
                 <div className="space-y-1">
-                  <Label className="text-xs text-gray-500 font-medium">
+                  <Label className="text-[10px] xs:text-xs text-gray-500 font-medium">
                     ID
                   </Label>
-                  <p className="text-sm font-medium truncate">
+                  <p className="text-xs sm:text-sm font-medium truncate">
                     {selectedUser.id}
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs text-gray-500 font-medium">
+                  <Label className="text-[10px] xs:text-xs text-gray-500 font-medium">
                     NIK
                   </Label>
-                  <p className="text-sm font-medium">
+                  <p className="text-xs sm:text-sm font-medium">
                     {selectedUser.nik || "-"}
                   </p>
                 </div>
                 <div className="space-y-1 col-span-1 sm:col-span-2">
-                  <Label className="text-xs text-gray-500 font-medium">
+                  <Label className="text-[10px] xs:text-xs text-gray-500 font-medium">
                     Nama Lengkap
                   </Label>
-                  <p className="text-sm font-semibold">
+                  <p className="text-xs sm:text-sm font-semibold">
                     {selectedUser.name || "-"}
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="space-y-1">
-                  <Label className="text-xs text-gray-500 font-medium">
+                  <Label className="text-[10px] xs:text-xs text-gray-500 font-medium">
                     Email
                   </Label>
-                  <p className="text-sm px-3 py-2 bg-gray-50 rounded-md break-words">
+                  <p className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 bg-gray-50 rounded-md break-words">
                     {selectedUser.email || "-"}
                   </p>
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs text-gray-500 font-medium">
+                  <Label className="text-[10px] xs:text-xs text-gray-500 font-medium">
                     No. Telepon
                   </Label>
-                  <p className="text-sm px-3 py-2 bg-gray-50 rounded-md">
+                  <p className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 bg-gray-50 rounded-md">
                     {selectedUser.phone_number || "-"}
                   </p>
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs text-gray-500 font-medium">
+                  <Label className="text-[10px] xs:text-xs text-gray-500 font-medium">
                     Alamat
                   </Label>
-                  <p className="text-sm px-3 py-2 bg-gray-50 rounded-md whitespace-pre-line">
+                  <p className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 bg-gray-50 rounded-md whitespace-pre-line">
                     {selectedUser.address || "-"}
                   </p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="py-4 text-center">
-              <Loader2 className="h-6 w-6 animate-spin mx-auto text-gray-400" />
-              <p className="text-sm text-gray-500 mt-2">
-                Memuat data pelapor...
-              </p>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-6 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-6 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-16 w-full" />
+              </div>
             </div>
           )}
           <DialogFooter className="sm:justify-end justify-center">
             <Button
               onClick={() => setUserDetailsOpen(false)}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm h-8 sm:h-9"
             >
               Tutup
             </Button>
@@ -583,39 +662,68 @@ const ManageReports = () => {
       </Dialog>
 
       <Dialog open={updateStatusOpen} onOpenChange={setUpdateStatusOpen}>
-        <DialogContent className="sm:max-w-md max-w-[90%] rounded-lg">
+        <DialogContent className="sm:max-w-md max-w-[92%] rounded-lg">
           <DialogHeader>
-            <DialogTitle>Update Status Laporan</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">
+              Update Status Laporan
+            </DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
               Perbarui status dan berikan umpan balik untuk laporan ini.
             </DialogDescription>
           </DialogHeader>
-          {selectedReport && (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="status">Status Laporan</Label>
+          {selectedReport ? (
+            <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-1 sm:space-y-2">
+                <Label htmlFor="status" className="text-xs sm:text-sm">
+                  Status Laporan
+                </Label>
                 <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full h-8 sm:h-9 text-xs sm:text-sm">
                     <SelectValue placeholder="Pilih status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Menunggu</SelectItem>
-                    <SelectItem value="inprogress">Diproses</SelectItem>
-                    <SelectItem value="resolved">Selesai</SelectItem>
-                    <SelectItem value="rejected">Ditolak</SelectItem>
+                    <SelectItem value="pending" className="text-xs sm:text-sm">
+                      Menunggu
+                    </SelectItem>
+                    <SelectItem
+                      value="inprogress"
+                      className="text-xs sm:text-sm"
+                    >
+                      Diproses
+                    </SelectItem>
+                    <SelectItem value="resolved" className="text-xs sm:text-sm">
+                      Selesai
+                    </SelectItem>
+                    <SelectItem value="rejected" className="text-xs sm:text-sm">
+                      Ditolak
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="feedback">Umpan Balik</Label>
+              <div className="space-y-1 sm:space-y-2">
+                <Label htmlFor="feedback" className="text-xs sm:text-sm">
+                  Umpan Balik
+                </Label>
                 <Textarea
                   id="feedback"
                   placeholder="Berikan umpan balik untuk pelapor..."
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   rows={5}
+                  className="text-xs sm:text-sm"
                 />
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-9 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-24 w-full" />
               </div>
             </div>
           )}
@@ -623,19 +731,19 @@ const ManageReports = () => {
             <Button
               variant="outline"
               onClick={() => setUpdateStatusOpen(false)}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
             >
               Batal
             </Button>
             <Button
               onClick={handleUpdateReport}
               disabled={updateReportMutation.isPending}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
             >
               {updateReportMutation.isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Menyimpan...
+                  <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                  <span>Menyimpan...</span>
                 </>
               ) : (
                 "Simpan Perubahan"
