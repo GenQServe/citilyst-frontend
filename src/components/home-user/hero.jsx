@@ -71,7 +71,7 @@ const Hero = () => {
           </div>
           <div
             ref={imageRef}
-            className="relative order-first md:order-last rounded-lg overflow-hidden shadow-xl"
+            className="relative order-first md:order-last rounded-lg overflow-hidden"
           >
             <img
               src={images.heroNewBanner}
