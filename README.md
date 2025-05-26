@@ -20,14 +20,21 @@ Aplikasi ini juga menyediakan dashboard khusus untuk admin/petugas kota agar dap
 
 ## Fitur Utama
 
-- **Buat Laporan**: Formulir pelaporan yang mudah digunakan, dengan pilihan kategori, deskripsi dengan teknologi AI, lokasi, dan upload foto pendukung.
-- **Pantau Status**: Setiap laporan memiliki status (Menunggu, Diproses, Selesai, Ditolak) yang dapat dipantau secara real-time.
-- **Notifikasi & Umpan Balik**: Pengguna menerima notifikasi otomatis melalui email dan feedback dari admin terkait perkembangan laporan.
-- **Manajemen Laporan (Admin)**: Admin dapat melihat seluruh laporan, memperbarui status, memberikan feedback, dan mengelola data pelapor.
-- **Profil Pengguna**: Pengguna dapat melengkapi profil untuk memudahkan verifikasi dan penanganan laporan.
-- **Dashboard Statistik**: Visualisasi data laporan, grafik, dan insight untuk admin.
-- **Autentikasi Aman**: Login/registrasi dengan JWT, serta pengelolaan sesi yang aman.
-- **UI/UX Modern**: Tampilan responsif, interaktif, dan mudah digunakan di berbagai perangkat.
+1. **Buat Laporan**: Formulir pelaporan yang sederhana dan intuitif, dilengkapi kategori, deskripsi dibantu AI, lokasi kejadian, dan fitur unggah foto untuk mendukung laporan.
+
+2. **Pantau Status**: Setiap laporan memiliki status yang jelas (Menunggu, Diproses, Selesai, Ditolak) dan dapat dipantau pengguna secara real-time melalui dashboard.
+
+3. **Notifikasi & Umpan Balik**: Pengguna menerima notifikasi otomatis melalui email mengenai perkembangan laporan, serta dapat melihat umpan balik dari admin.
+
+4. **Manajemen Laporan (Admin)**: Admin memiliki akses untuk melihat semua laporan, memperbarui status, memberikan respon, serta mengelola data pelapor secara efisien.
+
+5. **Profil Pengguna**: Pengguna dapat melengkapi profil pribadi untuk mendukung proses verifikasi identitas dan mempercepat penanganan laporan.
+
+6. **Dashboard Statistik**: Admin disediakan tampilan grafik dan visualisasi data laporan yang informatif, untuk mendukung analisis dan pengambilan keputusan.
+
+7. **Autentikasi Aman**: Sistem login dan registrasi menggunakan JWT serta dukungan Google OAuth, memastikan keamanan dan kemudahan akses bagi pengguna.
+
+8. **UI/UX Modern**: Desain antarmuka yang responsif, menarik, dan mudah digunakan di berbagai perangkat, memberikan pengalaman pengguna yang optimal.
 
 ---
 
