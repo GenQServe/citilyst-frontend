@@ -5,6 +5,7 @@ import reportPhoto from "@/assets/images/lapor.png";
 import cityListLogo from "@/assets/images/citylist-logo.png";
 import heroPhoto from "@/assets/images/heroPhoto.png";
 import logo from "@/assets/images/logo.png";
+import heroNewBanner from "@/assets/images/hero-new.jpg";
 
 export const images = {
   peopleWithForm,
@@ -14,4 +15,5 @@ export const images = {
   cityListLogo,
   heroPhoto,
   logo,
+  heroNewBanner,
 };

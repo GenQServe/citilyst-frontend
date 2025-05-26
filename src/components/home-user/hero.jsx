@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import useGSAP from "@/hooks/use-gsap";
 import { Button } from "@/components/ui/button";
 import { images } from "@/constants/images";
+import { FiArrowRight } from "react-icons/fi";
+import Cookies from "js-cookie";
 
 const Hero = () => {
   const heroRef = useRef(null);
@@ -36,7 +38,12 @@ const Hero = () => {
   }, []);
 
   const handleCreateReport = () => {
-    navigate("/user/create-report");
+    const token = Cookies.get("token");
+    if (!token) {
+      navigate("/login", { state: { returnTo: "/user/create-report" } });
+    } else {
+      navigate("/user/create-report");
+    }
   };
 
   return (
@@ -58,20 +65,7 @@ const Hero = () => {
                 className="bg-[#9DB17C] hover:bg-[#8CA06B] text-white px-6 py-2 rounded-md flex items-center gap-2"
               >
                 Buat Laporan Sekarang
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M5 12h14"></path>
-                  <path d="m12 5 7 7-7 7"></path>
-                </svg>
+                <FiArrowRight size={18} />
               </Button>
             </div>
           </div>
@@ -80,7 +74,7 @@ const Hero = () => {
             className="relative order-first md:order-last rounded-lg overflow-hidden shadow-xl"
           >
             <img
-              src={images.heroPhoto}
+              src={images.heroNewBanner}
               alt="Citizen reporting using CitiLyst"
               className="w-full h-auto lg:h-[300px] xl:h-[400px] object-cover rounded-lg"
             />
