@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 
 export const registerUser = async (userData) => {
   const response = await api.post("/auth/register", userData);
-  Cookies.set("email", userData.email, { expires: 1 });
+  Cookies.set("email", userData.email, { expires: 300 / 86400 }); // 5 minutes (300 seconds / seconds per day)
   return response.data;
 };
 

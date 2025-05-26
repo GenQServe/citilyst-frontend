@@ -58,15 +58,12 @@ export function OtpForm() {
     const cookieEmail = Cookies.get("email");
     const stateEmail = location.state?.email;
 
-    // Set email in state for component rendering
     if (cookieEmail) {
       setEmailValue(cookieEmail);
     } else if (stateEmail) {
       setEmailValue(stateEmail);
-      // Save to cookie if not already there
-      Cookies.set("email", stateEmail, { expires: 1 });
+      Cookies.set("email", stateEmail, { expires: 300 / 86400 }); // 5 minutes
     } else {
-      // Only navigate away if we have no email from either source
       toast.error("Email tidak ditemukan, silakan daftar terlebih dahulu");
       navigate("/register");
     }
@@ -140,12 +137,17 @@ export function OtpForm() {
     }
   };
 
+  const handleBackClick = () => {
+    Cookies.remove("email");
+  };
+
   return (
     <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-8 lg:py-12">
       <div className="w-full max-w-md">
         <Link
           to="/register"
           className="inline-flex items-center gap-2 mb-8 text-gray-600 hover:text-gray-900"
+          onClick={handleBackClick}
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="font-medium">Kembali</span>

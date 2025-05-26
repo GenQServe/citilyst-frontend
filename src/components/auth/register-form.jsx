@@ -63,12 +63,17 @@ export function RegisterForm() {
     register(data);
   };
 
+  const handleBackClick = () => {
+    Cookies.remove("email");
+  };
+
   return (
     <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-8 lg:py-12">
       <div className="w-full max-w-md">
         <Link
           to="/"
           className="inline-flex items-center gap-2 mb-8 text-gray-600 hover:text-gray-900"
+          onClick={handleBackClick}
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="font-medium">Kembali</span>
@@ -190,6 +195,7 @@ export function RegisterForm() {
                 <Link
                   to="/login"
                   className="text-[#9DB17C] font-semibold hover:underline"
+                  onClick={handleBackClick}
                 >
                   Masuk
                 </Link>
