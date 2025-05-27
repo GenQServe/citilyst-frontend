@@ -75,6 +75,13 @@ import {
   clearReportForm,
 } from "@/features/slices/reportSlice";
 import ReactMarkdown from "react-markdown";
+import { useUserProfile } from "@/hooks/use-auth";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function CreateLaporan() {
   const navigate = useNavigate();
@@ -88,6 +95,7 @@ export default function CreateLaporan() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [successFileUrl, setSuccessFileUrl] = useState("");
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   const {
     categoryId,
@@ -118,6 +126,8 @@ export default function CreateLaporan() {
   const { mutate: uploadImages, isPending: isUploadingImages } =
     useUploadReportImages();
 
+  const { data: userProfile, isLoading: isLoadingProfile } = useUserProfile();
+
   const districts = districtsData?.data || [];
   const categories = categoriesData?.data || [];
 
@@ -126,16 +136,26 @@ export default function CreateLaporan() {
   );
   const villagesInSelectedDistrict = selectedDistrict?.villages || [];
 
+  useEffect(() => {
+    if (
+      !isLoadingProfile &&
+      userProfile &&
+      (!userProfile.nik || !userProfile.phone_number || !userProfile.address)
+    ) {
+      setProfileDialogOpen(true);
+    } else {
+      setProfileDialogOpen(false);
+    }
+  }, [userProfile, isLoadingProfile]);
+
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
       const remainingSlots = 2 - images.length;
-
       if (remainingSlots <= 0) {
         toast.warning("Maksimal 2 foto yang dapat diunggah");
         return;
       }
-
       const filesToAdd = files.slice(0, remainingSlots);
       const newImagesArray = [
         ...images,
@@ -144,7 +164,6 @@ export default function CreateLaporan() {
           preview: URL.createObjectURL(file),
         })),
       ];
-
       dispatch(setImages(newImagesArray));
     }
   };
@@ -301,15 +320,12 @@ export default function CreateLaporan() {
     const files = Array.from(e.dataTransfer.files).filter((file) =>
       file.type.startsWith("image/")
     );
-
     if (files.length > 0) {
       const remainingSlots = 2 - images.length;
-
       if (remainingSlots <= 0) {
         toast.warning("Maksimal 2 foto yang dapat diunggah");
         return;
       }
-
       const filesToAdd = files.slice(0, remainingSlots);
       const newImagesArray = [
         ...images,
@@ -318,7 +334,6 @@ export default function CreateLaporan() {
           preview: URL.createObjectURL(file),
         })),
       ];
-
       dispatch(setImages(newImagesArray));
     }
   };
@@ -388,186 +403,149 @@ export default function CreateLaporan() {
     isSubmitting ||
     isGeneratingDescription ||
     isSubmittingReport ||
-    isUploadingImages;
+    isUploadingImages ||
+    isLoadingProfile;
 
   const canAddMorePhotos = images.length < 2;
 
+  const isProfileIncomplete =
+    !userProfile ||
+    !userProfile.nik ||
+    !userProfile.phone_number ||
+    !userProfile.address;
+
+  const profileFields = [
+    { key: "nik", label: "NIK" },
+    { key: "phone_number", label: "Nomor Telepon" },
+    { key: "address", label: "Alamat" },
+  ];
+
+  const incompleteFields =
+    userProfile &&
+    profileFields.filter((f) => !userProfile[f.key]).map((f) => f.label);
+
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto px-2 sm:px-4">
-        <div ref={pageRef} className="w-full max-w-3xl mx-auto">
-          <div className="text-center mb-8 sm:mb-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#e6f4ea] shadow-sm mb-4">
-              <FileCheck2 className="h-5 w-5 text-[#4E9F60]" />
-              <span className="text-[#4E9F60] font-semibold text-sm tracking-wide">
-                Formulir Laporan Warga
-              </span>
+    <TooltipProvider>
+      <div className="min-h-screen py-8">
+        <div className="container mx-auto px-2 sm:px-4">
+          <div ref={pageRef} className="w-full max-w-3xl mx-auto">
+            <div className="text-center mb-8 sm:mb-10">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#e6f4ea] shadow-sm mb-4">
+                <FileCheck2 className="h-5 w-5 text-[#4E9F60]" />
+                <span className="text-[#4E9F60] font-semibold text-sm tracking-wide">
+                  Formulir Laporan Warga
+                </span>
+              </div>
+              <h1
+                ref={titleRef}
+                className="text-2xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-[#4E9F60] to-[#9DB17C] drop-shadow-sm"
+              >
+                Buat Laporan Baru
+              </h1>
+              <p className="text-gray-600 mt-2 sm:mt-3 text-base sm:text-lg">
+                Sampaikan masalah di lingkungan sekitar Anda dengan mudah dan
+                cepat
+              </p>
             </div>
-            <h1
-              ref={titleRef}
-              className="text-2xl sm:text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-[#4E9F60] to-[#9DB17C] drop-shadow-sm"
-            >
-              Buat Laporan Baru
-            </h1>
-            <p className="text-gray-600 mt-2 sm:mt-3 text-base sm:text-lg">
-              Sampaikan masalah di lingkungan sekitar Anda dengan mudah dan
-              cepat
-            </p>
-          </div>
-
-          <div className="mb-8 sm:mb-10">
-            <Progress
-              value={progress}
-              className="bg-[#9CDE9F] h-2 rounded-full"
-            />
-            <div className="flex items-center justify-between mt-4 sm:mt-6 gap-2">
-              {[1, 2, 3].map((s) => (
-                <div key={s} className="flex flex-col items-center flex-1">
-                  <div
-                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow transition-all duration-300 ${
-                      s === step
-                        ? "bg-[#4E9F60] text-white ring-4 ring-[#9DB17C]/30 scale-110"
-                        : s < step
-                        ? "bg-[#9DB17C] text-white"
-                        : "bg-white border-2 border-gray-200 text-gray-400"
-                    }`}
-                  >
-                    {s < step ? (
-                      <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6" />
-                    ) : s === 1 ? (
-                      <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
-                    ) : s === 2 ? (
-                      <ImagePlus className="h-5 w-5 sm:h-6 sm:w-6" />
-                    ) : (
-                      <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6" />
-                    )}
+            <div className="mb-8 sm:mb-10">
+              <Progress
+                value={progress}
+                className="bg-[#9CDE9F] h-2 rounded-full"
+              />
+              <div className="flex items-center justify-between mt-4 sm:mt-6 gap-2">
+                {[1, 2, 3].map((s) => (
+                  <div key={s} className="flex flex-col items-center flex-1">
+                    <div
+                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow transition-all duration-300 ${
+                        s === step
+                          ? "bg-[#4E9F60] text-white ring-4 ring-[#9DB17C]/30 scale-110"
+                          : s < step
+                          ? "bg-[#9DB17C] text-white"
+                          : "bg-white border-2 border-gray-200 text-gray-400"
+                      }`}
+                    >
+                      {s < step ? (
+                        <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6" />
+                      ) : s === 1 ? (
+                        <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
+                      ) : s === 2 ? (
+                        <ImagePlus className="h-5 w-5 sm:h-6 sm:w-6" />
+                      ) : (
+                        <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6" />
+                      )}
+                    </div>
+                    <span
+                      className={`text-xs sm:text-base mt-2 sm:mt-3 font-semibold ${
+                        s === step ? "text-[#4E9F60]" : "text-gray-500"
+                      }`}
+                    >
+                      {s === 1
+                        ? "Detail Laporan"
+                        : s === 2
+                        ? "Tambah Media"
+                        : "Konfirmasi"}
+                    </span>
                   </div>
-                  <span
-                    className={`text-xs sm:text-base mt-2 sm:mt-3 font-semibold ${
-                      s === step ? "text-[#4E9F60]" : "text-gray-500"
-                    }`}
-                  >
-                    {s === 1
-                      ? "Detail Laporan"
-                      : s === 2
-                      ? "Tambah Media"
-                      : "Konfirmasi"}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-
-          <div>
-            <Card className="shadow-2xl border-0 overflow-hidden bg-white/90 backdrop-blur-md">
-              <form ref={formRef} onSubmit={handleSubmit} className="space-y-1">
-                {step === 1 && (
-                  <>
-                    <CardHeader className="border-b border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#4E9F60]/10 rounded-full">
-                          <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg sm:text-2xl text-[#2D3748] font-bold">
-                            Detail Laporan
-                          </CardTitle>
-                          <CardDescription className="text-gray-600">
-                            Masukkan informasi detail laporan Anda
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-6 sm:pt-8 pb-2 sm:pb-4 px-3 sm:px-8">
-                      <div className="space-y-6 sm:space-y-7">
-                        <div className="space-y-2">
-                          <Label
-                            htmlFor="category"
-                            className="text-[#4A5568] font-semibold"
-                          >
-                            Kategori Laporan
-                          </Label>
-                          <Select
-                            value={categoryId}
-                            onValueChange={handleSelectCategory}
-                            required
-                            disabled={isLoadingCategories}
-                          >
-                            <SelectTrigger className="w-full border-gray-200 focus-visible:ring-[#9DB17C] h-11 sm:h-12 rounded-lg text-base">
-                              <SelectValue placeholder="Pilih kategori laporan" />
-                            </SelectTrigger>
-                            <SelectContent className="shadow-lg">
-                              {categories.map((category) => (
-                                <SelectItem
-                                  key={category.id}
-                                  value={category.id}
-                                  className="cursor-pointer"
-                                >
-                                  {category.name
-                                    .split(" ")
-                                    .map(
-                                      (word) =>
-                                        word.charAt(0).toUpperCase() +
-                                        word.slice(1)
-                                    )
-                                    .join(" ")}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label
-                            htmlFor="description"
-                            className="text-[#4A5568] font-semibold"
-                          >
-                            Deskripsi Laporan
-                          </Label>
-                          <Textarea
-                            id="description"
-                            placeholder="Deskripsikan masalah secara detail. Contoh: Jalan berlubang dengan diameter sekitar 1 meter dan kedalaman 30 cm yang sangat membahayakan pengendara."
-                            value={description}
-                            onChange={(e) =>
-                              dispatch(setDescription(e.target.value))
-                            }
-                            className="min-h-[120px] sm:min-h-[150px] border-gray-200 focus-visible:ring-[#9DB17C] rounded-lg text-base"
-                            rows={5}
-                            required
-                            maxLength={200}
-                          />
-                          <div className="flex flex-col sm:flex-row justify-between text-xs text-gray-500 mt-1 gap-1">
-                            <p>
-                              Semakin detail informasi yang Anda berikan,
-                              semakin mudah pihak berwenang menindaklanjuti
-                            </p>
-                            <p>{description.length}/200</p>
+            <div>
+              <Card className="shadow-2xl border-0 overflow-hidden bg-white/90 backdrop-blur-md">
+                <form
+                  ref={formRef}
+                  onSubmit={handleSubmit}
+                  className="space-y-1"
+                >
+                  {step === 1 && (
+                    <>
+                      <CardHeader className="border-b border-gray-100">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-[#4E9F60]/10 rounded-full">
+                            <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg sm:text-2xl text-[#2D3748] font-bold">
+                              Detail Laporan
+                            </CardTitle>
+                            <CardDescription className="text-gray-600">
+                              Masukkan informasi detail laporan Anda
+                            </CardDescription>
                           </div>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                      </CardHeader>
+                      <CardContent className="pt-6 sm:pt-8 pb-2 sm:pb-4 px-3 sm:px-8">
+                        <div className="space-y-6 sm:space-y-7">
                           <div className="space-y-2">
                             <Label
-                              htmlFor="district"
+                              htmlFor="category"
                               className="text-[#4A5568] font-semibold"
                             >
-                              Kecamatan
+                              Kategori Laporan
                             </Label>
                             <Select
-                              value={districtId}
-                              onValueChange={handleDistrictChange}
+                              value={categoryId}
+                              onValueChange={handleSelectCategory}
                               required
-                              disabled={isLoadingDistricts}
+                              disabled={isLoadingCategories}
                             >
                               <SelectTrigger className="w-full border-gray-200 focus-visible:ring-[#9DB17C] h-11 sm:h-12 rounded-lg text-base">
-                                <SelectValue placeholder="Pilih kecamatan" />
+                                <SelectValue placeholder="Pilih kategori laporan" />
                               </SelectTrigger>
                               <SelectContent className="shadow-lg">
-                                {districts.map((district) => (
+                                {categories.map((category) => (
                                   <SelectItem
-                                    key={district.id}
-                                    value={district.id}
+                                    key={category.id}
+                                    value={category.id}
                                     className="cursor-pointer"
                                   >
-                                    {district.name}
+                                    {category.name
+                                      .split(" ")
+                                      .map(
+                                        (word) =>
+                                          word.charAt(0).toUpperCase() +
+                                          word.slice(1)
+                                      )
+                                      .join(" ")}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -575,474 +553,574 @@ export default function CreateLaporan() {
                           </div>
                           <div className="space-y-2">
                             <Label
-                              htmlFor="village"
+                              htmlFor="description"
                               className="text-[#4A5568] font-semibold"
                             >
-                              Kelurahan
+                              Deskripsi Laporan
                             </Label>
-                            <Select
-                              value={villageId}
-                              onValueChange={(value) =>
-                                dispatch(setVillageId(value))
-                              }
-                              required
-                              disabled={
-                                !districtId ||
-                                villagesInSelectedDistrict.length === 0
-                              }
-                            >
-                              <SelectTrigger className="w-full border-gray-200 focus-visible:ring-[#9DB17C] h-11 sm:h-12 rounded-lg text-base">
-                                <SelectValue placeholder="Pilih kelurahan" />
-                              </SelectTrigger>
-                              <SelectContent className="shadow-lg">
-                                {villagesInSelectedDistrict.map((village) => (
-                                  <SelectItem
-                                    key={village.id}
-                                    value={village.id}
-                                    className="cursor-pointer"
-                                  >
-                                    {village.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label
-                            htmlFor="location"
-                            className="text-[#4A5568] font-semibold"
-                          >
-                            Detail Lokasi Kejadian
-                          </Label>
-                          <div className="relative">
-                            <Input
-                              id="location"
-                              placeholder="Contoh: Jl. Pahlawan No. 123, RT 02/RW 03, dekat Toko Maju Jaya"
-                              value={location}
+                            <Textarea
+                              id="description"
+                              placeholder="Deskripsikan masalah secara detail. Contoh: Jalan berlubang dengan diameter sekitar 1 meter dan kedalaman 30 cm yang sangat membahayakan pengendara."
+                              value={description}
                               onChange={(e) =>
-                                dispatch(setLocation(e.target.value))
+                                dispatch(setDescription(e.target.value))
                               }
-                              className="pr-10 border-gray-200 focus-visible:ring-[#9DB17C] h-11 sm:h-12 rounded-lg text-base"
+                              className="min-h-[120px] sm:min-h-[150px] border-gray-200 focus-visible:ring-[#9DB17C] rounded-lg text-base"
+                              rows={5}
                               required
+                              maxLength={200}
                             />
-                            <MapPin className="h-5 w-5 absolute right-3 top-3 text-gray-400" />
-                          </div>
-                          <p className="text-xs text-gray-500 flex items-center mt-1 gap-1">
-                            <Info className="h-3 w-3" />
-                            Sertakan nama jalan, RT/RW, dan titik acuan terdekat
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </>
-                )}
-
-                {step === 2 && (
-                  <>
-                    <CardHeader className="border-b border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#4E9F60]/10 rounded-full">
-                          <Camera className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg sm:text-2xl text-[#2D3748] font-bold">
-                            Tambah Dokumentasi
-                          </CardTitle>
-                          <CardDescription className="text-gray-600">
-                            Foto akan membantu petugas menilai tingkat keparahan
-                            masalah (maksimal 2 foto)
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-6 sm:pt-8 pb-2 sm:pb-4 px-3 sm:px-8">
-                      <div className="space-y-6 sm:space-y-7">
-                        {canAddMorePhotos && (
-                          <div
-                            className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-10 bg-gray-50 hover:bg-gray-50/80 transition-all duration-300 cursor-pointer group"
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            onDrop={handleDrop}
-                            onClick={triggerFileInput}
-                          >
-                            <div className="w-14 h-14 sm:w-20 sm:h-20 mb-4 rounded-full bg-[#4E9F60]/10 flex items-center justify-center">
-                              <UploadCloud className="h-8 w-8 sm:h-10 sm:w-10 text-[#4E9F60]" />
+                            <div className="flex flex-col sm:flex-row justify-between text-xs text-gray-500 mt-1 gap-1">
+                              <p>
+                                Semakin detail informasi yang Anda berikan,
+                                semakin mudah pihak berwenang menindaklanjuti
+                              </p>
+                              <p>{description.length}/200</p>
                             </div>
-                            <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-1">
-                              Unggah Foto
-                            </h3>
-                            <p className="text-sm sm:text-base text-gray-500 mb-4 text-center max-w-xs">
-                              Seret & lepas gambar di sini, atau klik untuk
-                              memilih file ({images.length}/2 foto)
-                            </p>
-                            <Button
-                              type="button"
-                              className="bg-[#4E9F60] hover:bg-[#3d7d4c] transition-colors"
-                            >
-                              <Camera className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                              Pilih Foto
-                            </Button>
-                            <p className="text-xs text-gray-500 mt-4">
-                              Format: JPG, PNG, HEIC (maks. 5MB per foto)
-                            </p>
-                            <Input
-                              ref={fileInputRef}
-                              id="image-upload"
-                              type="file"
-                              accept="image/*"
-                              multiple
-                              className="hidden"
-                              onChange={handleImageUpload}
-                            />
                           </div>
-                        )}
-                        {images.length > 0 && (
-                          <div>
-                            <div className="border-t border-gray-100 pt-5">
-                              <div className="flex items-center justify-between mb-3">
-                                <Label className="font-semibold text-[#4A5568]">
-                                  Foto terlampir ({images.length}/2)
-                                </Label>
-                                {images.length > 0 && (
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-red-500 hover:text-red-600 hover:bg-red-50 h-8 px-2"
-                                    onClick={() => dispatch(setImages([]))}
-                                  >
-                                    <Trash2 className="h-4 w-4 mr-1" />
-                                    Hapus semua
-                                  </Button>
-                                )}
-                              </div>
-                              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                                {images.map((img, index) => (
-                                  <div
-                                    key={index}
-                                    className="relative group rounded-lg overflow-hidden border border-gray-200 aspect-square bg-gray-100"
-                                  >
-                                    <img
-                                      src={img.preview}
-                                      alt={`Preview ${index + 1}`}
-                                      className="w-full h-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300"></div>
-                                    <Button
-                                      type="button"
-                                      size="icon"
-                                      className="absolute top-2 right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full opacity-0 group-hover:opacity-100 bg-white text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 shadow-sm"
-                                      onClick={() => removeImage(index)}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                            <div className="space-y-2">
+                              <Label
+                                htmlFor="district"
+                                className="text-[#4A5568] font-semibold"
+                              >
+                                Kecamatan
+                              </Label>
+                              <Select
+                                value={districtId}
+                                onValueChange={handleDistrictChange}
+                                required
+                                disabled={isLoadingDistricts}
+                              >
+                                <SelectTrigger className="w-full border-gray-200 focus-visible:ring-[#9DB17C] h-11 sm:h-12 rounded-lg text-base">
+                                  <SelectValue placeholder="Pilih kecamatan" />
+                                </SelectTrigger>
+                                <SelectContent className="shadow-lg">
+                                  {districts.map((district) => (
+                                    <SelectItem
+                                      key={district.id}
+                                      value={district.id}
+                                      className="cursor-pointer"
                                     >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                    <Badge className="absolute bottom-2 left-2 bg-black/60 text-white text-xs hover:bg-black/60">
-                                      Foto {index + 1}
-                                    </Badge>
-                                  </div>
-                                ))}
-                              </div>
+                                      {district.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label
+                                htmlFor="village"
+                                className="text-[#4A5568] font-semibold"
+                              >
+                                Kelurahan
+                              </Label>
+                              <Select
+                                value={villageId}
+                                onValueChange={(value) =>
+                                  dispatch(setVillageId(value))
+                                }
+                                required
+                                disabled={
+                                  !districtId ||
+                                  villagesInSelectedDistrict.length === 0
+                                }
+                              >
+                                <SelectTrigger className="w-full border-gray-200 focus-visible:ring-[#9DB17C] h-11 sm:h-12 rounded-lg text-base">
+                                  <SelectValue placeholder="Pilih kelurahan" />
+                                </SelectTrigger>
+                                <SelectContent className="shadow-lg">
+                                  {villagesInSelectedDistrict.map((village) => (
+                                    <SelectItem
+                                      key={village.id}
+                                      value={village.id}
+                                      className="cursor-pointer"
+                                    >
+                                      {village.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </div>
                           </div>
-                        )}
-                        <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 sm:p-5">
-                          <div className="flex gap-3">
-                            <Info className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 flex-shrink-0" />
-                            <div className="text-sm sm:text-base text-blue-700">
-                              <p className="font-semibold">Tips</p>
-                              <p className="mt-1">
-                                Foto yang jelas dan dari berbagai sudut akan
-                                membantu petugas menilai situasi dengan lebih
-                                baik. Maksimal 2 foto yang dapat diunggah.
-                              </p>
+                          <div className="space-y-2">
+                            <Label
+                              htmlFor="location"
+                              className="text-[#4A5568] font-semibold"
+                            >
+                              Detail Lokasi Kejadian
+                            </Label>
+                            <div className="relative">
+                              <Input
+                                id="location"
+                                placeholder="Contoh: Jl. Pahlawan No. 123, RT 02/RW 03, dekat Toko Maju Jaya"
+                                value={location}
+                                onChange={(e) =>
+                                  dispatch(setLocation(e.target.value))
+                                }
+                                className="pr-10 border-gray-200 focus-visible:ring-[#9DB17C] h-11 sm:h-12 rounded-lg text-base"
+                                required
+                              />
+                              <MapPin className="h-5 w-5 absolute right-3 top-3 text-gray-400" />
                             </div>
+                            <p className="text-xs text-gray-500 flex items-center mt-1 gap-1">
+                              <Info className="h-3 w-3" />
+                              Sertakan nama jalan, RT/RW, dan titik acuan
+                              terdekat
+                            </p>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </>
-                )}
-
-                {step === 3 && (
-                  <>
-                    <CardHeader className="border-b border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#4E9F60]/10 rounded-full">
-                          <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg sm:text-2xl text-[#2D3748] font-bold">
-                            Konfirmasi Laporan
-                          </CardTitle>
-                          <CardDescription className="text-gray-600">
-                            Periksa kembali detail laporan Anda sebelum mengirim
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-6 sm:pt-8 pb-2 sm:pb-4 px-3 sm:px-8">
-                      <div className="space-y-6 sm:space-y-7">
-                        <div className="bg-gray-50 rounded-xl p-4 sm:p-6 space-y-5 sm:space-y-6 border border-gray-100">
-                          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-                            <Badge
-                              variant="outline"
-                              className="bg-[#4E9F60]/10 text-[#4E9F60] font-semibold py-1.5 px-3 rounded-lg"
-                            >
-                              {getSelectedCategoryName()}
-                            </Badge>
-                            <Badge
-                              variant="outline"
-                              className="bg-gray-100/80 text-gray-700 font-semibold py-1.5 px-3 rounded-lg flex items-center gap-1.5"
-                            >
-                              <Calendar className="h-4 w-4" />
-                              {new Date().toLocaleDateString("id-ID", {
-                                day: "numeric",
-                                month: "long",
-                                year: "numeric",
-                              })}
-                            </Badge>
+                      </CardContent>
+                    </>
+                  )}
+                  {step === 2 && (
+                    <>
+                      <CardHeader className="border-b border-gray-100">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-[#4E9F60]/10 rounded-full">
+                            <Camera className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
                           </div>
                           <div>
-                            <p className="text-sm text-gray-500 mb-1">
-                              Deskripsi
-                            </p>
-                            <p className="text-gray-700 text-base whitespace-pre-line">
-                              {description || "Tidak ada deskripsi"}
-                            </p>
+                            <CardTitle className="text-lg sm:text-2xl text-[#2D3748] font-bold">
+                              Tambah Dokumentasi
+                            </CardTitle>
+                            <CardDescription className="text-gray-600">
+                              Foto akan membantu petugas menilai tingkat
+                              keparahan masalah (maksimal 2 foto)
+                            </CardDescription>
                           </div>
-                          <div className="border-t border-gray-200 pt-4">
-                            <p className="text-sm text-gray-500 mb-1">Lokasi</p>
-                            <div className="flex items-center gap-2 p-3 rounded-lg bg-gray-100/50">
-                              <MapPin className="h-5 w-5 text-[#4E9F60]" />
-                              <p className="text-gray-700">
-                                {getFullLocation()}
-                              </p>
-                            </div>
-                          </div>
-                          {images.length > 0 && (
-                            <div className="border-t border-gray-200 pt-4">
-                              <p className="text-sm text-gray-500 mb-2">
-                                Media ({images.length} foto)
-                              </p>
-                              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                                {images.map((img, index) => (
-                                  <div
-                                    key={index}
-                                    className="relative aspect-square"
-                                  >
-                                    <img
-                                      src={img.preview}
-                                      alt={`Preview ${index + 1}`}
-                                      className="w-full h-full object-cover rounded-lg border border-gray-200"
-                                    />
-                                    <div className="absolute bottom-0 right-0 bg-black bg-opacity-60 text-white text-xs py-0.5 px-2 rounded-tl-md rounded-br-md">
-                                      {index + 1}
-                                    </div>
-                                  </div>
-                                ))}
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-6 sm:pt-8 pb-2 sm:pb-4 px-3 sm:px-8">
+                        <div className="space-y-6 sm:space-y-7">
+                          {canAddMorePhotos && (
+                            <div
+                              className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-10 bg-gray-50 hover:bg-gray-50/80 transition-all duration-300 cursor-pointer group"
+                              onDragOver={handleDragOver}
+                              onDragLeave={handleDragLeave}
+                              onDrop={handleDrop}
+                              onClick={triggerFileInput}
+                            >
+                              <div className="w-14 h-14 sm:w-20 sm:h-20 mb-4 rounded-full bg-[#4E9F60]/10 flex items-center justify-center">
+                                <UploadCloud className="h-8 w-8 sm:h-10 sm:w-10 text-[#4E9F60]" />
                               </div>
+                              <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-1">
+                                Unggah Foto
+                              </h3>
+                              <p className="text-sm sm:text-base text-gray-500 mb-4 text-center max-w-xs">
+                                Seret & lepas gambar di sini, atau klik untuk
+                                memilih file ({images.length}/2 foto)
+                              </p>
+                              <Button
+                                type="button"
+                                className="bg-[#4E9F60] hover:bg-[#3d7d4c] transition-colors"
+                              >
+                                <Camera className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                                Pilih Foto
+                              </Button>
+                              <p className="text-xs text-gray-500 mt-4">
+                                Format: JPG, PNG, HEIC (maks. 5MB per foto)
+                              </p>
+                              <Input
+                                ref={fileInputRef}
+                                id="image-upload"
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                className="hidden"
+                                onChange={handleImageUpload}
+                              />
                             </div>
                           )}
-                          {isGeneratingDescription && !reportId && (
-                            <div className="border-t border-gray-200 pt-4">
-                              <p className="text-sm text-gray-500 mb-2">
-                                Menyiapkan Format Resmi Laporan...
-                              </p>
-                              <div className="p-4 rounded-lg bg-white border border-gray-200">
-                                <div className="space-y-4">
-                                  <div className="flex space-x-3 items-center">
-                                    <Skeleton className="h-5 w-5 rounded-full" />
-                                    <Skeleton className="h-5 w-48" />
-                                  </div>
-                                  <Skeleton className="h-4 w-full" />
-                                  <Skeleton className="h-4 w-full" />
-                                  <Skeleton className="h-4 w-[90%]" />
-                                  <Skeleton className="h-4 w-[85%]" />
-                                  <div className="pt-2">
-                                    <Skeleton className="h-4 w-[70%]" />
-                                    <Skeleton className="h-4 w-[80%] mt-2" />
-                                    <Skeleton className="h-4 w-[75%] mt-2" />
-                                  </div>
-                                  <div className="pt-2">
-                                    <Skeleton className="h-4 w-full" />
-                                    <Skeleton className="h-4 w-[60%] mt-2" />
-                                  </div>
+                          {images.length > 0 && (
+                            <div>
+                              <div className="border-t border-gray-100 pt-5">
+                                <div className="flex items-center justify-between mb-3">
+                                  <Label className="font-semibold text-[#4A5568]">
+                                    Foto terlampir ({images.length}/2)
+                                  </Label>
+                                  {images.length > 0 && (
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      className="text-red-500 hover:text-red-600 hover:bg-red-50 h-8 px-2"
+                                      onClick={() => dispatch(setImages([]))}
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-1" />
+                                      Hapus semua
+                                    </Button>
+                                  )}
+                                </div>
+                                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                  {images.map((img, index) => (
+                                    <div
+                                      key={index}
+                                      className="relative group rounded-lg overflow-hidden border border-gray-200 aspect-square bg-gray-100"
+                                    >
+                                      <img
+                                        src={img.preview}
+                                        alt={`Preview ${index + 1}`}
+                                        className="w-full h-full object-cover"
+                                      />
+                                      <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300"></div>
+                                      <Button
+                                        type="button"
+                                        size="icon"
+                                        className="absolute top-2 right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full opacity-0 group-hover:opacity-100 bg-white text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 shadow-sm"
+                                        onClick={() => removeImage(index)}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                      <Badge className="absolute bottom-2 left-2 bg-black/60 text-white text-xs hover:bg-black/60">
+                                        Foto {index + 1}
+                                      </Badge>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
                             </div>
                           )}
-                          {reportId && formalDescription && (
-                            <div
-                              ref={previewRef}
-                              className="border-t border-gray-200 pt-4"
-                            >
-                              <p className="text-sm text-gray-500 mb-2">
-                                Format Resmi Laporan
-                              </p>
-                              <div className="p-4 rounded-lg bg-white border border-gray-200 prose prose-sm max-w-none">
-                                <ReactMarkdown>
-                                  {formalDescription}
-                                </ReactMarkdown>
+                          <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 sm:p-5">
+                            <div className="flex gap-3">
+                              <Info className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 flex-shrink-0" />
+                              <div className="text-sm sm:text-base text-blue-700">
+                                <p className="font-semibold">Tips</p>
+                                <p className="mt-1">
+                                  Foto yang jelas dan dari berbagai sudut akan
+                                  membantu petugas menilai situasi dengan lebih
+                                  baik. Maksimal 2 foto yang dapat diunggah.
+                                </p>
                               </div>
-                            </div>
-                          )}
-                        </div>
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 sm:p-5">
-                          <div className="flex gap-3">
-                            <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600 flex-shrink-0" />
-                            <div className="text-sm sm:text-base text-amber-700">
-                              <p className="font-semibold">Perhatian</p>
-                              <p className="mt-1">
-                                Dengan mengirimkan laporan ini, Anda menyatakan
-                                bahwa informasi yang diberikan adalah benar.
-                                Laporan yang sudah dikirim tidak dapat diubah.
-                              </p>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </>
-                )}
-
-                <CardFooter className="border-t border-gray-100 flex flex-col sm:flex-row justify-between py-5 sm:py-7 px-3 sm:px-8 gap-3 sm:gap-4">
-                  {step > 1 ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={goToPreviousStep}
-                      className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
-                      disabled={isLoading}
-                    >
-                      <ArrowLeft className="mr-2 h-5 w-5" />
-                      Kembali
-                    </Button>
-                  ) : (
-                    <div></div>
+                      </CardContent>
+                    </>
                   )}
-                  <Button
-                    type="submit"
-                    className={`${
-                      step === 3
-                        ? "bg-[#4E9F60] hover:bg-[#3d7d4c]"
-                        : "bg-[#9DB17C] hover:bg-[#8CA06B]"
-                    } transition-colors min-w-[140px] sm:min-w-[180px] font-semibold px-6 py-3 rounded-lg text-base sm:text-lg w-full sm:w-auto`}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Memproses...
-                      </>
-                    ) : step < 3 ? (
-                      <>
-                        Lanjutkan
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </>
-                    ) : reportId ? (
-                      "Kirim Laporan"
+                  {step === 3 && (
+                    <>
+                      <CardHeader className="border-b border-gray-100">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-[#4E9F60]/10 rounded-full">
+                            <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-[#4E9F60]" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg sm:text-2xl text-[#2D3748] font-bold">
+                              Konfirmasi Laporan
+                            </CardTitle>
+                            <CardDescription className="text-gray-600">
+                              Periksa kembali detail laporan Anda sebelum
+                              mengirim
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-6 sm:pt-8 pb-2 sm:pb-4 px-3 sm:px-8">
+                        <div className="space-y-6 sm:space-y-7">
+                          <div className="bg-gray-50 rounded-xl p-4 sm:p-6 space-y-5 sm:space-y-6 border border-gray-100">
+                            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                              <Badge
+                                variant="outline"
+                                className="bg-[#4E9F60]/10 text-[#4E9F60] font-semibold py-1.5 px-3 rounded-lg"
+                              >
+                                {getSelectedCategoryName()}
+                              </Badge>
+                              <Badge
+                                variant="outline"
+                                className="bg-gray-100/80 text-gray-700 font-semibold py-1.5 px-3 rounded-lg flex items-center gap-1.5"
+                              >
+                                <Calendar className="h-4 w-4" />
+                                {new Date().toLocaleDateString("id-ID", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })}
+                              </Badge>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500 mb-1">
+                                Deskripsi
+                              </p>
+                              <p className="text-gray-700 text-base whitespace-pre-line">
+                                {description || "Tidak ada deskripsi"}
+                              </p>
+                            </div>
+                            <div className="border-t border-gray-200 pt-4">
+                              <p className="text-sm text-gray-500 mb-1">
+                                Lokasi
+                              </p>
+                              <div className="flex items-center gap-2 p-3 rounded-lg bg-gray-100/50">
+                                <MapPin className="h-5 w-5 text-[#4E9F60]" />
+                                <p className="text-gray-700">
+                                  {getFullLocation()}
+                                </p>
+                              </div>
+                            </div>
+                            {images.length > 0 && (
+                              <div className="border-t border-gray-200 pt-4">
+                                <p className="text-sm text-gray-500 mb-2">
+                                  Media ({images.length} foto)
+                                </p>
+                                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                  {images.map((img, index) => (
+                                    <div
+                                      key={index}
+                                      className="relative aspect-square"
+                                    >
+                                      <img
+                                        src={img.preview}
+                                        alt={`Preview ${index + 1}`}
+                                        className="w-full h-full object-cover rounded-lg border border-gray-200"
+                                      />
+                                      <div className="absolute bottom-0 right-0 bg-black bg-opacity-60 text-white text-xs py-0.5 px-2 rounded-tl-md rounded-br-md">
+                                        {index + 1}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {isGeneratingDescription && !reportId && (
+                              <div className="border-t border-gray-200 pt-4">
+                                <p className="text-sm text-gray-500 mb-2">
+                                  Menyiapkan Format Resmi Laporan...
+                                </p>
+                                <div className="p-4 rounded-lg bg-white border border-gray-200">
+                                  <div className="space-y-4">
+                                    <div className="flex space-x-3 items-center">
+                                      <Skeleton className="h-5 w-5 rounded-full" />
+                                      <Skeleton className="h-5 w-48" />
+                                    </div>
+                                    <Skeleton className="h-4 w-full" />
+                                    <Skeleton className="h-4 w-full" />
+                                    <Skeleton className="h-4 w-[90%]" />
+                                    <Skeleton className="h-4 w-[85%]" />
+                                    <div className="pt-2">
+                                      <Skeleton className="h-4 w-[70%]" />
+                                      <Skeleton className="h-4 w-[80%] mt-2" />
+                                      <Skeleton className="h-4 w-[75%] mt-2" />
+                                    </div>
+                                    <div className="pt-2">
+                                      <Skeleton className="h-4 w-full" />
+                                      <Skeleton className="h-4 w-[60%] mt-2" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {reportId && formalDescription && (
+                              <div
+                                ref={previewRef}
+                                className="border-t border-gray-200 pt-4"
+                              >
+                                <p className="text-sm text-gray-500 mb-2">
+                                  Format Resmi Laporan
+                                </p>
+                                <div className="p-4 rounded-lg bg-white border border-gray-200 prose prose-sm max-w-none">
+                                  <ReactMarkdown>
+                                    {formalDescription}
+                                  </ReactMarkdown>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 sm:p-5">
+                            <div className="flex gap-3">
+                              <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600 flex-shrink-0" />
+                              <div className="text-sm sm:text-base text-amber-700">
+                                <p className="font-semibold">Perhatian</p>
+                                <p className="mt-1">
+                                  Dengan mengirimkan laporan ini, Anda
+                                  menyatakan bahwa informasi yang diberikan
+                                  adalah benar. Laporan yang sudah dikirim tidak
+                                  dapat diubah.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </>
+                  )}
+                  <CardFooter className="border-t border-gray-100 flex flex-col sm:flex-row justify-between py-5 sm:py-7 px-3 sm:px-8 gap-3 sm:gap-4">
+                    {step > 1 ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={goToPreviousStep}
+                        className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
+                        disabled={isLoading}
+                      >
+                        <ArrowLeft className="mr-2 h-5 w-5" />
+                        Kembali
+                      </Button>
                     ) : (
-                      "Pratinjau Laporan"
+                      <div></div>
                     )}
-                  </Button>
-                </CardFooter>
-              </form>
-            </Card>
-            <div className="mt-6 sm:mt-8 text-right">
-              <Button
-                variant="ghost"
-                className="text-white bg-red-500 hover:bg-red-600 transition-colors font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
-                onClick={() => {
-                  dispatch(clearReportForm());
-                }}
-                disabled={isLoading}
-              >
-                <Home className="mr-2 h-5 w-5" />
-                Reset Laporan
-              </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="w-full sm:w-auto">
+                          <Button
+                            type="submit"
+                            className={`${
+                              step === 3
+                                ? "bg-[#4E9F60] hover:bg-[#3d7d4c]"
+                                : "bg-[#9DB17C] hover:bg-[#8CA06B]"
+                            } transition-colors min-w-[140px] sm:min-w-[180px] font-semibold px-6 py-3 rounded-lg text-base sm:text-lg w-full sm:w-auto`}
+                            disabled={
+                              isLoading || (step === 1 && isProfileIncomplete)
+                            }
+                          >
+                            {isLoading ? (
+                              <>
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Memproses...
+                              </>
+                            ) : step < 3 ? (
+                              <>
+                                Lanjutkan
+                                <ArrowRight className="ml-2 h-5 w-5" />
+                              </>
+                            ) : reportId ? (
+                              "Kirim Laporan"
+                            ) : (
+                              "Pratinjau Laporan"
+                            )}
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      {step === 1 && isProfileIncomplete && (
+                        <TooltipContent side="top" align="center">
+                          Lengkapi data diri Anda sebelum melanjutkan
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </CardFooter>
+                </form>
+              </Card>
+              <div className="mt-6 sm:mt-8 text-right">
+                <Button
+                  variant="ghost"
+                  className="text-white bg-red-500 hover:bg-red-600 transition-colors font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
+                  onClick={() => {
+                    dispatch(clearReportForm());
+                  }}
+                  disabled={isLoading}
+                >
+                  <Home className="mr-2 h-5 w-5" />
+                  Reset Laporan
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-        <DialogContent className="sm:max-w-md rounded-lg">
-          <DialogHeader>
-            <DialogTitle>Konfirmasi Pengiriman Laporan</DialogTitle>
-            <DialogDescription>
-              Laporan yang telah dikirim tidak dapat diubah atau dibatalkan.
-              Pastikan semua informasi yang Anda berikan sudah benar.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="p-4 bg-amber-50 rounded-md border border-amber-200 text-amber-700 text-base">
-            <p className="font-semibold">Perhatian:</p>
-            <p>Dengan mengklik "Kirim Laporan", Anda menyatakan bahwa:</p>
-            <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li>Semua informasi yang diberikan adalah benar</li>
-              <li>Anda bertanggung jawab atas laporan yang dikirimkan</li>
-              <li>Laporan ini dapat ditindaklanjuti oleh pihak berwenang</li>
-            </ul>
-          </div>
-          <DialogFooter className="sm:justify-between gap-3 sm:gap-4 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setConfirmDialogOpen(false)}
-              className="font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
-            >
-              Batalkan
-            </Button>
-            <Button
-              className="bg-[#4E9F60] hover:bg-[#3d7d4c] font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
-              onClick={finalizeReport}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Memproses...
-                </>
-              ) : (
-                "Kirim Laporan"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
-        <DialogContent className="sm:max-w-md rounded-lg">
-          <DialogHeader>
-            <DialogTitle className="text-[#4E9F60]">
-              Laporan Berhasil Dikirim
-            </DialogTitle>
-            <DialogDescription className="text-base sm:text-lg">
-              Laporan berhasil dikirim! Berkas laporan telah diunduh.{" "}
-              <a
-                href={successFileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#4E9F60] underline font-semibold inline-flex items-center"
+        <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+          <DialogContent className="sm:max-w-md rounded-lg">
+            <DialogHeader>
+              <DialogTitle>Konfirmasi Pengiriman Laporan</DialogTitle>
+              <DialogDescription>
+                Laporan yang telah dikirim tidak dapat diubah atau dibatalkan.
+                Pastikan semua informasi yang Anda berikan sudah benar.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="p-4 bg-amber-50 rounded-md border border-amber-200 text-amber-700 text-base">
+              <p className="font-semibold">Perhatian:</p>
+              <p>Dengan mengklik "Kirim Laporan", Anda menyatakan bahwa:</p>
+              <ul className="list-disc pl-5 mt-2 space-y-1">
+                <li>Semua informasi yang diberikan adalah benar</li>
+                <li>Anda bertanggung jawab atas laporan yang dikirimkan</li>
+                <li>Laporan ini dapat ditindaklanjuti oleh pihak berwenang</li>
+              </ul>
+            </div>
+            <DialogFooter className="sm:justify-between gap-3 sm:gap-4 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setConfirmDialogOpen(false)}
+                className="font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
               >
-                Lihat laporan kamu disini{" "}
-                <ExternalLink className="ml-1 h-4 w-4" />
-              </a>
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              className="bg-[#4E9F60] hover:bg-[#3d7d4c] font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
-              onClick={() => {
-                setSuccessDialogOpen(false);
-                dispatch(clearReportForm());
-                navigate("/user/check-status");
-              }}
-            >
-              Lihat Status Laporan
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+                Batalkan
+              </Button>
+              <Button
+                className="bg-[#4E9F60] hover:bg-[#3d7d4c] font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
+                onClick={finalizeReport}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Memproses...
+                  </>
+                ) : (
+                  "Kirim Laporan"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
+          <DialogContent className="sm:max-w-md rounded-lg">
+            <DialogHeader>
+              <DialogTitle className="text-[#4E9F60]">
+                Laporan Berhasil Dikirim
+              </DialogTitle>
+              <DialogDescription className="text-base sm:text-lg">
+                Laporan berhasil dikirim! Berkas laporan telah diunduh.{" "}
+                <a
+                  href={successFileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#4E9F60] underline font-semibold inline-flex items-center"
+                >
+                  Lihat laporan kamu disini{" "}
+                  <ExternalLink className="ml-1 h-4 w-4" />
+                </a>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                className="bg-[#4E9F60] hover:bg-[#3d7d4c] font-semibold px-6 py-3 rounded-lg w-full sm:w-auto"
+                onClick={() => {
+                  setSuccessDialogOpen(false);
+                  dispatch(clearReportForm());
+                  navigate("/user/check-status");
+                }}
+              >
+                Lihat Status Laporan
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+          <DialogContent className="sm:max-w-xs rounded-lg">
+            <DialogHeader>
+              <DialogTitle className="text-[#EAB308] flex items-center gap-2">
+                <AlertCircle className="h-5 w-5" /> Lengkapi Data Diri
+              </DialogTitle>
+              <DialogDescription>
+                Sebelum membuat laporan, lengkapi data berikut:
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-2">
+              <ul className="list-disc pl-5 space-y-1 text-base text-gray-700">
+                {incompleteFields &&
+                  incompleteFields.map((field) => <li key={field}>{field}</li>)}
+              </ul>
+            </div>
+            <DialogFooter>
+              <Button
+                className="bg-[#4E9F60] hover:bg-[#3d7d4c] font-semibold px-6 py-3 rounded-lg w-full"
+                onClick={() => {
+                  setProfileDialogOpen(false);
+                  navigate("/profile");
+                }}
+              >
+                Lengkapi Data Diri
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </TooltipProvider>
   );
 }
