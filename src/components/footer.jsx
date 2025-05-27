@@ -56,19 +56,19 @@ const Footer = () => {
             </h4>
             <div className="flex flex-col gap-1.5 sm:gap-2">
               <Link
-                to="/faq"
+                to="#"
                 className="text-xs sm:text-sm text-gray-700 hover:text-[#4E9F60] transition-colors"
               >
                 FAQ
               </Link>
               <Link
-                to="/panduan"
+                to="#"
                 className="text-xs sm:text-sm text-gray-700 hover:text-[#4E9F60] transition-colors"
               >
                 Panduan Penggunaan
               </Link>
               <Link
-                to="/kebijakan-privasi"
+                to="#"
                 className="text-xs sm:text-sm text-gray-700 hover:text-[#4E9F60] transition-colors"
               >
                 Kebijakan Privasi

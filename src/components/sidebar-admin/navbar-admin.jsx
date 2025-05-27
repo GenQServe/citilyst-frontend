@@ -156,7 +156,7 @@ const NavbarAdmin = ({ toggleSidebar, isMobileView, isTablet }) => {
               Apakah Anda yakin ingin keluar dari akun admin?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
             <AlertDialogCancel className="w-full sm:w-auto mt-2 sm:mt-0">
               Batal
             </AlertDialogCancel>

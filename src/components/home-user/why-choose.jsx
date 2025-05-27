@@ -13,9 +13,9 @@ const featureData = [
   },
   {
     icon: icons.circle,
-    title: "Judul Laporan Otomatis",
+    title: "Deskripsi Laporan Otomatis",
     description:
-      "Dengan teknologi AI, kami merangkum keluhan anda menjadi judul laporan yang jelas dan singkat",
+      "Dengan teknologi AI, kami merangkum keluhan anda menjadi deskripsi laporan yang jelas dan singkat",
   },
   {
     icon: icons.progress,

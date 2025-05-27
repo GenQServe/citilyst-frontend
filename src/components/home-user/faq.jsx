@@ -9,13 +9,13 @@ const faqItems = [
     id: "item-1",
     question: "Apa itu CityList?",
     answer:
-      "CityList adalah platform pelaporan warga yang menghubungkan masyarakat dengan pemerintah kota. Aplikasi ini memungkinkan pengguna melaporkan masalah di sekitar mereka seperti jalan rusak, sampah, atau masalah infrastruktur lainnya.",
+      "CityList adalah platform pelaporan warga yang menghubungkan masyarakat dengan pemerintah kota. Aplikasi ini memungkinkan pengguna melaporkan masalah di sekitar mereka seperti jalan rusak, sampah, atau masalah infrastruktur lainnya dengan bantuan AI untuk deskripsi otomatis.",
   },
   {
     id: "item-2",
     question: "Bagaimana cara membuat laporan?",
     answer:
-      "Untuk membuat laporan, login ke akun Anda, pilih menu 'Buat Laporan', lengkapi informasi yang diperlukan seperti kategori masalah, lokasi, deskripsi, dan tambahkan foto jika ada. Setelah selesai, klik 'Kirim' dan laporan Anda akan diproses.",
+      "Untuk membuat laporan, login ke akun Anda, pilih menu 'Buat Laporan', lengkapi informasi yang diperlukan seperti kategori masalah, lokasi, deskripsi, dan tambahkan foto jika ada. AI akan membantu memberikan deskripsi otomatis untuk mempermudah pelaporan. Setelah selesai, klik 'Kirim' dan laporan Anda akan diproses.",
   },
   {
     id: "item-3",
@@ -37,6 +37,12 @@ const faqItems = [
   },
   {
     id: "item-6",
+    question: "Bagaimana AI membantu dalam membuat laporan?",
+    answer:
+      "AI di CityList dapat memberikan deskripsi otomatis tentang masalah yang dilaporkan. Fitur ini membantu membuat laporan lebih akurat dan detail, serta menghemat waktu Anda dalam menjelaskan kondisi masalah yang terjadi.",
+  },
+  {
+    id: "item-7",
     question: "Apakah identitas saya akan dirahasiakan?",
     answer:
       "CityList menghormati privasi pengguna. Data pribadi Anda tidak akan dibagikan ke publik, tetapi mungkin diperlukan oleh pihak berwenang untuk menindaklanjuti laporan. Anda juga dapat memilih untuk melaporkan secara anonim pada kasus tertentu.",

@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getAllReports, updateReport, getReportDetail } from "@/services/use-manage";
+import {
+  getAllReports,
+  updateReport,
+  getReportDetail,
+} from "@/services/manage-service";
 
 export function useGetAllReports() {
   return useQuery({
@@ -31,7 +35,7 @@ export function useGetReportDetail(reportId) {
 
 export function useUpdateReport() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: updateReport,
     onSuccess: () => {
@@ -42,20 +46,20 @@ export function useUpdateReport() {
       // Improved error handling
       const errorDetails = error.response?.data?.detail;
       let errorMessage = "Gagal memperbarui status laporan";
-      
+
       if (Array.isArray(errorDetails) && errorDetails.length > 0) {
         // Display the first validation error from array
         const firstError = errorDetails[0];
-        if (typeof firstError === 'object' && firstError.msg) {
+        if (typeof firstError === "object" && firstError.msg) {
           errorMessage = firstError.msg;
-        } else if (typeof firstError === 'string') {
+        } else if (typeof firstError === "string") {
           errorMessage = firstError;
         }
         console.log("Validation errors:", errorDetails);
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       }
-      
+
       toast.error(errorMessage);
     },
   });

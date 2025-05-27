@@ -137,7 +137,10 @@ const ManageReports = () => {
         header: "Kategori",
         cell: ({ row }) => (
           <div className="max-w-[100px] xs:max-w-[120px] md:max-w-none truncate">
-            {row.original.category_name || "-"}
+            {row.original.category_name
+              ?.split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ") || "-"}
           </div>
         ),
       },
@@ -155,7 +158,10 @@ const ManageReports = () => {
         header: "Umpan Balik",
         cell: ({ row }) => (
           <div className="hidden md:block max-w-[150px] lg:max-w-[200px] truncate">
-            {row.original.feedback || "-"}
+            {row.original.feedback
+              ? row.original.feedback.charAt(0).toUpperCase() +
+                row.original.feedback.slice(1)
+              : "-"}
           </div>
         ),
       },
