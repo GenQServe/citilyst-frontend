@@ -466,7 +466,7 @@ const ManageReports = () => {
                       table.setPageSize(Number(value));
                     }}
                   >
-                    <SelectTrigger className="h-6 sm:h-8 w-12 sm:w-[70px] text-[10px] xs:text-xs sm:text-sm">
+                    <SelectTrigger className="h-6 sm:h-8 w-16 md:w-18 text-[10px] xs:text-xs sm:text-sm">
                       <SelectValue
                         placeholder={table.getState().pagination.pageSize}
                       />
