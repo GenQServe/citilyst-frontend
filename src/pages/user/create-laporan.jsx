@@ -129,21 +129,23 @@ export default function CreateLaporan() {
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
-      if (files.length > 2) {
+      const remainingSlots = 2 - images.length;
+
+      if (remainingSlots <= 0) {
         toast.warning("Maksimal 2 foto yang dapat diunggah");
-        const limitedFiles = files.slice(0, 2);
-        const newImages = limitedFiles.map((file) => ({
-          file,
-          preview: URL.createObjectURL(file),
-        }));
-        dispatch(setImages(newImages));
         return;
       }
-      const newImages = files.map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-      }));
-      dispatch(setImages(newImages));
+
+      const filesToAdd = files.slice(0, remainingSlots);
+      const newImagesArray = [
+        ...images,
+        ...filesToAdd.map((file) => ({
+          file,
+          preview: URL.createObjectURL(file),
+        })),
+      ];
+
+      dispatch(setImages(newImagesArray));
     }
   };
 
@@ -299,22 +301,25 @@ export default function CreateLaporan() {
     const files = Array.from(e.dataTransfer.files).filter((file) =>
       file.type.startsWith("image/")
     );
+
     if (files.length > 0) {
-      if (files.length > 2) {
+      const remainingSlots = 2 - images.length;
+
+      if (remainingSlots <= 0) {
         toast.warning("Maksimal 2 foto yang dapat diunggah");
-        const limitedFiles = files.slice(0, 2);
-        const newImages = limitedFiles.map((file) => ({
-          file,
-          preview: URL.createObjectURL(file),
-        }));
-        dispatch(setImages(newImages));
         return;
       }
-      const newImages = files.map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-      }));
-      dispatch(setImages(newImages));
+
+      const filesToAdd = files.slice(0, remainingSlots);
+      const newImagesArray = [
+        ...images,
+        ...filesToAdd.map((file) => ({
+          file,
+          preview: URL.createObjectURL(file),
+        })),
+      ];
+
+      dispatch(setImages(newImagesArray));
     }
   };
 
@@ -384,6 +389,8 @@ export default function CreateLaporan() {
     isGeneratingDescription ||
     isSubmittingReport ||
     isUploadingImages;
+
+  const canAddMorePhotos = images.length < 2;
 
   return (
     <div className="min-h-screen py-8">
@@ -651,43 +658,45 @@ export default function CreateLaporan() {
                     </CardHeader>
                     <CardContent className="pt-6 sm:pt-8 pb-2 sm:pb-4 px-3 sm:px-8">
                       <div className="space-y-6 sm:space-y-7">
-                        <div
-                          className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-10 bg-gray-50 hover:bg-gray-50/80 transition-all duration-300 cursor-pointer group"
-                          onDragOver={handleDragOver}
-                          onDragLeave={handleDragLeave}
-                          onDrop={handleDrop}
-                          onClick={triggerFileInput}
-                        >
-                          <div className="w-14 h-14 sm:w-20 sm:h-20 mb-4 rounded-full bg-[#4E9F60]/10 flex items-center justify-center">
-                            <UploadCloud className="h-8 w-8 sm:h-10 sm:w-10 text-[#4E9F60]" />
-                          </div>
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-1">
-                            Unggah Foto
-                          </h3>
-                          <p className="text-sm sm:text-base text-gray-500 mb-4 text-center max-w-xs">
-                            Seret & lepas gambar di sini, atau klik untuk
-                            memilih file
-                          </p>
-                          <Button
-                            type="button"
-                            className="bg-[#4E9F60] hover:bg-[#3d7d4c] transition-colors"
+                        {canAddMorePhotos && (
+                          <div
+                            className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-10 bg-gray-50 hover:bg-gray-50/80 transition-all duration-300 cursor-pointer group"
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                            onClick={triggerFileInput}
                           >
-                            <Camera className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                            Pilih Foto
-                          </Button>
-                          <p className="text-xs text-gray-500 mt-4">
-                            Format: JPG, PNG, HEIC (maks. 5MB per foto)
-                          </p>
-                          <Input
-                            ref={fileInputRef}
-                            id="image-upload"
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            className="hidden"
-                            onChange={handleImageUpload}
-                          />
-                        </div>
+                            <div className="w-14 h-14 sm:w-20 sm:h-20 mb-4 rounded-full bg-[#4E9F60]/10 flex items-center justify-center">
+                              <UploadCloud className="h-8 w-8 sm:h-10 sm:w-10 text-[#4E9F60]" />
+                            </div>
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-1">
+                              Unggah Foto
+                            </h3>
+                            <p className="text-sm sm:text-base text-gray-500 mb-4 text-center max-w-xs">
+                              Seret & lepas gambar di sini, atau klik untuk
+                              memilih file ({images.length}/2 foto)
+                            </p>
+                            <Button
+                              type="button"
+                              className="bg-[#4E9F60] hover:bg-[#3d7d4c] transition-colors"
+                            >
+                              <Camera className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                              Pilih Foto
+                            </Button>
+                            <p className="text-xs text-gray-500 mt-4">
+                              Format: JPG, PNG, HEIC (maks. 5MB per foto)
+                            </p>
+                            <Input
+                              ref={fileInputRef}
+                              id="image-upload"
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              className="hidden"
+                              onChange={handleImageUpload}
+                            />
+                          </div>
+                        )}
                         {images.length > 0 && (
                           <div>
                             <div className="border-t border-gray-100 pt-5">
