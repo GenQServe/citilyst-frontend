@@ -738,7 +738,7 @@ const ManageReports = () => {
             <Button
               onClick={handleUpdateReport}
               disabled={updateReportMutation.isPending}
-              className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+              className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9 bg-green-600 hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {updateReportMutation.isPending ? (
                 <>
