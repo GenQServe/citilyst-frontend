@@ -136,15 +136,6 @@ export function LoginForm({ setLoading }) {
                   )}
                 />
 
-                <div className="flex justify-end">
-                  <Link
-                    to="/forgot-password"
-                    className="text-sm text-[#9DB17C] hover:underline"
-                  >
-                    Lupa Password?
-                  </Link>
-                </div>
-
                 <Button
                   type="submit"
                   className="w-full bg-[#9DB17C] hover:bg-[#8CA06B] text-white"
