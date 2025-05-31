@@ -110,7 +110,7 @@ Aplikasi ini juga menyediakan dashboard khusus untuk admin/petugas kota agar dap
    - Buat file `.env` di root project, isi dengan URL API backend:
 
      ```env
-     VITE_API_URL=https://api.citilyst.rekrutgenai.com/v1
+     VITE_API_URL=https://api.citylist.rekrutgenai.com/v1
      ```
 
    - Jika menggunakan backend lokal, sesuaikan dengan URL lokal:
