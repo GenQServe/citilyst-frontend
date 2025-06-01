@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/dialog";
 
 const ProfileCard = ({ icon: Icon, label, value, loading = false, onEdit }) => (
-  <div className="flex items-start space-x-3 p-4 rounded-lg bg-white border border-gray-100 shadow-sm relative hover:shadow-md transition-all group">
+  <div className="flex items-start space-x-3 p-4 rounded-lg bg-white border border-gray-100 shadow-sm relative hover:shadow-md transition-all">
     <div className="mt-0.5 bg-[#9DB17C]/10 p-2 rounded-full">
       <Icon className="h-4 w-4 text-[#9DB17C]" />
     </div>
@@ -53,7 +53,7 @@ const ProfileCard = ({ icon: Icon, label, value, loading = false, onEdit }) => (
       <Button
         size="icon"
         variant="ghost"
-        className="opacity-100 sm:opacity-0 group-hover:opacity-100 absolute right-2 top-2 h-7 w-7 text-[#9DB17C] hover:bg-[#9DB17C]/10"
+        className="absolute right-2 top-2 h-7 w-7 text-[#9DB17C] hover:bg-[#9DB17C]/10"
         onClick={onEdit}
       >
         <FaPen className="h-3 w-3" />
@@ -229,8 +229,8 @@ export default function UserProfilePage() {
             <Card className="overflow-hidden border-none shadow-lg bg-white py-0">
               <CardHeader className="relative px-4 sm:px-6 pt-6 pb-4 border-b bg-[#9DB17C]/5">
                 <div className="flex flex-col items-center text-center">
-                  <div className="relative group mb-3">
-                    <div className="absolute inset-0 rounded-full bg-[#9DB17C]/20 blur-lg transform scale-110 group-hover:scale-125 transition-all duration-300"></div>
+                  <div className="relative mb-3">
+                    <div className="absolute inset-0 rounded-full bg-[#9DB17C]/20 blur-lg transform scale-110 transition-all duration-300"></div>
                     <Avatar className="h-24 sm:h-32 w-24 sm:w-32 border-4 border-white shadow-lg ring-2 ring-[#9DB17C]/30 relative">
                       <AvatarImage src={user?.image_url} alt={user?.name} />
                       <AvatarFallback className="text-4xl bg-[#9DB17C]/20 text-[#9DB17C]">
@@ -240,7 +240,7 @@ export default function UserProfilePage() {
                     <Button
                       size="icon"
                       variant="secondary"
-                      className="absolute bottom-0 right-1 h-8 w-8 rounded-full opacity-80 sm:opacity-0 group-hover:opacity-100 bg-[#9DB17C] hover:bg-[#8CA06B] transition-all shadow-md"
+                      className="absolute bottom-0 right-1 h-8 w-8 rounded-full bg-[#9DB17C] hover:bg-[#8CA06B] transition-all shadow-md"
                       onClick={() => handleEditClick("image_url")}
                     >
                       <FaPen className="h-3 w-3 text-white" />
